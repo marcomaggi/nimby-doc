@@ -1,0 +1,107 @@
+
+			 Nimby-Doc
+			 =========
+
+
+Topics
+------
+
+  1. Introduction
+  2. License
+  3. Install
+  4. Usage
+  A. Credits
+  B. Bugs
+  C. Resources
+
+
+1. Introduction
+---------------
+
+This package is a  distribution of software documentation in
+GNU Texinfo  format.  All the documents are  a conversion of
+existing  documentation   in  other  formats   from  various
+projects, whose code and documentation is distributed on the
+Internet.
+
+
+2. License
+----------
+
+All the files have a specific documentation license.
+
+
+3. Install
+----------
+
+See  the "README.build"  file  for the  requirements of  the
+building infrastructure.  Do this:
+
+    $ cd package-1.2.3
+    $ mkdir "=build"
+    $ cd "=build"
+
+to inspect the available configuration options:
+
+    $ ../configure --help
+
+then do it:
+
+    $ ../configure [options]
+    $ make
+    $ make tests
+    $ make install
+
+  Notice that, by default, only the shared library is built,
+the static library is not.  To  build it we have to give the
+"--enable-static" option to "configure".
+
+  The Makefile supports  the DESTDIR environment variable to
+install files in a  temporary location, example: to see what
+will happen:
+
+    $ make -n install DESTDIR=/tmp/marco/package
+
+to really do it:
+
+    $ make install DESTDIR=/tmp/marco/package
+
+
+4. Usage
+--------
+
+Read the documentation.
+
+
+A. Credits
+----------
+
+The    conversion   to   Texinfo    is   by    Marco   Maggi
+<marcomaggi@gna.org>.  Refer to the individual files for the
+original authors.
+
+
+B. Bugs
+-------
+
+Bug reports  are appreciated.  Please use  the issue tracker
+at GitHub.
+
+
+C. Resources
+------------
+
+The GNU  Project software  (including Texinfo) can  be found
+here:
+
+		   <http://www.gnu.org/>
+
+this package is distributed at:
+
+    <http://github.com/marcomaggi/nimby-doc/tree/master>
+
+
+### end of file
+# Local Variables:
+# mode: text
+# End:
