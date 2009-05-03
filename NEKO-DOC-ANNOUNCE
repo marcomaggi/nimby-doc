@@ -1,0 +1,49 @@
+
+	Announce for documentation in Texinfo format
+	============================================
+
+
+TO: neko@lists.motion-twin.com
+SUBJECT: [announce] Neko Texinfo documentation 2008-08-19
+
+
+A  new version of  Neko documentation  in Texinfo  format is
+available:
+
+<http://sites.google.com/site/mrcmgg/doc/neko.texi.gz?attredirects=0>
+<http://sites.google.com/site/mrcmgg/doc/neko.info.gz?attredirects=0>
+<http://sites.google.com/site/mrcmgg/doc/neko.html.gz?attredirects=0>
+
+these files  are released  under the GNU  Free Documentation
+License version  1.2 or any  later version published  by the
+Free Software Foundation.
+
+
+Details for ?
+-------------
+
+* Added updated  versions of the  #list and #o32  modules as
+  examples.
+
+* Moved the distribution site under GoogleSites.
+
+
+Details for 2008-08-19
+----------------------
+
+I have combed the text  in the Neko language chapters and (I
+think) completed the reference  for the Neko library.  Still
+to  do  is  a  complete  revision  of the  FFI  and  of  the
+"embedding Neko" chapter.  This should be a usable revision,
+so  if some  kind soul  wants to  beta-read it,  I  would be
+thankful.
+
+
+
+### end of file
+# Local Variables:
+# mode: text
+# coding: iso-latin-1-unix
+# fill-column: 60
+# paragraph-start: "*"
+# End:

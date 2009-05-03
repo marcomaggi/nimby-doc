@@ -1,0 +1,1017 @@
+@node sa
+@appendix @acronym{OSSP} Socket Abstraction
+
+
+@menu
+* sa data types::               Data types.
+* sa functions::                Functions.
+* sa references::               References.
+@end menu
+
+
+
+@section License
+
+@noindent
+Copyright @copyright{} 2001-2005 Ralf S. Engelschall @email{rse@@engelschall.com}@*
+Copyright @copyright{} 2001-2005 The OSSP Project @url{http://www.ossp.org/}@*
+Copyright @copyright{} 2001-2005 Cable & Wireless @url{http://www.cw.com/}
+
+
+@noindent
+Permission to use, copy, modify, and distribute this software for any
+purpose with or without fee is hereby granted, provided that the above
+copyright notice and this permission notice appear in all copies.
+
+THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
+WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN
+NO EVENT SHALL THE AUTHORS AND COPYRIGHT HOLDERS AND THEIR CONTRIBUTORS
+BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+THE POSSIBILITY OF SUCH DAMAGE.
+
+
+@section Description
+
+
+@noindent
+@ossp{} @sa{} is an abstraction library for the Unix Socket networking
+application programming interface (@acronym{API}), featuring stream and
+datagram oriented communication over Unix Domain and Internet Domain
+(@acronym{TCP} and @acronym{UDP}) sockets.
+
+It provides the following key features:
+
+@table @strong
+@item Stand--Alone, Self--Contained, Embeddable
+Although there are various Open Source libraries available which provide
+a similar abstraction approach, they all either lack important features
+or unfortunately depend on other companion libraries. @ossp{} @sa{}
+fills this gap by providing all important features (see following
+points) as a stand--alone and fully self--contained library. This way
+@ossp{} @sa{} can be trivially embedded as a sub--library into other
+libraries. It especially provides additional support for namespace--safe
+embedding of its @acronym{API} in order to avoid symbol conflicts (see
+@code{SA_PREFIX} in @file{sa.h}).
+
+@item Address Abstraction
+Most of the ugliness in the Unix Socket @acronym{API} is the necessity
+to have to deal with the various address structures (@code{struct
+sockaddr_xx}) which exist because of both the different communication
+types and addressing schemes. @ossp{} @sa{} fully hides this by
+providing an abstract and opaque address type (@code{sa_addr_t})
+together with utility functions which allow one to convert from the
+traditional @code{struct sockaddr} or @acronym{URI} specification to the
+@code{sa_addr_t} and vice versa without having to deal with special
+cases related to the underlying particular @code{struct
+sockaddr_xx}. @ossp{} @sa{} support Unix Domain and both IPv4 and IPv6
+Internet Domain addressing.
+
+@item Type Abstraction
+Some other subtle details in the Unix Socket @acronym{API} make the life
+hard in practice: @code{socklen_t} and @code{ssize_t}. These two types
+originally were (and on some platforms still are) plain integers or
+unsigned integers while @acronym{POSIX} later introduced own types for
+them (and even revised these types after some time again). This is
+nasty, because for 100% type--correct @acronym{API} usage (especially
+important on 64--bit machines where pointers to different integer types
+make trouble), every application has to check whether the newer types
+exists, and if not provide own definitions which map to the still
+actually used integer type on the underlying platform. @ossp{} @sa{}
+hides most of this in its @acronym{API} and for @code{socklen_t}
+provides a backward--compatibility definition.  Instead of
+@code{ssize_t} it can use @code{size_t} because @ossp{} @sa{} does not
+use traditional Unix return code semantics.
+
+@item I/O Timeouts
+Each I/O function in @ossp{} @sa{} is aware of timeouts (set by
+@code{sa_timeout(3)}, i.e., all I/O operations return @code{SA_ERR_TMT}
+if the timeout expired before the I/O operation was able to succeed.
+This allows one to easily program less-blocking network services.
+@ossp{} @sa{} internally implements these timeouts either through the
+@code{SO_@{SND,RCV@}TIMEO} feature on more modern Socket implementations
+or through traditional @code{select(2)}. This way high performance is
+achieved on modern platforms while the full functionality still is
+available on older platforms.
+
+@item I/O Stream Buffering
+If @ossp{} @sa{} is used for stream communication, internally all I/O
+operations can be performed through input and/or output buffers (set by
+@code{sa_buffer()}) for achieving higher I/O performance by doing I/O
+operations on larger aggregated messages and with less required system
+calls. Additionally if @ossp{} @sa{} is used for stream communication,
+for convenience reasons line--oriented reading (@code{sa_readln()}) and
+formatted writing (see @code{sa_writef()}) is provided, modelled after
+@code{STDIO}'s @code{fgets(3)} and @code{fprintf(3)}. Both features
+fully leverage from the I/O buffering.
+@end table
+
+
+@section History
+
+
+@noindent
+@ossp{} @sa{} was invented in August 2001 by Ralf S. Engelschall
+@email{rse@@engelschall.com} under contract with Cable & Wireless
+@url{http://www.cw.com/} for use inside the @ossp{} project.
+
+Its creation was prompted by the requirement to implement an
+@acronym{SMTP} logging channel for the @ossp{} @strong{l2} library. Its
+initial code was derived from a predecessor sub--library originally
+written for socket address abstraction inside the @ossp{}
+@strong{lmtp2nntp} tool.
+
+
+@section Author
+
+@noindent
+Ralf S. Engelschall@*
+@email{rse@@engelschall.com}@*
+@url{www.engelschall.com}
+
+
+@c ------------------------------------------------------------
+
+@c page
+@node sa data types
+@section Data types
+
+
+@noindent
+@ossp{} @sa{} uses three data types in its @acronym{API}.
+
+
+@deftp {Typedef} sa_rc_t (Return Code Type)
+This is an exported enumerated integer type with the following possible
+values:
+
+@table @code
+@item SA_OK
+Everything Ok
+@item SA_ERR_ARG
+Invalid Argument
+@item SA_ERR_USE
+Invalid Use Or Context
+@item SA_ERR_MEM
+Not Enough Memory
+@item SA_ERR_MTC
+Matching Failed
+@item SA_ERR_EOF
+End Of Communication
+@item SA_ERR_TMT
+Communication Timeout
+@item SA_ERR_SYS
+Operating System Error (see errno)
+@item SA_ERR_IMP
+Implementation Not Available
+@item SA_ERR_INT
+Internal Error
+@end table
+@end deftp
+
+
+@deftp Typedef sa_addr_t (Socket Address Abstraction Type)
+This is an opaque data type representing a socket address.  Only
+pointers to this abstract data type are used in the @acronym{API}.
+@end deftp
+
+
+@deftp Typedef sa_t (Socket Abstraction Type)
+This is an opaque data type representing a socket.  Only pointers to
+this abstract data type are used in the @acronym{API}.
+@end deftp
+
+
+@c ------------------------------------------------------------
+
+@c page
+@node sa functions
+@section Functions
+
+
+@menu
+* sa address object::           Address object operations.
+* sa address operations::       Address operations.
+* sa socket object::            Socket object operations.
+* sa socket parameter::         Socket parameter operations.
+* sa socket connection::        Socket connection operations.
+* sa socket stream::            Socket stream communication
+* sa socket datagram::          Socket datagram communication.
+* sa error::                    Error handling.
+@end menu
+
+
+@noindent
+@ossp{} @sa{} provides a bunch of @acronym{API} functions, all modelled
+after the same prototype:
+
+@example
+sa_rc_t sa_name(sa_[addr_]_t * ...)
+@end example
+
+This means, every function returns @code{sa_rc_t} to indicate its
+success (@code{SA_OK}) or failure (@code{SA_ERR_XXX}) by returning a
+return code (the corresponding describing text can be determined by
+passing this return code to @code{sa_error()}). Each function name
+starts with the common prefix @code{sa_} and receives a @code{sa_t} (or
+@code{sa_addr_t}) object handle on which it operates as its first
+argument.
+
+
+@c ------------------------------------------------------------
+
+@c page
+@node sa address object
+@subsection Address object operations
+
+
+@noindent
+This @acronym{API} part provides operations for the creation and
+destruction of address abstraction @code{sa_addr_t}.
+
+
+@deftypefun sa_rc_t sa_addr_create (sa_addr_t ** @var{saa})
+Create a socket address abstraction object.  The object is stored in
+@var{saa} on success.
+
+Example: @code{sa_addr_t *saa; sa_addr_create(&saa);}
+@end deftypefun
+
+
+@deftypefun sa_rc_t sa_addr_destroy (sa_addr_t * @var{saa})
+Destroy a socket address abstraction object.  The object @var{saa} is
+invalid after this call succeeded.
+
+Example: @code{sa_addr_destroy(saa);}
+@end deftypefun
+
+
+@c ------------------------------------------------------------
+
+@c page
+@node sa address operations
+@subsection Address operations
+
+
+@noindent
+This @acronym{API} part provides operations for working with the address
+abstraction @code{sa_addr_t}.
+
+
+@deftypefun sa_rc_t sa_addr_u2a (sa_addr_t * @var{saa}, const char * @var{uri}, ...)
+Import an address into by converting from an @acronym{URI} specification
+to the corresponding address abstraction.
+
+The supported syntax for @var{uri} is: @code{"unix:path"} for Unix
+Domain addresses and @code{"inet://addr:port[#protocol]"} for Internet
+Domain addresses.
+
+In the @acronym{URI}, @var{path} can be an absolute or relative
+filesystem path to an existing or not--existing file. @var{addr} can be
+an IPv4 address in dotted decimal notation (@code{"127.0.0.1"}), an IPv6
+address in colon--separated (optionally abbreviated) hexadecimal
+notation (@code{"::1"}) or a to--be--resolved hostname
+(@code{"localhost.example.com"}).
+
+@var{port} has to be either a decimal port in the range 1...65535 or a
+port name (@code{smtp}). If @var{port} is specified as a name, it is
+resolved as a @acronym{TCP} port by default. To force resolving a
+@var{port} name via a particular protocol, @var{protocol} can be
+specified as either @code{tcp} or @code{udp}.
+
+The result is stored in @var{saa} on success.
+
+Example: @code{sa_addr_u2a(saa, "inet://192.168.0.1:smtp");}
+@end deftypefun
+
+
+@deftypefun sa_rc_t sa_addr_s2a (sa_addr_t * @var{saa}, const struct sockaddr * @var{sabuf}, socklen_t @var{salen})
+Import an address by converting from a traditional @code{struct
+sockaddr} object to the corresponding address abstraction.
+
+The accepted addresses for @var{sabuf} are: @code{struct sockaddr_un}
+(@code{AF_LOCAL}), @code{struct sockaddr_in} (@code{AF_INET}) and
+@code{struct sockaddr_in6} (@code{AF_INET6}).
+
+The @var{salen} is the corresponding @code{sizeof(...)} of the
+particular underyling structure.
+
+The result is stored in @var{saa} on success.
+
+Example:
+
+@example
+sockaddr_in in;
+sa_addr_s2a(saa, (struct sockaddr *)&in, (socklen_t)sizeof(in));
+@end example
+@end deftypefun
+
+
+@deftypefun sa_rc_t sa_addr_a2u (sa_addr_t * @var{saa}, char ** @var{uri})
+Export an address by converting from the address abstraction to the
+corresponding @acronym{URI} specification.
+
+The result is a string of the form @code{unix:@var{path}} for Unix
+Domain addresses and @code{inet://@var{addr}:@var{port}} for Internet
+Domain addresses. Notice that @var{addr} and @var{port} are returned in
+numerical (unresolved) way. Additionally, because usually one cannot map
+bidirectionally between @acronym{TCP} or @acronym{UDP} port names and
+the numerical value, there is no distinction between @acronym{TCP} and
+@acronym{UDP} here.
+
+The result is stored in @var{uri} on success.  The caller has to
+@code{free()} the @var{uri} buffer later.
+
+Example: @code{char *uri; sa_addr_a2u(saa, &uri);}
+@end deftypefun
+
+
+@deftypefun sa_rc_t sa_addr_a2s (sa_addr_t * @var{saa}, struct sockaddr ** @var{sabuf}, socklen_t * @var{salen})
+Export an address by converting from the address abstraction to the
+corresponding traditional @code{struct sockaddr} object.
+
+The result is one of the following particular underlying address
+structures: @code{struct sockaddr_un} (@code{AF_LOCAL}), @code{struct
+sockaddr_in} (@code{AF_INET}) and @code{struct sockaddr_in6}
+(@code{AF_INET6}).
+
+The result is stored in @var{sabuf} and @var{salen} on success.  The
+caller has to @code{free()} the @var{sabuf} buffer later.
+
+Example:
+
+@example
+struct sockaddr sabuf;
+socklen_t salen;
+sa_addr_a2s(saa, &sa, &salen);
+@end example
+@end deftypefun
+
+
+@deftypefun sa_rc_t sa_addr_match (sa_addr_t * @var{saa1}, sa_addr_t * @var{saa2}, size_t @var{prefixlen})
+Match two address abstractions up to a specified prefix.
+
+This compares the addresses @var{saa1} and @var{saa2} by only taking the
+prefix part of length @var{prefixlen} into account. @var{prefixlen} is
+number of filesystem path characters for Unix Domain addresses and
+number of bits for Internet Domain addresses.
+
+In case of Internet Domain addresses, the addresses are matched in
+network byte order and the port (counting as an additional bit/item of
+length 1) is virtually appended to the address for matching.
+
+Specifying @var{prefixlen} as @code{-1} means matching the whole address
+(but without the virtually appended port) without having to know how
+long the underlying address representation (length of path for Unix
+Domain addresses, 32+1 [IPv4] or 128+1 [IPv6] for Internet Domain
+addresses) is.
+
+Specifying @var{prefixlen} as @code{-2} is equal to @code{-1} but
+additionally the port is matched, too.
+
+This especially can be used to implement Access Control Lists
+(@acronym{ACL}) without having to fiddle around with the underlying
+representation.  For this, make @var{saa1} the to be checked address and
+@code{saa2} plus @var{prefixlen} the @acronym{ACL} pattern as shown in
+the following example.
+
+@example
+sa_addr_t *srv_sa;
+sa_addr_t *clt_saa;
+sa_t      *clt_sa;
+sa_addr_t *acl_saa;
+char      *acl_addr = "192.168.0.0";
+int        acl_len  = 24;
+...
+sa_addr_u2a(&acl_saa, "inet://%s:0", acl_addr);
+...
+while (sa_accept(srv_sa, &clt_saa, &clt_sa) == SA_OK) @{
+  if (sa_addr_match(clt_saa, acl_saa, acl_len) != SA_OK) @{
+    /* connection refused */
+    ...
+    sa_addr_destroy(clt_saa);
+    sa_destroy(clt_sa);
+    continue;
+  @}
+  ...
+@}
+...
+@end example
+@end deftypefun
+
+
+@c ------------------------------------------------------------
+
+@c page
+@node sa socket object
+@subsection Socket object operations
+
+
+@noindent
+This @acronym{API} part provides operations for the creation and
+destruction of socket abstraction @code{sa_t}.
+
+
+@deftypefun sa_rc_t sa_create sa_t ** @var{sa})
+Create a socket abstraction object.  The object is stored in @var{sa} on
+success.
+
+Example: @code{sa_t *sa; sa_create(&sa);}
+@end deftypefun
+
+
+@deftypefun sa_rc_t sa_destroy (sa_t * @var{sa})
+Destroy a socket abstraction object.  The object @var{sa} is invalid
+after this call succeeded.
+
+Example: @code{sa_destroy(sa);}
+@end deftypefun
+
+
+@c ------------------------------------------------------------
+
+@c page
+@node sa socket parameter
+@subsection Socket parameter operations
+
+
+@noindent
+This @acronym{API} part provides operations for parameterizing the
+socket abstraction @code{sa_t}.
+
+
+@deftypefun sa_rc_t sa_type (sa_t * @var{sa}, sa_type_t @var{type})
+Assign a particular communication protocol type to the socket
+abstraction object.
+
+A socket can only be assigned a single protocol type at any time.
+Nevertheless one can switch the type of a socket abstraction object at
+any time in order to reuse it for a different communication. Just keep
+in mind that switching the type will stop a still ongoing communication
+by closing the underlying socket.
+
+Possible values for @var{type} are @code{SA_TYPE_STREAM} (stream
+communication) and @code{SA_TYPE_DATAGRAM} (datagram communication). The
+default communication protocol type is @code{SA_TYPE_STREAM}.
+
+Example: @code{sa_type(sa, SA_TYPE_STREAM);}
+@end deftypefun
+
+
+@deftypefun sa_rc_t sa_timeout (sa_t * @var{sa}, sa_timeout_t @var{id}, long @var{sec}, long @var{usec})
+Assign one or more communication timeouts to the socket abstraction
+object.
+
+Possible values for @var{id} are:
+
+@table @code
+@item SA_TIMEOUT_ACCEPT
+affecting @code{sa_accept()},
+@item SA_TIMEOUT_CONNECT
+affecting @code{sa_connect()},
+@item SA_TIMEOUT_READ
+affecting @code{sa_read()}, @code{sa_readln()} and @code{sa_recv()}
+@item SA_TIMEOUT_WRITE
+affecting @code{sa_write()}, @code{sa_writef()}, @code{sa_send()}, and
+@code{sa_sendf()}.
+@end table
+
+Additionally you can set all four timeouts at once by using
+@code{SA_TIMEOUT_ALL}. The default is that no communication timeouts are
+used which is equal to @code{@var{sec}=0} @code{@var{usec}=0}.
+
+Example: @code{sa_timeout(sa, SA_TIMEOUT_ALL, 30, 0);}
+@end deftypefun
+
+
+@deftypefun sa_rc_t sa_buffer (sa_t * @var{sa}, sa_buffer_t @var{id}, size_t @var{size})
+Assign I/O communication buffers to the socket abstraction object.
+
+Possible values for @var{id} are:
+
+@table @code
+@item SA_BUFFER_READ
+affecting @code{sa_read()} and @code{sa_readln()},
+@item SA_BUFFER_WRITE
+affecting @code{sa_write()} and @code{sa_writef()}.
+@end table
+
+The default is that no communication buffers are used which is equal to
+@code{@var{size}=0}.
+
+Example: @code{sa_buffer(sa, SA_BUFFER_READ, 16384);}
+@end deftypefun
+
+
+@deftypefun sa_rc_t sa_option (sa_t * @var{sa}, sa_option_t @var{id}, ...)
+Adjust various options of the socket abstraction object.
+
+The adjusted option is controlled by @var{id}. The number and type of
+the expected following argument(s) are dependent on the particular
+option.  Currently the following options are implemented (option
+arguments in parenthesis):
+
+@item @code
+@item SA_OPTION_NAGLE} (int @var{yesno})
+for enabling (@var{yesno}=1) or disabling (@var{yesno} == 0) Nagle's
+Algorithm (see RFC898 and @code{TCP_NODELAY} of setsockopt(2)).
+
+@item SA_OPTION_LINGER (int @var{amount})
+for enabling (@var{amount} == @var{seconds} != 0) or disabling
+(@var{amount} == 0) lingering on close (see @code{SO_LINGER} of
+@code{setsockopt()}).
+
+Notice: using @var{seconds} > 0 results in a regular (maximum of
+@var{seconds} lasting) lingering on close while using @var{seconds} < 0
+results in the special case of a @acronym{TCP} @acronym{RST} based
+connection termination on close.
+
+@item SA_OPTION_REUSEADDR (int @var{yesno})
+for enabling (@var{yesno} == 1) or disabling (@var{yesno} == 0) the
+reusability of the address on binding via @code{sa_bind()} (see
+@code{SO_REUSEADDR} of @code{setsockopt()}).
+
+@item SA_OPTION_REUSEPORT (int @var{yesno})
+for enabling (@var{yesno} == 1) or disabling (@var{yesno} == 0) the
+reusability of the port on binding via @code{sa_bind()} (see
+@code{SO_REUSEPORT} of @code{setsockopt()}).
+
+@item SA_OPTION_NONBLOCK (int @var{yesno})
+for enabling (@var{yesno} == 1) or disabling (@var{yesno} == 0)
+non--blocking I/O mode (see @code{O_NONBLOCK} of @code{fcntl()}).
+
+Example: @code{sa_option(sa, SA_OPTION_NONBLOCK, 1);}
+@end deftypefun
+
+
+@deftypefun sa_rc_t sa_syscall (sa_t * @var{sa}, sa_syscall_t @var{id}, void * @var{fptr})(), void * @var{fctx})
+Divert I/O communication related system calls to user supplied callback
+functions.
+
+This allows you to override mostly all I/O related system calls @ossp{}
+@sa{} internally performs while communicating. This can be used to adapt
+@ossp{} @sa{} to different run--time environments and requirements
+without having to change the source code. Usually this is used to divert
+the system calls to the variants of a user--land multithreading facility
+like @acronym{GNU} Pth.
+
+The function supplied as @var{fptr} is required to fulfill the
+@acronym{API} of the replaced system call, i.e., it has to have the same
+prototype (if @var{fctx} is @code{NULL}). If @var{fctx} is not
+@code{NULL}, this prototype has to be extended to accept an additional
+first argument of type @code{void *} which receives the value of
+@var{fctx}. It is up to the callback function whether to pass the call
+through to the replaced actual system call or not.
+
+Possible values for @var{id} are (expected prototypes behind @var{fptr}
+are given in parenthesis):
+
+@table @code
+@item SA_SYSCALL_CONNECT
+@code{int (*)([void *,] int, const struct sockaddr *, socklen_t)}, see
+@code{connect()}.
+
+@item SA_SYSCALL_ACCEPT
+@code{int (*)([void *,] int, struct sockaddr *, socklen_t *)}, see
+@code{accept()}.
+
+@item SA_SYSCALL_SELECT
+@code{int (*)([void *,] int, fd_set *, fd_set *, fd_set *, struct
+timeval *)}, see @code{select()}.
+
+@item SA_SYSCALL_READ
+@code{ssize_t (*)([void *,] int, void *, size_t)}, see @code{read()}.
+
+@item SA_SYSCALL_WRITE
+@code{ssize_t (*)([void *,] int, const void *, size_t)}, see
+@code{write()}.
+
+@item SA_SYSCALL_RECVFROM
+@code{ssize_t (*)([void *,] int, void *, size_t, int, struct sockaddr *,
+socklen_t *)}, see @code{recvfrom()}.
+
+@item SA_SYSCALL_SENDTO
+@code{ssize_t (*)([void *,] int, const void *, size_t, int, const struct
+sockaddr *, socklen_t)}, see @code{sendto()}.
+@end table
+    
+Example:
+
+@example
+ssize_t
+trace_read(void *ctx, int fd, void *buf, size_t len)
+@{
+  FILE *fp = (FILE *)ctx;
+  ssize_t rv;
+  int errno_saved;
+
+  rv = read(fd, buf, len);
+  errno_saved = errno;
+  fprintf(fp, "read(%d, %lx, %d) = %d\n", fd, (long)buf, len, rv);
+  errno = errno_saved;
+  return rv;
+@}
+
+...
+FILE *trace_fp = ...;
+sa_syscall(sa, SA_SC_READ, trace_read, trace_fp);
+...
+@end example
+@end deftypefun
+
+
+@c ------------------------------------------------------------
+
+@c page
+@node sa socket connection
+@subsection Socket connection operations
+
+
+@noindent
+This @acronym{API} part provides connection operations for
+stream--oriented data communication through the socket abstraction
+@code{sa_t}.
+
+
+@deftypefun sa_rc_t sa_bind (sa_t * @var{sa}, sa_addr_t * @var{laddr})
+Bind socket abstraction object to a local protocol address.
+
+This assigns the local protocol address @var{laddr}. When a socket is
+created, it exists in an address family space but has no protocol
+address assigned. This call requests that @var{laddr} be used as the
+local address. For servers this is the address they later listen on (see
+@code{sa_listen()}) for incoming connections, for clients this is the
+address used for outgoing connections (see
+@code{sa_connect()}). Internally this directly maps to @code{bind()}.
+
+Example: @code{sa_bind(sa, laddr);}
+@end deftypefun
+
+
+@deftypefun sa_rc_t sa_connect (sa_t * @var{sa}, sa_addr_t * @var{raddr})
+Initiate an outgoing connection on a socket abstraction object.  This
+performs a connect to the remote address @var{raddr}.
+
+If the socket is of type @code{SA_TYPE_DATAGRAM}, this call specifies
+the peer with which the socket is to be associated; this address is that
+to which datagrams are to be sent, and the only address from which
+datagrams are to be received.
+
+If the socket is of type @code{SA_TYPE_STREAM}, this call attempts to
+make a connection to the remote socket. Internally this directly maps to
+connect(2).
+
+Example: @code{sa_connect(sa, raddr);}
+@end deftypefun
+
+
+@deftypefun sa_rc_t sa_listen (sa_t * @var{sa}, int @var{backlog})
+Listen for incoming connections on a socket abstraction object.
+
+A willingness to accept incoming connections and a queue limit for
+incoming connections are specified by this call. The @var{backlog}
+argument defines the maximum length the queue of pending connections may
+grow to.  Internally this directly maps to @code{listen()}.
+
+Example: @code{sa_listen(sa, 128);}
+@end deftypefun
+
+
+@deftypefun sa_rc_t sa_accept (sa_t * @var{sa}, sa_addr_t ** @var{caddr}, sa_t ** @var{csa})
+Accept incoming connection on a socket abstraction object.
+
+This accepts an incoming connection by extracting the first connection
+request on the queue of pending connections. It creates a new socket
+abstraction object (returned in @var{csa}) and a new socket address
+abstraction object (returned in @var{caddr}) describing the
+connection. The caller has to destroy these objects later. If no pending
+connections are present on the queue, it blocks the caller until a
+connection is present.
+
+Example:
+
+@example
+sa_addr_t *clt_saa;
+sa_t      *clt_sa;
+...
+while (sa_accept(srv_sa, &clt_saa, &clt_sa) == SA_OK) @{
+    ...
+@}
+@end example
+@end deftypefun
+
+
+@deftypefun sa_rc_t sa_getremote (sa_t * @var{sa}, sa_addr_t ** @var{raddr})
+Get address abstraction of remote side of communication.
+
+This determines the address of the communication peer and creates a new
+socket address abstraction object (returned in @var{raddr}) describing
+the peer address. The application has to destroy @var{raddr} later with
+@code{sa_addr_destroy()}. Internally this maps to @code{getpeername()}.
+
+Example: @code{sa_addr_t *raddr; sa_getremote(sa, &raddr);}
+@end deftypefun
+
+
+@deftypefun sa_rc_t sa_getlocal (sa_t * @var{sa}, sa_addr_t ** @var{laddr})
+Get address abstraction of local side of communication.
+
+This determines the address of the local communication side and creates
+a new socket address abstraction object (returned in @var{laddr})
+describing the local address. The application has to destroy @var{laddr}
+later with @code{sa_addr_destroy()}. Internally this maps to
+@code{getsockname()}.
+
+Example: @code{sa_addr_t *laddr; sa_getlocal(sa, &laddr);}
+@end deftypefun
+
+
+@deftypefun sa_rc_t sa_shutdown (sa_t * @var{sa}, char * @var{flags})
+Shut down part of the full--duplex connection.
+
+This performs a shut down of the connection described in @var{sa}. The
+flags string can be either:
+
+@table @code
+@item "r"
+indicating the read channel of the communication is shut down only,
+@item "w"
+indicating the write channel of the communication is shut down only,
+@item "rw"
+indicating both the read and write channels of the communication are
+shut down.
+@end table
+
+Internally this directly maps to @code{shutdown()}.
+
+Example: @code{sa_shutdown(sa, "w");}
+@end deftypefun
+
+
+@c ------------------------------------------------------------
+
+@c page
+@node sa socket stream
+@subsection Socket input/output operations (stream communication)
+
+
+@noindent
+This @acronym{API} part provides I/O operations for stream--oriented
+data communication through the socket abstraction @code{sa_t}.
+
+
+@deftypefun sa_rc_t sa_getfd (sa_t * @var{sa}, int * @var{fd})
+Get underlying socket filedescriptor.
+
+This peeks into the underlying socket filedescriptor @ossp{} @sa{}
+allocated internally for the communication. This can be used for
+adjusting the socket communication (via @code{fcntl()},
+@code{setsockopt()}, etc) directly.
+
+Think twice before using this, then think once more. After all that,
+think again. With enough thought, the need for directly manipulating the
+underlying socket can often be eliminated. At least remember that all
+your direct socket operations fully by--pass @ossp{} @sa{} and this way
+can lead to nasty side--effects.
+
+Example: @code{int fd; sa_getfd(sa, &fd);}
+@end deftypefun
+
+
+@deftypefun sa_rc_t sa_read (sa_t * @var{sa}, char * @var{buf}, size_t @var{buflen}, size_t * @var{bufdone})
+Read a chunk of data from socket into own buffer.
+
+This reads from the socket (optionally through the internal read buffer)
+up to a maximum of @var{buflen} bytes into buffer @var{buf}. The actual
+number of read bytes is stored in @var{bufdone}. This internally maps to
+@code{read()}.
+
+Example:
+
+@example
+char buf[1024];
+size_t n;
+sa_read(sa, buf, sizeof(buf), &n);
+@end example
+@end deftypefun
+
+
+@deftypefun sa_rc_t sa_readln (sa_t * @var{sa}, char * @var{buf}, size_t @var{buflen}, size_t * @var{bufdone})
+Read a line of data from socket into own buffer.
+
+This reads from the socket (optionally through the internal read buffer)
+up to a maximum of @var{buflen} bytes into buffer @var{buf}, but only as
+long as no line terminating newline character (0x0a) was found. The line
+terminating newline character is stored in the buffer plus a (not
+counted) terminating @code{NUL} character (@code{\0}), too. The actual
+number of read bytes is stored in @var{bufdone}. This internally maps to
+@code{sa_read()}.
+
+Keep in mind that for efficiency reasons, line-oriented I/O usually
+always should be performed with read buffer (see @code{sa_option()} and
+@code{SA_BUFFER_READ}). Without such a read buffer, the performance is
+cruel, because single character @code{read()} operations would be
+performed on the underlying socket.
+
+Example:
+
+@example
+char buf[1024];
+size_t n;
+sa_readln(sa, buf, sizeof(buf), &n);
+@end example
+@end deftypefun
+
+
+@deftypefun sa_rc_t sa_write (sa_t * @var{sa}, const char * @var{buf}, size_t @var{buflen}, size_t * @var{bufdone})
+Write a chunk of data to socket from own buffer.
+
+This writes to the socket (optionally through the internal write buffer)
+@var{buflen} bytes from buffer @var{buf}. In case of a partial write,
+the actual number of written bytes is stored in @var{bufdone}. This
+internally maps to @code{write()}.
+
+Example: @code{sa_write(sa, cp, strlen(cp), NULL);}
+@end deftypefun
+
+
+@deftypefun sa_rc_t sa_writef (sa_t * @var{sa}, const char * @var{fmt}, ...)
+Write formatted data data to socket.
+
+This formats a string according to the @code{printf()} style format
+specification @var{fmt} and sends the result to the socket (optionally
+through the internal write buffer). In case of a partial socket write,
+the not written data of the formatted string is internally
+discarded. Hence using a write buffer is strongly recommended here (see
+@code{sa_option()} and @code{SA_BUFFER_WRITE}). This internally maps to
+@code{sa_write()}.
+
+The underlying string formatting engine is just a minimal one and for
+security and independence reasons intentionally not directly based on
+@code{s[n]printf()}. It understands only the following format
+specifications: @code{%%}, @code{%c} (@code{char}), @code{%s}
+(@code{char *}) and @code{%d} (@code{int}) without any precision and
+padding possibilities. It is intended for minimal formatting only. If
+you need more sophisticated formatting, you have to format first into an
+own buffer via @code{s[n]printf()} and then write this to the socket via
+@code{sa_write()} instead.
+
+Example: @code{sa_writef(sa, "%s=%d\n", cp, i);}
+@end deftypefun
+
+
+@deftypefun sa_rc_t sa_flush (sa_t * @var{sa})
+Flush still pending outgoing data to socket.
+
+This writes all still pending outgoing data for the internal write
+buffer (see @code{sa_option()} and @code{SA_BUFFER_WRITE}) to the
+socket. This internally maps to @code{write()}.
+
+Example: @code{sa_flush(sa);}
+@end deftypefun
+
+
+@c ------------------------------------------------------------
+
+@c page
+@node sa socket datagram
+@subsection Socket input/output operations (datagram communication)
+
+
+@noindent
+This @acronym{API} part provides I/O operations for datagram--oriented
+data communication through the socket abstraction @code{sa_t}.
+
+
+@deftypefun sa_rc_t sa_recv (sa_t * @var{sa}, sa_addr_t ** @var{raddr}, char * @var{buf}, size_t @var{buflen}, size_t * @var{bufdone})
+Receive a chunk of data from remote address via socket into own buffer.
+
+This receives from the remote address specified in @var{raddr} via the
+socket up to a maximum of @var{buflen} bytes into buffer @var{buf}. The
+actual number of received bytes is stored in @var{bufdone}. This
+internally maps to @code{recvfrom()}.
+
+Example:
+
+@example
+char buf[1024];
+size_t n;
+sa_recv(sa, buf, sizeof(buf), &n, saa);
+@end example
+@end deftypefun
+
+
+@deftypefun sa_rc_t sa_send (sa_t * @var{sa}, sa_addr_t * @var{raddr}, const char * @var{buf}, size_t @var{buflen}, size_t * @var{bufdone})
+Send a chunk of data to remote address via socket from own buffer.
+
+This sends to the remote address specified in @var{raddr} via the socket
+@var{buflen} bytes from buffer @var{buf}. The actual number of sent
+bytes is stored in @var{bufdone}. This internally maps to sendto(2).
+
+Example: @code{sa_send(sa, buf, strlen(buf), NULL, saa);}
+@end deftypefun
+
+
+@deftypefun sa_rc_t sa_sendf (sa_t * @var{sa}, sa_addr_t * @var{raddr}, const char * @var{fmt}, ...)
+Send formatted data data to remote address via socket.
+
+This formats a string according to the @code{printf()} style format
+specification @var{fmt} and sends the result to the socket as a single
+piece of data chunk. In case of a partial socket write, the not written
+data of the formatted string is internally discarded.
+
+The underlying string formatting engine is just a minimal one and for
+security and independence reasons intentionally not directly based on
+@code{s[n]printf()}. It understands only the following format
+specifications: @code{%%}, @code{%c} (@code{char}), @code{%s}
+(@code{char *}) and @code{%d} (@code{int}) without any precision and
+padding possibilities.
+
+It is intended for minimal formatting only. If you need more
+sophisticated formatting, you have to format first into an own buffer
+via @code{s[n]printf()} and then send this to the remote address via
+@code{sa_send()} instead.
+
+Example: @code{sa_sendf(sa, saa, "%s=%d\n", cp, i);}
+@end deftypefun
+
+
+@c ------------------------------------------------------------
+
+@c page
+@node sa error
+@subsection Socket error handling
+
+
+@noindent
+This @acronym{API} part provides error handling operations only.
+
+
+@deftypefun {char *} sa_error (sa_rc_t @var{rv})
+Return the string representation corresponding to the return code value
+@var{rv}. The returned string has to be treated read--only by the
+application and is not required to be deallocated.
+@end deftypefun
+
+
+@c ------------------------------------------------------------
+
+@c page
+@node sa references
+@section References
+
+
+@subsection Standards
+
+
+@noindent
+R. Gilligan, S. Thomson, J. Bound, W. Stevens:@*
+@emph{Basic Socket Interface Extensions for IPv6},@*
+@strong{RFC 2553}, March 1999.
+
+@noindent
+W. Stevens:@*
+@emph{Advanced Sockets API for IPv6},@*
+@strong{RFC 2292}, February 1998.
+
+@noindent
+R. Fielding, L. Masinter, T. Berners-Lee:@*
+@emph{Uniform Resource Identifiers: Generic Syntax},
+@strong{RFC 2396}, August 1998.
+
+@noindent
+R. Hinden, S. Deering:@*
+@emph{IP Version 6 Addressing Architecture},@*
+@strong{RFC 2373}, July 1998.
+
+@noindent
+R. Hinden, B. Carpenter, L. Masinter:@*
+@emph{Format for Literal IPv6 Addresses in URL's},@*
+@strong{RFC 2732}, December 1999.
+
+
+@subsection Papers
+
+@noindent
+Stuart Sechrest:@*
+@emph{An Introductory 4.4BSD Interprocess Communication Tutorial},@*
+FreeBSD 4.4 (@file{/usr/share/doc/psd/20.ipctut/}).
+
+@noindent
+Samuel J. Leffler, Robert S. Fabry, William N. Joy, Phil Lapsley:@*
+@emph{An Advanced 4.4BSD Interprocess Communication Tutorial},@*
+FreeBSD 4.4 (@file{/usr/share/doc/psd/21.ipc/}).
+
+@noindent
+Craig Metz:@*
+@emph{Protocol Independence Using the Sockets API},@*
+@url{http://www.usenix.org/publications/library/proceedings/usenix2000/freenix/metzprotocol.html},@*
+USENIX Annual Technical Conference, June 2000.
+
+
+@c end of file

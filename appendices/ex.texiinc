@@ -1,0 +1,1131 @@
+@c
+@c OSSP ex - Exception Handling
+@c Copyright (c) 2002-2007 Ralf S. Engelschall <rse@engelschall.com>
+@c Copyright (c) 2002-2007 The OSSP Project <http://www.ossp.org/>
+@c
+@c This file is part of OSSP ex, an exception library which can be found
+@c at <http://www.ossp.org/pkg/lib/ex/>.
+@c
+@c Permission to use, copy, modify, and distribute this software for any
+@c purpose  with or  without fee  is hereby  granted, provided  that the
+@c above  copyright notice  and  this permission  notice  appear in  all
+@c copies.
+@c
+@c THIS  SOFTWARE IS  PROVIDED ``AS  IS'' AND  ANY EXPRESSED  OR IMPLIED
+@c WARRANTIES, INCLUDING, BUT NOT  LIMITED TO, THE IMPLIED WARRANTIES OF
+@c MERCHANTABILITY AND FITNESS FOR  A PARTICULAR PURPOSE ARE DISCLAIMED.
+@c IN  NO  EVENT SHALL  THE  AUTHORS  AND  COPYRIGHT HOLDERS  AND  THEIR
+@c CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+@c EXEMPLARY, OR  CONSEQUENTIAL DAMAGES (INCLUDING, BUT  NOT LIMITED TO,
+@c PROCUREMENT OF  SUBSTITUTE GOODS OR  SERVICES; LOSS OF USE,  DATA, OR
+@c PROFITS; OR  BUSINESS INTERRUPTION) HOWEVER CAUSED AND  ON ANY THEORY
+@c OF  LIABILITY,  WHETHER  IN   CONTRACT,  STRICT  LIABILITY,  OR  TORT
+@c (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+@c OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+@c
+@c ex.pod: exception library manual page
+@c
+
+@c Translated into GNU Texinfo format by Marco Maggi
+@c <marcomaggi@gna.org> - Wed Jun 11, 2008.
+
+@c page
+@c ------------------------------------------------------------
+@c Macros.
+@c ------------------------------------------------------------
+
+@c The following macros must be defined
+
+@ignore
+
+@macro iso{}
+@acronym{ISO}
+@end macro
+
+@macro gnu{}
+@acronym{GNU}
+@end macro
+
+@macro api{}
+@acronym{API}
+@end macro
+
+@macro ossp{}
+@acronym{OSSP}
+@end macro
+
+@macro ex{}
+Ex
+@end macro
+
+@macro function{NAME}
+@code{\NAME\()}
+@end macro
+
+@macro null{}
+@code{NULL}
+@end macro
+
+@set publish_email
+
+@ifset publish_email
+@macro ralfengel{}
+@email{rse@@engelschall.com}
+@end macro
+@end ifset
+
+@ifclear publish_email
+@macro ralfengel{}
+<email hidden>
+@end macro
+@end ifclear
+
+@end ignore
+
+@c ------------------------------------------------------------
+
+@c page
+@node ex
+@appendix @ossp{} Exception Handling
+
+
+@quotation
+This appendix is a @gnu{} Texinfo translation of the original manual
+page of @ossp{} Ex version 1.0.6.
+@end quotation
+
+
+@menu
+* ex license::                  Licence notice.
+* ex description::              Description.
+* ex implementation::           Implementation control.
+* ex pitfalls::                 Programming pitfalls.
+* ex multithread::              Multithreading environments.
+* ex examples::                 Examples.
+* ex references::               See Also.
+* ex history::                  History.
+
+@detailmenu
+ --- The Detailed Node Listing ---
+
+Description
+
+* ex exceptions::               Exceptions.
+* ex api::                      Application Programmer Interface.
+
+Application Programmer Interface.
+
+* ex api typedefs::             Type definitions.
+* ex api basic::                Basic macros.
+* ex api ancillary::            Ancillary macros.
+* ex api inspection::           Inspection booleans.
+@end detailmenu
+@end menu
+
+@c ------------------------------------------------------------
+
+@c page
+@node ex license
+@appendixsec Licence notice
+
+
+@ossp{} ex - Exception Handling@*
+Copyright @copyright{} 2002--2007 Ralf S. Engelschall @ralfengel{}@*
+Copyright @copyright{} 2002--2007 The @ossp{} Project @url{http://www.ossp.org/}
+
+
+This file is part of @ossp{} ex, an exception library which can be found
+at @url{http://www.ossp.org/pkg/lib/ex/}.
+
+Permission to use, copy, modify, and distribute this software for any
+purpose with or without fee is hereby granted, provided that the above
+copyright notice and this permission notice appear in all copies.
+
+THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
+WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN
+NO EVENT SHALL THE AUTHORS AND COPYRIGHT HOLDERS AND THEIR CONTRIBUTORS
+BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+THE POSSIBILITY OF SUCH DAMAGE.
+
+@c ------------------------------------------------------------
+
+@c page
+@node ex description
+@appendixsec Description
+
+
+@menu
+* ex exceptions::               Exceptions.
+* ex api::                      Application Programmer Interface.
+@end menu
+
+
+@noindent
+@ossp{} Ex is a small @iso{}--C++ style exception handling library for
+use in the @iso{}--C language.  It allows you to use the paradigm of
+throwing and catching exceptions in order to reduce the amount of error
+handling code without making your program less robust.
+
+This is achieved by directly transferring exceptional return codes (and
+the program control flow) from the location where the exception is
+raised (throw point) to the location where it is handled (catch point)
+-- usually from a deeply nested sub-routine to a parent routine.  All
+intermediate routines no longer have to make sure that the exceptional
+return codes from sub-routines are correctly passed back to the parent.
+
+
+@c ------------------------------------------------------------
+
+@c page
+@node ex exceptions
+@appendixsubsec Exceptions
+
+
+@noindent
+An @ossp{} Ex exception is a triple @code{<class,object,value>} where
+@code{class} identifies the class of the exception thrower,
+@code{object} identifies the particular class instance of the exception
+thrower, and @code{value} is the exceptional return code value the
+thrower wants to communicate.  All three parts are of type @code{void *}
+internally, but every value which can be lossless ``casted'' to this
+type is usable.  Exceptions are created on--the--fly by the
+@function{ex_throw} command.
+
+
+@c ------------------------------------------------------------
+
+@c page
+@node ex api
+@appendixsubsec Application Programmer Interface (@api{})
+
+
+@menu
+* ex api typedefs::             Type definitions.
+* ex api basic::                Basic macros.
+* ex api ancillary::            Ancillary macros.
+* ex api inspection::           Inspection booleans.
+@end menu
+
+@c ------------------------------------------------------------
+
+@c page
+@node ex api typedefs
+@appendixsubsubsec Type definitions
+
+
+@deftp {Struct Typedef} ex_t
+This is the declaration of an exception variable.  It is usually never
+initialized manually.  Instead it is initialized by an @code{ex_catch}
+clause and just used read--only inside its block.  Such a variable of
+type @code{ex_t} consists of six attributes:
+
+@table @code
+@item void * ex_class
+This is the @code{class} argument of the @function{ex_throw} call which
+created the exception.  This can globally and uniquely identify the
+class to which @code{ex_value} belongs to.  Usually this is a pointer to
+a static object (variable, structure or function) which identifies the
+class of the thrower and allows the catcher to correctly handle
+@code{ex_value}.  It is usually just an additional (optional)
+information to @code{ex_value}.
+
+@item void * ex_object
+This is the @code{object} argument of the @function{ex_throw} call which
+created the exception.  This can globally and uniquely identify the
+class instance @code{ex_value} belongs to (in case multiple instances
+exists at all).  Usually this a pointer to a dynamic object (structure)
+which identifiers the particular instance of the thrower.  It is usually
+just an additional (optional) information to @code{ex_value}.
+
+@item void * ex_value
+This is the @code{value} argument of the @function{ex_throw} call which
+created the exception.  This is the exceptional return code value which
+has to uniquely identify the type of exception.  Usually this is the
+value which is @code{return}ed if no exceptions would be thrown.  In the
+simple case this is just a numerical return code.  In the complex case
+this can be a pointer to an arbitrary complex data structure describing
+the exception.
+
+@item char * ex_file
+This is the file name of the @iso{}--C source where the
+@function{ex_throw} call was performed.  It is automatically provided as
+an additional information about the throw point and is intended mainly
+for tracing and debugging purposes.
+
+@item int ex_line
+This is the line number inside the @iso{}--C source file name where the
+@function{ex_throw} call was performed.  It is automatically provided as
+an additional information about the throw point and is intended mainly
+for tracing and debugging purposes.
+
+@item char * ex_func
+This is the function name (if determinable, else @code{#NA#}) inside the
+@iso{}--C source file name where the @function{ex_throw} call was
+performed.  It is automatically provided as an additional information
+about the throw point and is intended mainly for tracing and debugging
+purposes.
+@end table
+@end deftp
+
+@c ------------------------------------------------------------
+
+@c page
+@node ex api basic
+@appendixsubsubsec Basic macros
+
+
+@defmac ex_try @var{BLOCK1} [ex_cleanup @var{BLOCK2}] ex_catch (@var{variable}) @var{BLOCK3}
+This is the primary syntactical construct provided by @ossp{} Ex.  It is
+modeled after the @iso{}--C++ @code{try}--@code{catch} clause which in
+turn is very similar to an @iso{}--C @code{if}--@code{else} clause.  It
+consists of an @code{ex_try} block @var{BLOCK1} which forms the dynamic
+scope for exception handling (i.e. exceptions directly thrown there or
+thrown from its sub--routines are caught), an optional @code{ex_cleanup}
+block @var{BLOCK2} for performing cleanup operations and an
+@code{ex_catch} block @var{BLOCK3} where the caught exceptions are
+handled.
+
+The control flow in case no exception is thrown is simply @var{BLOCK1},
+optionally followed by @var{BLOCK2}; @var{BLOCK3} is skipped.  The
+control flow in case an exception is thrown is: @var{BLOCK1} (up to the
+statement where the exception is thrown only), optionally followed by
+@var{BLOCK2}, followed by @var{BLOCK3}.
+
+The @code{ex_try}, @code{ex_cleanup} and @code{ex_catch} cannot be used
+separately, they work only in combination because they form a language
+clause as a whole.  In contrast to @iso{}--C++ there is only one
+@code{ex_catch} block and not multiple ones (all @ossp{} Ex exceptions
+are of the same @iso{}--C type @code{ex_t}).  If an exception is caught,
+it is stored in @var{variable} for inspection inside the @code{ex_catch}
+block.  Although having to be declared outside, the @var{variable} value
+is only valid within the @code{ex_catch} block.  But the variable can be
+re-used in subsequent @code{ex_catch} clauses, of course.
+
+The @code{ex_try} block is a regular @iso{}--C language statement block,
+but it is not allowed to jump into it via @code{goto} or
+@function{longjmp} or out of it via @code{break}, @code{return},
+@code{goto} or @function{longjmp} because there is some hidden setup and
+cleanup that needs to be done by @ossp{} Ex regardless of whether an
+exception is caught.  Jumping into an @code{ex_try} clause would avoid
+doing the setup, and jumping out of it would avoid doing the cleanup.
+In both cases the result is a broken exception handling facility.
+Nevertheless you are allowed to nest @code{ex_try} clauses.
+
+The @code{ex_cleanup} and @code{ex_catch} blocks are regular @iso{}--C
+language statement blocks without any restrictions.  You are even
+allowed to throw (and in the @code{ex_catch} block to re--throw) an
+exception.
+
+There is just one subtle portability detail you have to remember about
+@code{ex_try} blocks: all accessible @iso{}--C objects have the
+(expected) values as of the time @function{ex_throw} was called, except
+that the values of objects of automatic storage invocation duration that
+do not have the @code{volatile} storage class @emph{and} have been
+changed between the @code{ex_try} invocation and @function{ex_throw} are
+indeterminate.  This is because both you usually do not know which
+commands in the @code{ex_try} were already successful before the
+exception was thrown (logically speaking) and because the underlying
+@iso{}--C @function{setjmp} facility applies those restrictions
+(technically speaking).
+@end defmac
+
+
+@defmac ex_throw (@var{class}, @var{object}, @var{value})
+This builds an exception from the supplied arguments and throws it.  If
+an @code{ex_try}/@code{ex_catch} clause formed the dynamic scope of the
+@function{ex_throw} call, this exception is copied into the
+@var{variable} of its @code{ex_catch} clause and the program control
+flow is continued in the (optional @code{ex_cleanup} and then in the)
+@code{ex_catch} block.
+
+If no @code{ex_try}/@code{ex_catch} clause exists in the dynamic scope
+of the @function{ex_throw} call, the program calls @function{abort}.
+The @function{ex_throw} can be performed everywhere, including inside
+@code{ex_try}, @code{ex_cleanup} and @code{ex_catch} blocks.
+@end defmac
+
+
+@defmac ex_rethrow
+This is only valid within an @code{ex_catch} block and re-throws the
+current exception (in @var{variable}).  It is similar to the call:
+
+@example
+ex_throw(@var{variable}.ex_class, @var{variable}.ex_object, @var{variable}.ex_value)
+@end example
+
+@noindent
+except for the difference that the @code{ex_file}, @code{ex_line} and
+@code{ex_func} elements of the caught exception are passed through as it
+would have been never caught.
+@end defmac
+
+
+@c ------------------------------------------------------------
+
+@c page
+@node ex api ancillary
+@appendixsubsubsec Ancillary macros
+
+
+@defmac ex_defer @var{BLOCK}
+This directive executes @var{BLOCK} while deferring the throwing of
+exceptions, i.e., inside the dynamic scope of @code{ex_defer} all
+@function{ex_throw} operations are remembered but deferred and on
+leaving the @var{BLOCK} the @emph{first} occurred exception is thrown.
+The second and subsequent exceptions are ignored.
+
+The @code{ex_defer} block @var{BLOCK} is a regular @iso{}--C language
+statement block, but it is not allowed to jump into it via @code{goto}
+or @function{longjmp} or out of it via @code{break}, @code{return},
+@code{goto} or @function{longjmp} because this would cause the deferral
+level to become out of sync.  Jumping into an @code{ex_defer} clause
+would avoid increasing the exception deferral level, and jumping out of
+it would avoid decreasing it.  In both cases the result is an incorrect
+exception deferral level.  Nevertheless you are allowed to nest
+@code{ex_defer} clauses.
+@end defmac
+
+
+@defmac ex_shield @var{BLOCK}
+This directive executes @var{BLOCK} while shielding it against the
+throwing of exceptions, i.e., inside the dynamic scope of
+@code{ex_shield} all @function{ex_throw} operations are just silently
+ignored.
+
+The @code{ex_shield} block is a regular @iso{}--C language statement
+block, but it is not allowed to jump into it via @code{goto} or
+@function{longjmp} or out of it via @code{break}, @code{return},
+@code{goto} or @function{longjmp} because this would cause the shielding
+level to become out of sync.  Jumping into an @code{ex_shield} clause
+would avoid increasing the exception shielding level, and jumping out of
+it would avoid decreasing it.  In both cases the result is an incorrect
+exception shielding level.  Nevertheless you are allowed to nest
+@code{ex_shield} clauses.
+@end defmac
+
+@c ------------------------------------------------------------
+
+@c page
+@node ex api inspection
+@appendixsubsubsec Inspection booleans
+
+
+@defmac ex_catching
+This is a boolean flag which can be checked inside the dynamic scope of
+an @code{ex_try} clause to test whether the current scope is exception
+catching (see @code{ex_try}/@code{ex_catch} clause).
+@end defmac
+
+
+@defmac ex_deferred
+This is a boolean flag which can be checked inside the dynamic scope of
+an @code{ex_defer} clause to test whether the current scope is exception
+deferring (see @code{ex_defer} clause).
+@end defmac
+
+
+@defmac ex_shielding
+This is a boolean flag which can be checked inside the dynamic scope of
+an @code{ex_shield} clause to test whether the current scope is
+exception shielding (see @code{ex_shield} clause).
+@end defmac
+
+@c ------------------------------------------------------------
+
+@c page
+@node ex implementation
+@appendixsec Implementation control
+
+
+@noindent
+@ossp{} Ex uses a very light--weight but still flexible exception
+facility implementation.  The following adjustments can be made before
+including the @file{ex.h} header.
+
+@c ------------------------------------------------------------
+
+@appendixsubsec Machine Context
+
+
+@noindent
+In order to move the program control flow from the exception throw point
+(@function{ex_throw}) to the catch point (@code{ex_catch}), @ossp{} Ex
+uses four macros:
+
+
+@table @code
+@item __ex_mctx_struct
+This holds the contents of the machine context structure.  A pointer to
+such a machine context is passed to the following macros as @var{mctx}.
+
+@item __ex_mctx_save (__ex_mctx_struct * @var{mctx})
+This is called by the prolog of @code{ex_try} to save the current
+machine context in @var{mctx}.  This function has to return true (not
+@code{0}) after saving.  If the machine context is restored (by
+@code{__ex_mctx_restore}) it has to return false (@code{0}).  In other
+words, this function has to return twice and indicate the particular
+situation with the provided return code.
+
+@item __ex_mctx_restored (__ex_mctx_struct * @var{mctx})
+This is called by the epilog of @code{ex_try} to perform additional
+operations at the new (restored) machine context after an exception was
+caught.  Usually this is a no--operation macro.
+
+@item __ex_mctx_restore (__ex_mctx_struct * @var{mctx})
+This is called by @function{ex_throw} at the old machine context in
+order to restore the machine context of the
+@code{ex_try}/@code{ex_catch} clause which will catch the exception.
+@end table
+
+
+The default implementation (define @code{__EX_MCTX_SJLJ__} or as long as
+@code{__EX_MCTX_CUSTOM__} is not defined) uses the @iso{}--C
+@function{jmp_buf} facility:
+
+@example
+#define __ex_mctx_struct         jmp_buf jb;
+#define __ex_mctx_save(mctx)     (setjmp((mctx)->jb) == 0)
+#define __ex_mctx_restored(mctx) /* noop */
+#define __ex_mctx_restore(mctx)  (void)longjmp((mctx)->jb, 1)
+@end example
+
+Alternatively, you can define @code{__EX_MCTX_SSJLJ__} to use
+@acronym{POSIX}.1 @function{sigjmp_buf} or @code{__EX_MCTX_MCSC__} to
+use @acronym{POSIX}.1 @function{ucontext}.  For using a custom
+implementation define @code{__EX_MCTX_CUSTOM__} and provide own
+definitions for the four @code{__ex_mctx_xxxx} macros.
+
+@c ------------------------------------------------------------
+
+@appendixsubsec Exception Context
+
+
+@noindent
+In order to maintain the exception catching stack and for passing the
+exception between the throw and the catch point, @ossp{} Ex uses a
+global exception context, returned on--the--fly by the callback
+@code{ex_ctx_t *(*__ex_ctx)(void)}.
+
+By default, @code{__ex_ctx} (which is @code{__ex_ctx_default} as
+provided by @file{libex}) returns a pointer to a static @code{ex_ctx_t}
+context.  For use in multi--threading environments, this should be
+overwritten with a callback function returning a per--thread context
+structure (@ref{ex multithread}, see section ``Multithreading
+environments'' below).
+
+To initialize an exception context structure there are two macros
+defined: @code{EX_CTX_INITIALIZER} for static initialization and
+@code{void EX_CTX_INITIALIZE (ex_ctx_t *)} for dynamic initialization.
+
+@c ------------------------------------------------------------
+
+@appendixsubsec Termination Handler
+
+
+@noindent
+In case there is an exception thrown which is not caught by any
+@code{ex_try}/@code{ex_catch} clauses, @ossp{} Ex calls the callback
+@code{void (* __ex_terminate)(ex_t *)}.  It receives a pointer to the
+exception object which was thrown.
+
+By default, @code{__ex_terminate} (which is
+@code{__ex_terminate_default} as provided by @file{libex}) prints a
+message of the form @code{**EX: UNCAUGHT EXCEPTION: class=0xXXXXXXXX
+object=0xXXXXXXXX value=0xXXXXXXX [xxxx:NNN:xxxx]} to @code{stderr} and
+then calls @function{abort} in order to terminate the application.  For
+use in multi--threading environments, this should be overwritten with a
+callback function which terminates only the current thread.  Even
+better, a real application always should have a top--level
+@code{ex_try}/@code{ex_catch} clause in its @function{main} in order to
+more gracefully terminate the application.
+
+@c ------------------------------------------------------------
+
+@appendixsubsec Namespace Mapping
+
+
+@noindent
+The @ossp{} Ex implementation consistently uses the @code{ex_},
+@code{__ex_} and @code{__EX_} prefixes for namespace protection.  But at
+least the @code{ex_} prefix for the @api{} macros @code{ex_try},
+@code{ex_cleanup}, @code{ex_catch}, @code{ex_throw}, @code{ex_rethrow}
+and @code{ex_shield} sometimes have an unpleasant optical appearance.
+Especially because @ossp{} Ex is modeled after the exception facility of
+@iso{}--C++ where there is no such prefix on the language directives, of
+course.
+
+For this, @ossp{} Ex optionally provides the ability to provide
+additional namespace mappings for those @api{} elements.  By default
+(define @code{__EX_NS_CXX__} or as long as @code{__EX_NS_CUSTOM__} and
+@code{__cplusplus} is not defined) you can additionally use the
+@iso{}--C++ style names @code{catch}, @code{cleanup}, @code{throw},
+@code{rethrow} and @code{shield}.  As an alternative you can define
+@code{__EX_NS_UCCXX__} to get the same but with a more namespace safe
+upper case first letter.
+
+@c ------------------------------------------------------------
+
+@c page
+@node ex pitfalls
+@appendixsec Programming pitfalls
+
+
+@noindent
+Exception handling is a very elegant and efficient way of dealing with
+exceptional situation.  Nevertheless it requires additional discipline
+in programming and there are a few pitfalls one must be aware of.  Look
+the following code which shows some pitfalls and contains many errors
+(assuming a @function{mallocex} function which throws an exception if
+@function{malloc} fails):
+
+@example
+/* BAD EXAMPLE */
+ex_try
+  @{
+    char *cp1, *cp2, cp3;
+
+    cp1 = mallocex(SMALLAMOUNT);
+    globalcontext->first = cp1;
+    cp2 = mallocex(TOOBIG);
+    cp3 = mallocex(SMALLAMOUNT);
+    strcpy(cp1, "foo");
+    strcpy(cp2, "bar");
+  @}
+ex_cleanup
+  @{
+    if (cp3 != NULL) free(cp3);
+    if (cp2 != NULL) free(cp2);
+    if (cp1 != NULL) free(cp1);
+  @}
+ex_catch(ex)
+  @{
+    printf("cp3=%s", cp3);
+    ex_rethrow;
+  @}
+@end example
+
+This example raises a few issues:
+
+@table @emph
+@item 01: variable scope
+Variables which are used in the @code{ex_cleanup} or @code{ex_catch}
+clauses must be declared before the @code{ex_try} clause, otherwise they
+only exist inside the @code{ex_try} block.  In the example above,
+@code{cp1}, @code{cp2} and @code{cp3} are automatic variables and only
+exist in the block of the @code{ex_try} clause, the code in the
+@code{ex_cleanup} and @code{ex_catch} clauses does not know anything
+about them.
+
+@item 02: variable initialization
+Variables which are used in the @code{ex_cleanup} or @code{ex_catch}
+clauses must be initialized before the point of the first possible
+@function{ex_throw} is reached.  In the example above, @code{ex_cleanup}
+would have trouble using @code{cp3} if @function{mallocex} throws a
+exception when allocating a @code{TOOBIG} buffer.
+
+@item 03: volatile variables
+Variables which are used in the @code{ex_cleanup} or @code{ex_catch}
+clauses must be declared with the storage class @code{volatile},
+otherwise they might contain outdated information if @function{ex_throw}
+throws an exception.  If using a ``free if unset'' approach like the
+example does in the @code{ex_cleanup} clause, the variables must be
+initialized (see @emph{02}) @emph{and} remain valid upon use.
+
+@item 04: clean before catch
+The @code{ex_cleanup} clause is not only written down before the
+@code{ex_catch} clause, it is also evaluated before the @code{ex_catch}
+clause.  So, resources being cleaned up must no longer be used in the
+@code{ex_catch} block.  The example above would have trouble referencing
+the character strings in the @function{printf} statement because these
+have been freed before.
+
+@item 05: variable uninitialization
+If resources are passed away and out of the scope of the
+@code{ex_try}/@code{ex_cleanup}/@code{ex_catch} construct and the
+variables were initialized for using a ``free if unset'' approach then
+they must be uninitialized after being passed away.  The example above
+would @function{free} @code{cp1} in the @code{ex_cleanup} clause if
+@function{mallocex} throws an exception if allocating a @code{TOOBIG}
+buffer.  The @code{globalcontext->first} pointer hence becomes invalid.
+@end table
+
+The following is fixed version of the code (annotated with the pitfall
+items for reference):
+
+@example
+/* GOOD EXAMPLE */
+@{ /*01*/
+  char * volatile /*03*/ cp1 = NULL /*02*/;
+  char * volatile /*03*/ cp2 = NULL /*02*/;
+  char * volatile /*03*/ cp3 = NULL /*02*/;
+  try
+    @{
+      cp1 = mallocex(SMALLAMOUNT);
+      globalcontext->first = cp1;
+      cp1 = NULL /*05 give away*/;
+      cp2 = mallocex(TOOBIG);
+      cp3 = mallocex(SMALLAMOUNT);
+      strcpy(cp1, "foo");
+      strcpy(cp2, "bar");
+    @}
+  clean
+    @{ /*04*/
+      printf("cp3=%s", cp3 == NULL /*02*/ ? "" : cp3);
+      if (cp3 != NULL)
+        free(cp3);
+      if (cp2 != NULL)
+        free(cp2);
+      /*05 cp1 was given away */
+    @}
+  catch(ex)
+    @{
+      /*05 global context untouched */
+      rethrow;
+    @}
+@}
+@end example
+
+Alternatively, this could also be used:
+
+@example
+/* ALTERNATIVE GOOD EXAMPLE */
+@{ /*01*/
+  char * volatile /*03*/ cp1 = NULL /*02*/;
+  char * volatile /*03*/ cp2 = NULL /*02*/;
+  char * volatile /*03*/ cp3 = NULL /*02*/;
+  try
+    @{
+      cp1 = mallocex(SMALLAMOUNT);
+      globalcontext->first = cp1;
+      /*05 keep responsibility*/
+      cp2 = mallocex(TOOBIG);
+      cp3 = mallocex(SMALLAMOUNT);
+      strcpy(cp1, "foo");
+      strcpy(cp2, "bar");
+    @}
+  clean
+    @{ /*04*/
+      printf("cp3=%s", cp3 == NULL /*02*/ ? "" : cp3);
+      if (cp3 != NULL)
+        free(cp3);
+      if (cp2 != NULL)
+        free(cp2);
+      if (cp1 != NULL)
+        free(cp1);
+    @}
+  catch(ex)
+    @{
+      globalcontext->first = NULL;
+      rethrow;
+    @}
+@}
+@end example
+
+@c ------------------------------------------------------------
+
+@c page
+@node ex multithread
+@appendixsec Multithreading environments
+
+
+@noindent
+@ossp{} Ex is designed to work both in single--threading and
+multi--threading environments.  The default is to support
+single--threading only.  But it is easy to configure @ossp{} Ex to work
+correctly in a multi-threading environment like @acronym{POSIX} Pthreads
+or @gnu{} Pth.
+
+There are only two issues: which machine context to use and where to
+store the exception context to make sure exception throwing happens only
+within a thread and does not conflict with the regular thread
+dispatching mechanism.
+
+
+@appendixsubsec @gnu{} Pth
+
+
+@noindent
+Using @ossp{} Ex together with @gnu{} Pth is straight--forward, because
+@gnu{} pth 2.0 (and higher) already has support for @ossp{} Ex
+built--in.  All which is needed is that @gnu{} Pth is configured with
+the @gnu{} Autoconf option @option{--with-ex}.  Then each @gnu{} Pth
+user--space thread has its own @ossp{} Ex exception context
+automatically.  The default of using @iso{}--C @function{jmp_buf} does
+not conflict with the thread dispatching mechanisms used by @gnu{} Pth.
+
+
+@appendixsubsec @acronym{POSIX} Pthreads
+
+
+@noindent
+Using @ossp{} Ex inside an arbitrary @acronym{POSIX} Pthreads standard
+compliant environment is also straight--forward, although it requires
+extra coding.  What you basically have to do is to make sure that the
+@code{__ex_ctx} becomes a per--thread context and that
+@code{__ex_terminate} terminates only the current thread.  To get an
+impression, a small utility library for this follows:
+
+@example
+/* pthread_ex.h */
+
+#ifndef __PTHREAD_EX_H__
+#define __PTHREAD_EX_H__
+
+#include <pthread.h>
+
+int pthread_init_ex   (void);
+int pthread_create_ex (pthread_t *, const pthread_attr_t *,
+                       void *(*)(void *), void *);
+
+#ifndef PTHREAD_EX_INTERNAL
+#  define pthread_init   pthread_init_ex
+#  define pthread_create pthread_create_ex
+#endif
+
+#endif /* __PTHREAD_EX_H__ */
+
+/* end of file */
+@end example
+
+@example
+/* pthread_ex.c */
+
+#include <stdlib.h>
+#include <pthread.h>
+
+#define PTHREAD_EX_INTERNAL
+
+#include "pthread_ex.h"
+#include "ex.h"
+
+ /* context storage key */
+static pthread_key_t pthread_ex_ctx_key;
+
+ /* context destructor */
+static void
+pthread_ex_ctx_destroy (void *data)
+@{
+  if (data != NULL)
+    free(data);
+  return;
+@}
+
+ /* callback: context fetching */
+static ex_ctx_t *
+pthread_ex_ctx (void)
+@{
+  ex_ctx_t *ctx;
+
+  if ((ctx = (ex_ctx_t *)pthread_getspecific(pthread_ex_ctx_key)) == NULL)
+    return __ex_ctx_default();
+  return ctx;
+@}
+
+ /* callback: termination */
+static void
+pthread_ex_terminate (ex_t *e)
+@{
+    ex_ctx_t *ctx;
+     if ((ctx = (ex_ctx_t *)pthread_getspecific(pthread_ex_ctx_key)) == NULL)
+        __ex_terminate_default(e);
+    pthread_exit(e->ex_value);
+@}
+
+ /* pthread init */
+int
+pthread_init_ex (void)
+@{
+  int rc;
+
+  /* additionally create thread data key and override OSSP ex callbacks */
+
+  pthread_key_create(&pthread_ex_ctx_key,
+                     pthread_ex_ctx_destroy);
+  __ex_ctx       = pthread_ex_ctx;
+  __ex_terminate = pthread_ex_terminate;
+  return rc;
+@}
+
+ /* internal thread entry wrapper information */
+typedef struct @{
+    void *(*entry)(void *);
+    void *arg;
+@} pthread_create_ex_t;
+
+ /* internal thread entry wrapper */
+static void *
+pthread_create_wrapper (void *arg)
+@{
+  pthread_create_ex_t *wrapper;
+  ex_ctx_t *ex_ctx;
+
+   /* create per-thread exception context */
+  wrapper = (pthread_create_ex_t *)arg;
+  ex_ctx = (ex_ctx_t *)malloc(sizeof(ex_ctx_t));
+  EX_CTX_INITIALIZE(ex_ctx);
+  pthread_setspecific(pthread_ex_ctx_key, ex_ctx);
+   /* perform original operation */
+  return wrapper->entry(wrapper->arg);
+@}
+
+ /* pthread_create() wrapper */
+int
+pthread_create_ex(pthread_t *thread,
+                  const pthread_attr_t *attr,
+                  void *(*entry)(void *), void *arg)
+@{
+  pthread_create_ex_t wrapper;
+
+  /* spawn thread but execute start function through wrapper */
+  wrapper.entry = entry;
+  wrapper.arg   = arg;
+  return pthread_create(thread, attr,
+                        pthread_create_wrapper, &wrapper);
+@}
+
+/* end of file */
+@end example
+
+Now all which is required is that you include @file{pthread_ex.h} after
+the standard @file{pthread.h} header and to call @function{pthread_init}
+once at startup of your program.
+
+@c ------------------------------------------------------------
+
+@c page
+@node ex examples
+@appendixsec Examples
+
+
+@noindent
+As a real--life example we will look how you can add optional @ossp{} Ex
+based exception handling support to a library @code{foo}.  The original
+library looks like this:
+
+@example
+/* foo.h */
+
+typedef enum @{
+     FOO_OK,
+     FOO_ERR_ARG,
+     FOO_ERR_XXX,
+     FOO_ERR_SYS,
+     FOO_ERR_IMP,
+     ...
+@} foo_rc_t;
+
+struct foo_st;
+typedef struct foo_st foo_t;
+
+foo_rc_t foo_create  (foo_t **foo);
+foo_rc_t foo_perform (foo_t  *foo);
+foo_rc_t foo_destroy (foo_t  *foo);
+
+/* end of file */
+@end example
+
+@example
+/* foo.c */
+
+#include "foo.h"
+
+struct foo_st @{
+  ...
+@}
+
+foo_rc_t
+foo_create (foo_t **foo)
+@{
+  if ((*foo = (foo_t)malloc(sizeof(foo))) == NULL)
+    return FOO_ERR_SYS;
+  (*foo)->... = ...
+  return FOO_OK;
+@}
+
+foo_rc_t
+foo_perform (foo_t *foo)
+@{
+  if (foo == NULL)
+    return FOO_ERR_ARG;
+  if (...)
+    return FOO_ERR_XXX;
+  return FOO_OK;
+@}
+
+foo_rc_t
+foo_destroy (foo_t *foo)
+@{
+  if (foo == NULL)
+    return FOO_ERR_ARG;
+  free(foo);
+  return FOO_OK;
+@}
+@end example
+
+Then the typical usage of this library is:
+
+@example
+#include "foo.h"
+
+...
+foo_t foo;
+foo_rc_t rc;
+...
+if ((rc = foo_create(&foo)) != FOO_OK)
+  die(rc);
+if ((rc = foo_perform(foo)) != FOO_OK)
+  die(rc);
+if ((rc = foo_destroy(foo)) != FOO_OK)
+  die(rc);
+@end example
+
+But what you really want, is to use exception handling to get rid of the
+intermixed error handling code:
+
+@example
+#include "foo.h"
+#include "ex.h"
+
+...
+foo_t foo;
+ex_t ex;
+...
+ex_try @{
+  foo_create(&foo);
+  foo_perform(foo);
+  foo_destroy(foo);
+@}
+ex_catch (ex) @{
+  die((foo_rc_t)ex->ex_value);
+@}
+@end example
+
+You can achieve this very easily by changing the library as following:
+
+@example
+/* foo.h */
+
+...
+extern const char foo_id[];
+...
+@end example
+
+@example
+/* foo.c */
+
+#include "foo.h"
+
+const char foo_id[] = "foo 1.0";
+
+#ifdef WITH_EX
+#include "ex.h"
+#  define FOO_RC(rv) \
+     ((((rv) != FOO_OK) && (ex_catching && !ex_shielding))? \
+        (ex_throw(foo_id, NULL, (rv)), (rv)) : (rv))
+#else
+#  define FOO_RC(rv) (rv)
+#endif
+
+struct foo_st @{
+     ...
+@}
+
+foo_rc_t
+foo_create (foo_t **foo)
+@{
+  if ((*foo = (foo_t)malloc(sizeof(foo))) == NULL)
+    return FOO_RC(FOO_ERR_SYS);
+  (*foo)->... = ...
+  return FOO_OK;
+@}
+
+foo_rc_t
+foo_perform (foo_t *foo)
+@{
+  if (foo == NULL)
+    return FOO_RC(FOO_ERR_ARG);
+  if (...)
+    return FOO_RC(FOO_ERR_XXX);
+  return FOO_OK;
+@}
+
+foo_rc_t
+foo_destroy (foo_t *foo)
+@{
+  if (foo == NULL)
+    return FOO_RC(FOO_ERR_ARG);
+  free(foo);
+  return FOO_OK;
+@}
+
+/* end of file */
+@end example
+
+This way the library by default is still exactly the same.  If you now
+compile it with @option{-DWITH_EX} you activate exception handling
+support.  This means that all @api{} functions throw exceptions where
+@code{ex_value} is the @code{foo_rc_t} instead of returning this value.
+
+@c ------------------------------------------------------------
+
+@c page
+@node ex references
+@appendixsec See Also
+
+
+@noindent
+@iso{}--C++ @code{try}, @code{catch}, @code{throw}.
+
+@noindent
+Java @code{try}, @code{catch}, @code{finally}, @code{throw}.
+
+@noindent
+@iso{}--C @function{jmp_buf}, @function{setjmp}, @function{longjmp}.
+
+@noindent
+@acronym{POSIX}.1 @function{sigjmp_buf}, @function{sigsetjmp},
+@function{siglongjump}.
+
+@noindent
+@acronym{POSIX}.1 @function{ucontext}, @function{setcontext},
+@function{getcontext}.
+
+@c ------------------------------------------------------------
+
+@c page
+@node ex history
+@appendixsec History
+
+
+@noindent
+@ossp{} Ex was invented in January 2002 by Ralf S. Engelschall
+@ralfengel{} for use inside the @ossp{} project.  Its creation was
+prompted by the requirement to reduce the error handling inside @ossp{}
+lmtp2nntp.
+
+The core @code{try}/@code{catch} clause was inspired by @iso{}--C++ and
+the implementation was partly derived from @code{cexcept} 2.0.0, a
+similar library written 2000 by Adam M. Costello
+@email{amc@@cs.berkeley.edu} and Cosmin Truta
+@email{cosmin@@cs.toronto.edu}.
+
+The @code{cleanup} clause was inspired by the Java @code{finally}
+clause.  The @code{shield} feature was inspired by an @code{errno}
+shielding facility used in the @gnu{} Pth implementation.  The
+@code{defer} feature was invented to simplify an application's cleanup
+handling if multiple independent resources are allocated and have to be
+freed on error.
+
+
+
+@c end of file
+@c Local Variables:
+@c mode: texinfo
+@c page-separator: "^@c -+$"
+@c End:

@@ -1,0 +1,27 @@
+@c index.texiinc --
+
+@include and-let-star.texiinc
+@include args-fold.texiinc
+@include case-lambda.texiinc
+@include cond-expand.texiinc
+@include eager-comp.texiinc
+@include environment-variables.texiinc
+@include error-reporting.texiinc
+@include general-cond.texiinc
+@include let-values.texiinc
+@include lightweight-testing.texiinc
+@include list.texiinc
+@include parameters.texiinc
+@include random.texiinc
+@include rec.texiinc
+@include receive.texiinc
+@include records.texiinc
+@include shared-structures.texiinc
+@include specialize-procedures.texiinc
+@include streams.texiinc
+@include string-ports.texiinc
+@include strings.texiinc
+@include time.texiinc
+@include vector.texiinc
+
+@c end of file

@@ -1,0 +1,51 @@
+
+     Announce for R6RS documentation in Texinfo format
+     =================================================
+
+
+NEWSGROUPS: comp.lang.scheme
+SUBJECT: [announce] Texinfo R6RS, 2008-11-05-21-32-46
+
+
+Although I understand that Texinfo is for the rest of us, as
+a  byproduct of  things I  am  interested in  I release  the
+following:
+
+
+<http://sites.google.com/site/mrcmgg/doc/r6rs.texi.gz?attredirects=0>
+<http://sites.google.com/site/mrcmgg/doc/r6rs.info.gz?attredirects=0>
+<http://sites.google.com/site/mrcmgg/doc/r6rs.html.gz?attredirects=0>
+
+<http://sites.google.com/site/mrcmgg/doc/r6rs-lib.texi.gz?attredirects=0>
+<http://sites.google.com/site/mrcmgg/doc/r6rs-lib.info.gz?attredirects=0>
+<http://sites.google.com/site/mrcmgg/doc/r6rs-lib.html.gz?attredirects=0>
+
+
+I accept  "bug" reports and contributions  (anybody wants to
+reformat the references and citations sections?).  Thanks to
+the  R6RS  editors  for  freely  distributing  the  original
+documents.
+
+
+Details for 2008-11-05-21-32-46
+-------------------------------
+
+* Applied the errata corrige (as much as I could).
+* Not perfect,  obviously.  All  the greek letters  and math
+  special symbols are  omitted, causing examples surrounding
+  them to be omitted.
+* The formal semantics appendix is omitted from the report.
+* The references and citations  sections are omitted for the
+  time being (sorry, I have no will for them now).
+* Many citation tags have been omitted (sorry, again).
+* Many section references  have been omitted.  The documents
+  are  meant to  be browsed  in Info  format, where  one has
+  accesso to various indexes (with autocompletion).
+
+
+### end of file
+# Local Variables:
+# mode: text
+# fill-column: 60
+# paragraph-start: "*"
+# End:

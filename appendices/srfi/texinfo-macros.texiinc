@@ -1,0 +1,317 @@
+@c page
+@c ------------------------------------------------------------
+@c Macros.
+@c ------------------------------------------------------------
+
+@macro gnu{}
+@acronym{GNU}
+@end macro
+
+@macro gpl{}
+@acronym{GPL}
+@end macro
+
+@macro fdl{}
+@acronym{FDL}
+@end macro
+
+@c ------------------------------------------------------------
+
+@c page
+@c ------------------------------------------------------------
+@c Special notes.
+@c ------------------------------------------------------------
+
+@macro draftnotice{}
+@quotation
+@strong{The features described in this section are still under
+development, so this section of documentation is a draft.}
+@end quotation
+@end macro
+
+@macro forunix{}
+@strong{Unix:}
+@end macro
+
+@macro fixme{TEXT}
+@strong{FIXME: \TEXT\}
+@end macro
+
+
+@c ------------------------------------------------------------
+
+@c page
+@c ------------------------------------------------------------
+@c Scheme related macros.
+@c ------------------------------------------------------------
+
+@macro rnrs{VERSION}
+@acronym{R\VERSION\RS}
+@end macro
+
+@macro rsix{}
+Revised^6 Report on the algorithmic language Scheme
+@end macro
+
+@macro repl{}
+@acronym{REPL}
+@end macro
+
+@macro srfi{}
+@acronym{SRFI}
+@end macro
+
+@c Separating the @srfi{} macro from the number with a '--' rather than
+@c a '-'  makes the expansion look  ugly in menu entries  under the Info
+@c reader.  IMHO  this should not happen,  but it does; so  we live with
+@c this, because the main purpose of this document is to provide an Info
+@c version.
+@macro ansrfi{NUM}
+@srfi{}-\NUM\
+@end macro
+
+@macro clos{}
+@acronym{CLOS}
+@end macro
+
+@macro library{SPEC}
+@code{(\SPEC\)}
+@end macro
+
+@macro ffi{}
+@acronym{FFI}
+@end macro
+
+
+@c ------------------------------------------------------------
+
+@c page
+@c ------------------------------------------------------------
+@c Miscellaneous acronyms.
+@c ------------------------------------------------------------
+
+@macro ansi{}
+@acronym{ANSI}
+@end macro
+
+@macro api{}
+@acronym{API}
+@end macro
+
+@c Remember that @url is already used by Texinfo.
+@macro aurl{}
+@acronym{URL}
+@end macro
+
+@macro ascii{}
+@acronym{ASCII}
+@end macro
+
+@macro cpu{}
+@acronym{CPU}
+@end macro
+
+@macro ieee{}
+@acronym{IEEE}
+@end macro
+
+@macro iso{}
+@acronym{ISO}
+@end macro
+
+@macro posix{}
+@acronym{POSIX}
+@end macro
+
+@macro utf{}
+@acronym{UTF}
+@end macro
+
+@c ------------------------------------------------------------
+
+@c page
+@c ------------------------------------------------------------
+@c Software acronyms.
+@c ------------------------------------------------------------
+
+@macro gmp{}
+@acronym{GMP}
+@end macro
+
+@macro gcc{}
+@acronym{GCC}
+@end macro
+
+@c ------------------------------------------------------------
+
+@c page
+@c ------------------------------------------------------------
+@c Network related acronyms.
+@c ------------------------------------------------------------
+
+@macro http{}
+@acronym{HTTP}
+@end macro
+
+@macro ftp{}
+@acronym{FTP}
+@end macro
+
+@macro tcp{}
+@acronym{TCP}
+@end macro
+
+@macro udp{}
+@acronym{UDP}
+@end macro
+
+@macro smtp{}
+@acronym{SMTP}
+@end macro
+
+@c ------------------------------------------------------------
+
+@c page
+@c ------------------------------------------------------------
+@c Scheme language macros.
+@c ------------------------------------------------------------
+
+@macro func{NAME}
+@code{@sc{\NAME\}}
+@end macro
+
+@macro cfunc{NAME}
+@code{\NAME\()}
+@end macro
+
+@macro null{}
+@code{()}
+@end macro
+
+@macro true{}
+@code{#t}
+@end macro
+
+@macro false{}
+@code{#f}
+@end macro
+
+@macro keyword{NAME}
+@code{#:\NAME\}
+@end macro
+
+@c ------------------------------------------------------------
+
+@c page
+@c ------------------------------------------------------------
+@c Macros for references to external documents.
+@c ------------------------------------------------------------
+
+@macro glibcref{NODE, TITLE}
+@ref{\NODE\,\TITLE\,\TITLE\,libc}
+@end macro
+
+@c @macro rsixref{NODE, TITLE}
+@c @ref{\NODE\,\TITLE\,\TITLE\,r6rs}
+@c @end macro
+
+@macro bibref{TAG}
+@code{[\TAG\]}
+@end macro
+
+
+@c ------------------------------------------------------------
+
+@c page
+@c ------------------------------------------------------------
+@c RNRS document macros.
+@c ------------------------------------------------------------
+
+@macro cite{NAME}
+[@sc{\NAME\}]
+@end macro
+
+@macro rsixlibrary{THING}
+@code{(rnrs \THING\ (6))}
+@end macro
+
+@macro arbno{THING}
+\THING\*
+@end macro
+
+@macro atleastone{THING}
+\THING\+
+@end macro
+
+@c ------------------------------------------------------------
+
+@macro meta{THING}
+<\THING\>
+@end macro
+
+@macro metai{THING}
+<\THING\1>
+@end macro
+
+@macro metaii{THING}
+<\THING\2>
+@end macro
+
+@macro metaiii{THING}
+<\THING\3>
+@end macro
+
+@c ------------------------------------------------------------
+
+@macro hyper{THING}
+<\THING\>
+@end macro
+
+@macro hyperi{THING}
+<\THING\1>
+@end macro
+
+@macro hyperii{THING}
+<\THING\2>
+@end macro
+
+@macro hyperiii{THING}
+<\THING\3>
+@end macro
+
+@macro hypern{THING}
+<\THING\n>
+@end macro
+
+@c ------------------------------------------------------------
+
+@macro vari{THING}
+@var{\THING\1}
+@end macro
+
+@macro varii{THING}
+@var{\THING\2}
+@end macro
+
+@macro variii{THING}
+@var{\THING\3}
+@end macro
+
+@macro variv{THING}
+@var{\THING\4}
+@end macro
+
+@macro varn{THING}
+@var{\THING\n}
+@end macro
+
+@macro vark{THING}
+@var{\THING\k}
+@end macro
+
+@macro varj{THING}
+@var{\THING\j}
+@end macro
+
+@c ------------------------------------------------------------
+

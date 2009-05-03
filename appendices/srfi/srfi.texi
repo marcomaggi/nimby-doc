@@ -1,0 +1,170 @@
+\input srfi.tex
+@c %**start of header
+@setfilename srfi.info
+@settitle Scheme Requests For Implementation
+@c %**end of header
+
+@c page
+@c ------------------------------------------------------------
+@c Macros.
+@c ------------------------------------------------------------
+
+@macro version{}
+2008-12-01-17-00-15
+@end macro
+
+@include texinfo-macros.texiinc
+
+@c ------------------------------------------------------------
+
+@c page
+@c ------------------------------------------------------------
+@c Values.
+@c ------------------------------------------------------------
+
+@set TITLE              Scheme Requests For Implementation
+
+@c ------------------------------------------------------------
+
+@c page
+@c ------------------------------------------------------------
+@c Copyright notice.
+@c ------------------------------------------------------------
+
+@copying
+@noindent
+This document is version @version{} of a Texinfo reformatting of the
+@value{TITLE} documents.
+
+The original documents can be downloaded from:
+
+@center @url{http://srfi.schemers.org/}
+
+@end copying
+
+@c ------------------------------------------------------------
+
+@c page
+@c ------------------------------------------------------------
+@c Headers.
+@c ------------------------------------------------------------
+
+@titlepage
+@title @value{TITLE}
+@subtitle Revision @version{}
+@page
+@vskip 0pt plus 1filll
+@insertcopying
+@end titlepage
+
+@c ------------------------------------------------------------
+
+@ifinfo
+@dircategory Development
+@direntry
+* srfi: (srfi).                 @value{TITLE}
+@end direntry
+@end ifinfo
+
+@c ------------------------------------------------------------
+
+@ignore
+@syncodeindex tp cp
+@syncodeindex vr cp
+@syncodeindex fn cp
+@end ignore
+
+@c ------------------------------------------------------------
+
+@c page
+@ifnottex
+@node Top
+@top @value{TITLE}
+
+@insertcopying
+
+@menu
+
+Appendices
+
+* srfi::                        @value{TITLE}.
+
+Indexes
+
+* concept index::               An entry for each concept.
+* function index::              An entry for each function.
+* variable index::              An entry for each variable.
+* type index::                  An entry for each type.
+@end menu
+@end ifnottex
+
+@c ------------------------------------------------------------
+
+@c page
+@node srfi
+@appendix @value{TITLE}
+
+@menu
+* srfi cond-expand::            @ansrfi{0} feature based conditional
+                                expansion construct.
+* srfi list::                   @ansrfi{1} list library.
+* srfi and-let-star::           @ansrfi{2} @func{and-let*}: an @func{and}
+                                with local bindings, a guarded @func{let*}
+                                special form.
+* srfi string-ports::           @ansrfi{6} basic string ports.
+* srfi receive::                @ansrfi{8} @func{receive}: Binding to
+                                multiple values.
+* srfi records::                @ansrfi{9} defining record types.
+* srfi let-values::             @ansrfi{11} syntax for receiving
+                                multiple values.
+* srfi strings::                @ansrfi{13} string library.
+* srfi case-lambda::            @ansrfi{16} syntax for procedures of
+                                variable arity.
+* srfi time::                   @ansrfi{19} time data types and procedures.
+* srfi error-reporting::        @ansrfi{23} error reporting mechanism.
+* srfi shared structures::      @ansrfi{38} representation for data with
+                                shared structure.
+* srfi specialize-procedures::  @ansrfi{26} notation for specializing
+                                parameters without currying.
+* srfi random::                 @ansrfi{27} sources of random bits.
+* srfi rec::                    @ansrfi{31} a special form @func{rec}
+                                for recursive evaluation.
+* srfi parameters::             @ansrfi{39} parameter objects.
+* srfi args-fold::              @ansrfi{37} a program argument processor.
+* srfi streams::                @ansrfi{41} streams.
+* srfi eager-comp::             @ansrfi{42} eager comprehensions.
+* srfi vector::                 @ansrfi{43} vector library.
+* srfi general-cond::           @ansrfi{61} a more general @func{cond} clause.
+* srfi lightweight-testing::    @ansrfi{78} lightweight testing.
+* srfi environment-variables::  @ansrfi{98} environment variables.
+@end menu
+
+@include index.texiinc
+
+@c ------------------------------------------------------------
+
+@c page
+@node concept index
+@appendix An entry for each concept
+
+@printindex cp
+
+@node function index
+@appendix An entry for each function.
+
+@printindex fn
+
+@node variable index
+@appendix An entry for each variable.
+
+@printindex vr
+
+@node type index
+@appendix An entry for each type.
+
+@printindex tp
+
+@contents
+@bye
+
+@c end of file

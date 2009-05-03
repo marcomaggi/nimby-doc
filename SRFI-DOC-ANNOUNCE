@@ -1,0 +1,49 @@
+
+     Announce for SRFI documentation in Texinfo format
+     =================================================
+
+
+NEWSGROUPS: comp.lang.scheme
+SUBJECT: [announce] Texinfo SRFI, 2008-11-10-16-35-17
+
+
+Although I understand that Texinfo is for the rest of us, as
+a  byproduct of  things I  am  interested in  I release  the
+following:
+
+
+<http://sites.google.com/site/mrcmgg/doc/srfi.tar.gz?attredirects=0>
+
+
+I  accept "bug"  reports and  contributions.  Thanks  to the
+SRFI  authors  and   editors  for  freely  distributing  the
+original documents.
+
+
+Details for 2008-11-10-16-35-17
+-------------------------------
+
+* Neither all the SRFIs  have been included, nor the missing
+  ones  will be  included in  the  future.  I  will add  the
+  char-set one sooner or later.
+* Occasionally I  avoided sections, but just a  few.  (I can
+  remember only one, with a chessboard.)
+* Each SRFI document is formatted as "@appendixsec" section,
+  not as standalone Texinfo document.
+* The file "texinfo-macros.texiinc" holds the Texinfo macros
+  required to  format the  documents.  Not all  the included
+  macros are needed.
+* The file "index.texiinc" loads  the SRFI documents but not
+  the macros file.
+* The file  "srfi.texi" is  a stub standalone  document that
+  loads  the macros  file  "index.texiinc" and  can be  used
+  browse the stuff.
+* A makefile for GNU make is included.
+
+
+### end of file
+# Local Variables:
+# mode: text
+# fill-column: 60
+# paragraph-start: "*"
+# End:
