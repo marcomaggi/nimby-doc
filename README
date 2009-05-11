@@ -31,42 +31,6 @@ Internet.
 All the files have a specific documentation license.
 
 
-3. Install
-----------
-
-See  the "README.build"  file  for the  requirements of  the
-building infrastructure.  Do this:
-
-    $ cd package-1.2.3
-    $ mkdir "=build"
-    $ cd "=build"
-
-to inspect the available configuration options:
-
-    $ ../configure --help
-
-then do it:
-
-    $ ../configure [options]
-    $ make
-    $ make tests
-    $ make install
-
-  Notice that, by default, only the shared library is built,
-the static library is not.  To  build it we have to give the
-"--enable-static" option to "configure".
-
-  The Makefile supports  the DESTDIR environment variable to
-install files in a  temporary location, example: to see what
-will happen:
-
-    $ make -n install DESTDIR=/tmp/marco/package
-
-to really do it:
-
-    $ make install DESTDIR=/tmp/marco/package
-
-
 4. Usage
 --------
 
