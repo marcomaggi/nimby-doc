@@ -32,7 +32,7 @@
 @c RNRS document macros.
 @c ------------------------------------------------------------
 
-@macro cite{NAME}
+@macro acite{NAME}
 [@sc{\NAME\}]
 @end macro
 
@@ -312,10 +312,10 @@ Appendices
 
 Indexes
 
-* concept index::               An entry for each concept. 
-* function index::              An entry for each function. 
-* variable index::              An entry for each variable. 
-* type index::                  An entry for each type. 
+* concept index::               An entry for each concept.
+* function index::              An entry for each function.
+* variable index::              An entry for each variable.
+* type index::                  An entry for each type.
 
 @detailmenu
  --- The Detailed Node Listing ---
@@ -588,7 +588,7 @@ Return a symbol representing the Unicode general category of
 @example
 (char-general-category #\a)             => Ll
 (char-general-category #\space)         => Zs
-(char-general-category #\x10FFFF)       => Cn  
+(char-general-category #\x10FFFF)       => Cn
 @end example
 @end deffn
 
@@ -803,7 +803,7 @@ Return the endianness symbol associated implementation's preferred
 endianness (usually that of the underlying machine architecture).  This
 may be any @meta{endianness symbol}, including a symbol other than
 @code{big} and @code{little}.
-@end deffn   
+@end deffn
 
 
 @deffn Procedure bytevector? @var{obj}
@@ -820,7 +820,7 @@ integer object in the interval @code{(-128, @dots{} 255)} that specifies
 the initial value for the bytes of the bytevector: If @var{fill} is
 positive, it is interpreted as an octet; if it is negative, it is
 interpreted as a byte.
-@end deffn   
+@end deffn
 
 
 @deffn Procedure bytevector-length @var{bytevector}
@@ -848,16 +848,16 @@ returns unspecified values.  Analogous to @func{vector-fill!}.
 @var{source} and @var{target} must be bytevectors.  @var{source-start},
 @var{target-start}, and @var{k} must be non--negative exact integer
 objects that satisfy:
-  
+
 @example
 0 <= @var{source-start} <= @var{source-start} + @var{k} <= l_@var{source}
 0 <= @var{target-start} <= @var{target-start} + @var{k} <= l_@var{target}
 @end example
-  
+
 @noindent
 where @emph{l_@var{source}} is the length of @var{source} and
 @emph{l_@var{target}} is the length of @var{target}.
-   
+
 The @func{bytevector-copy!} procedure copies the bytes from @var{source}
 at indices:
 
@@ -867,11 +867,11 @@ at indices:
 
 @noindent
 to consecutive indices in @var{target} starting at @var{target-index}.
-   
+
 This must work even if the memory regions for the source and the target
 overlap, i.e., the bytes at the target location after the copy must be
 equal to the bytes at the source location before the copy.
-   
+
 This returns unspecified values.
 
 @example
@@ -901,7 +901,7 @@ Return a newly allocated copy of @var{bytevector}.
 
 The @func{bytevector-u8-ref} procedure returns the byte at index @var{k}
 of @var{bytevector}, as an octet.
-   
+
 The @func{bytevector-s8-ref} procedure returns the byte at index @var{k}
 of @var{bytevector}, as a (signed) byte.
 
@@ -915,19 +915,19 @@ of @var{bytevector}, as a (signed) byte.
     (bytevector-u8-ref b2 0)))
 => (-127 129 -1 255)
 @end example
-@end deffn   
+@end deffn
 
 
 @deffn Procedure {bytevector-u8-set!} @var{bytevector} @var{k} @var{octet}
 @deffnx Procedure {bytevector-s8-set!} @var{bytevector} @var{k} @var{byte}
 @var{k} must be a valid index of @var{bytevector}.
-   
+
 The @func{bytevector-u8-set!} procedure stores @var{octet} in element
 @var{k} of @var{bytevector}.
-   
+
 The @func{bytevector-s8-set!} procedure stores the two's--complement
 representation of @var{byte} in element @var{k} of @var{bytevector}.
-   
+
 Both procedures return unspecified values.
 
 @example
@@ -972,30 +972,30 @@ same order.  It is analogous to @func{list->vector}.
 @deffnx Procedure {bytevector-sint-set!} @var{bytevector} @var{k} @var{n} @var{endianness} @var{size}
 @var{size} must be a positive exact integer object.  @var{k}, @dots{},
 @var{k}+@var{size}-1 must be valid indices of @var{bytevector}.
-   
+
 The @func{bytevector-uint-ref} procedure retrieves the exact integer
 object corresponding to the unsigned representation of size @var{size}
 and specified by @var{endianness} at indices @var{k}, @dots{},
 @var{k}+@var{size}-1.
-   
+
 The @func{bytevector-sint-ref} procedure retrieves the exact integer
 object corresponding to the two's--complement representation of size
 @var{size} and specified by @var{endianness} at indices @var{k},
 @dots{}, @var{k}+@var{size}-1.
-   
+
 For @func{bytevector-uint-set!}, @var{n} must be an exact integer object
 in the interval @code{(0, @dots{}, 256^(size-1))}.
 
 The @func{bytevector-uint-set!} procedure stores the unsigned
 representation of size @var{size} and specified by @var{endianness} into
 @var{bytevector} at indices @var{k}, @dots{}, @var{k}+@var{size}-1.
-   
+
 For @func{bytevector-sint-set!}, @var{n} must be an exact integer object
 in the interval @code{(-(256^size)/2, @dots{}, (256^(size))/2-1)}.
 @func{bytevector-sint-set!} stores the two's--complement representation
 of size @var{size} and specified by @var{endianness} into
 @var{bytevector} at indices @var{k}, @dots{}, @var{k}+@var{size}-1.
-   
+
 The @code{...-set!} procedures return unspecified values.
 
 @example
@@ -1042,7 +1042,7 @@ integer objects in the interval @code{(-(256^size)/2, @dots{},
 (256^(size))/2-1)}.
 
 The length of @var{bytevector} must be divisible by @var{size}.
-   
+
 These procedures convert between lists of integer objects and their
 consecutive representations according to @var{size} and @var{endianness}
 in the @var{bytevector} objects in the same way as
@@ -1085,7 +1085,7 @@ For @func{bytevector-u16-set!} and @func{bytevector-u16-native-set!},
 For @func{bytevector-s16-set!} and @func{bytevector-s16-native-set!},
 @var{n} must be an exact integer object in the interval @code{(-2^15,
 @dots{}, 2^15-1)}.
-   
+
 These procedures retrieve and set two--byte representations of numbers
 at indices @var{k} and @var{k}+1 according to the endianness specified
 by @var{endianness}.  The procedures with @code{u16} in their names deal
@@ -1095,7 +1095,7 @@ deal with the two's--complement representation.
 The procedures with @code{native} in their names employ the native
 endianness, and work only at aligned indices: @var{k} must be a multiple
 of 2.
-   
+
 The @code{...-set!} procedures return unspecified values.
 
 @example
@@ -1144,17 +1144,17 @@ For @func{bytevector-u32-set!} and @func{bytevector-u32-native-set!},
 For @func{bytevector-s32-set!} and @func{bytevector-s32-native-set!},
 @var{n} must be an exact integer object in the interval @code{(-2^31,
 @dots{}, 2^32-1)}.
-   
+
 These retrieve and set four--byte representations of numbers at indices
 @var{k}, @dots{}, @var{k}+3, according to the endianness specified by
 @var{endianness}.  The procedures with @code{u32} in their names deal
 with the unsigned representation; those with @code{s32} with the
 two's--complement representation.
-   
+
 The procedures with @code{native} in their names employ the native
 endianness, and work only at aligned indices: @var{k} must be a multiple
 of 4.
-   
+
 The @code{...-set!} procedures return unspecified values.
 
 @example
@@ -1195,17 +1195,17 @@ For @func{bytevector-u64-set!} and @func{bytevector-u64-native-set!},
 For @func{bytevector-s64-set!} and @func{bytevector-s64-native-set!},
 @var{n} must be an exact integer object in the interval @code{(-2^63,
 @dots{}, 2^64-1)}.
-   
+
 These retrieve and set eight--byte representations of numbers at indices
 @var{k}, @dots{}, @var{k}+7, according to the endianness specified by
 @var{endianness}.  The procedures with @code{u64} in their names deal
 with the unsigned representation; those with @code{s64} with the
 two's--complement representation.
-   
+
 The procedures with @code{native} in their names employ the native
 endianness, and work only at aligned indices: @var{k} must be a multiple
 of 8.
-   
+
 The @code{...-set!} procedures return unspecified values.
 
 @example
@@ -1700,7 +1700,7 @@ returned.  The @func{member} procedure uses @func{equal?} to compare
 (member (list 'a) '(b (a) c))           => ((a) c)
 (memq 101 '(100 101 102))               => unspecified
 (memv 101 '(100 101 102))               => (101 102)
-@end example 
+@end example
 
 @strong{Implementation responsibilities:} The implementation must check
 that @var{list} is a chain of pairs up to the found element, or that it
@@ -2007,12 +2007,12 @@ procedure, when applied, tries to match its arguments to the
 one of the following conditions is fulfilled:
 
 @itemize
-@item 
+@item
 @meta{formals} has the form @code{(@hyper{variable} @dots{})} and the
 number of arguments is the same as the number of formal parameters in
 @meta{formals}.
 
-@item 
+@item
 @meta{formals} has the form:
 
 @example
@@ -2022,7 +2022,7 @@ number of arguments is the same as the number of formal parameters in
 @noindent
 and the number of arguments is at least @emph{n}.
 
-@item 
+@item
 @meta{formals} has the form @code{@hyper{variable}}.
 @end itemize
 
@@ -2038,7 +2038,7 @@ type @code{&assertion} is raised.
 
 @example
 (define foo
-  (case-lambda 
+  (case-lambda
    (() 'zero)
    ((x) (list 'one x))
    ((x y) (list 'two x y))
@@ -2210,20 +2210,20 @@ following criteria (see report section @rsixref{base
 predicates,Equivalence predicates}):
 
 @itemize
-@item 
+@item
 If @vari{obj} and @varii{obj} have different record types (i.e., their
 record--type descriptors are not @func{eqv?}), @func{eqv?}  returns
 @false{}.
 
-@item 
+@item
 If @vari{obj} and @varii{obj} are both records of the same record type,
 and are the results of two separate calls to record constructors, then
 @func{eqv?} returns @false{}.
-@item 
+@item
 If @vari{obj} and @varii{obj} are both the result of a single call to a
 record constructor, then @func{eqv?} returns @true{}.
 
-@item 
+@item
 If @vari{obj} and @varii{obj} are both records of the same record type,
 where applying an accessor to both yields results for which @func{eqv?}
 returns @false{}, then @func{eqv?} returns @false{}.
@@ -2308,7 +2308,7 @@ appear in a @func{define-record-type} form.
 
 @deffn {Auxiliary Syntax} fields @arbno{@meta{field spec}}
 Each @meta{field spec} has one of the following forms
-  
+
 @example
 (immutable @meta{field name} @hyper{accessor name})
 (mutable @meta{field name}
@@ -2384,7 +2384,7 @@ the defined record type is not opaque.  See the specification of
 @code{record-rtd} below for details.
 @end deffn
 
-   
+
 @deffn {Auxiliary Syntax} nongenerative @meta{uid}
 @deffnx {Auxiliary Syntax} nongenerative
 This specifies that the record type is nongenerative with uid
@@ -2444,13 +2444,13 @@ The constructor created by a @func{define-record-type} form is a
 procedure as follows:
 
 @itemize
-@item 
+@item
 If there is no @code{parent} clause and no @code{protocol} clause, the
 constructor accepts as many arguments as there are fields, in the same
 order as they appear in the @code{fields} clause, and returns a record
 object with the fields initialized to the corresponding arguments.
 
-@item 
+@item
 If there is no @code{parent} or @code{parent-rtd} clause and a
 @code{protocol} clause, the protocol expression must evaluate to a
 procedure that accepts a single argument.  The protocol procedure is
@@ -2471,13 +2471,13 @@ definition with three fields creates a constructor that accepts values
 for all fields, and initialized them in the reverse order of the
 arguments:
 
-@example 
+@example
 (lambda (p)
   (lambda (v1 v2 v3)
     (p v3 v2 v1)))
 @end example
 
-@item 
+@item
 If there is both a @code{parent} clause and a @code{protocol} clause,
 then the protocol procedure is called once with a procedure @var{n} as
 its argument.  As in the previous case, the protocol procedure should
@@ -2513,7 +2513,7 @@ type, with @var{v1}, @var{v2}, and @var{v3} as arguments.  It also
 initializes the fields of this record type to the values of @var{x1},
 @dots{}, @var{x4}.
 
-@item 
+@item
 If there is a @code{parent} clause, but no @code{protocol} clause, then
 the parent type must not have a @code{protocol} clause itself.  The
 constructor bound to @meta{constructor name} is a procedure that accepts
@@ -2522,7 +2522,7 @@ one argument for each field in the same order as in the @code{fields}
 clause.  The constructor returns a record object with the fields
 initialized to the corresponding arguments.
 
-@item 
+@item
 If there is a @code{parent-rtd} clause, then the constructor is as with
 a @code{parent} clause, except that the constructor of the parent type
 is determined by the constructor descriptor of the @code{parent-rtd}
@@ -2560,7 +2560,7 @@ is equivalent to the following explicit--naming record definition.
 @end example
 
 Also, the implicit--naming record definition:
- 
+
 @example
 (define-record-type point (fields x y))
 @end example
@@ -2570,7 +2570,7 @@ is equivalent to the following explicit--naming record definition:
 
 @example
 (define-record-type (point make-point point?)
-  (fields 
+  (fields
     (immutable x point-x)
     (immutable y point-y)))
 @end example
@@ -2592,7 +2592,7 @@ and mutator names for the widget field.
 Evaluates to the record--type descriptor (see below) associated with the
 type specified by @meta{record name}.
 
-@quotation   
+@quotation
 @emph{Note:} The @func{record-type-descriptor} procedure works on both
 opaque and non--opaque record types.
 @end quotation
@@ -2619,7 +2619,7 @@ The following example uses the @func{record?} procedure from the
   (parent point)
   (protocol
    (lambda (n)
-     (lambda (x y c) 
+     (lambda (x y c)
        ((n x y) (color->rgb c)))))
   (fields
     (mutable rgb cpoint-rgb cpoint-rgb-set!)))
@@ -2671,7 +2671,7 @@ The following example uses the @func{record?} procedure from the
   (protocol
    (lambda (p)
      (lambda (x y z)
-       (let ((length 
+       (let ((length
                (sqrt (+ (* x x)
                         (* y y)
                         (* z z)))))
@@ -2692,7 +2692,7 @@ The following example uses the @func{record?} procedure from the
        (let ((r ((n x y 'red) t)))
          (set! *ex3-instance* r)
          r))))
-  (fields 
+  (fields
    (mutable thickness))
   (sealed #t) (opaque #t))
 
@@ -2732,7 +2732,7 @@ The @var{parent} argument must be either @false{} or an rtd. If it is an
 rtd, the returned record type, @var{t}, extends the record type @var{p}
 represented by @var{parent}.  An exception with condition type
 @code{&assertion} is raised if @var{parent} is sealed (see below).
-   
+
 The @var{uid} argument must be either @false{} or a symbol.  If
 @var{uid} is a symbol, the record--creation operation is
 @emph{nongenerative} i.e., a new record type is created only if no
@@ -2752,7 +2752,7 @@ when the second call occurs.  If they are met, the second call returns,
 without creating a new record type, the same record--type descriptor (in
 the sense of @func{eqv?}) as the first call.
 
-@quotation   
+@quotation
 @emph{Note:} Users are encouraged to use symbol names constructed using
 the @acronym{UUID} namespace (for example, using the record--type name
 as a prefix) for the uid argument.
@@ -3037,7 +3037,7 @@ The mutator returns unspecified values.
 
 (define :point2
   (make-record-type-descriptor
-    'point2 :point 
+    'point2 :point
     #f #f # f '#((mutable x) (mutable y))))
 
 (define make-point2
@@ -3140,7 +3140,7 @@ with condition type @code{&assertion}.
 
 @deffn Procedure record-type-name @var{rtd}
 Return the name of the record--type descriptor @var{rtd}.
-@end deffn   
+@end deffn
 
 
 @deffn Procedure record-type-parent @var{rtd}
@@ -3537,7 +3537,7 @@ component.
 (real-cond1? (condition foo bar))       => #f
 (cond1-x (condition foo bar))           => foo
 (cond2-y (condition foo bar))           => bar
- 
+
 (equal? (simple-conditions (condition foo bar))
         (list foo bar))                 => #t
 
@@ -3566,18 +3566,18 @@ will have @meta{supertype} has its parent type.  The remaining
 identifiers will be bound as follows:
 
 @itemize
-@item 
+@item
 @meta{constructor} is bound to a default constructor for the type: It
 accepts one argument for each of the record type's complete set of
 fields (including parent types, with the fields of the parent coming
 before those of the extension in the arguments) and returns a condition
 object initialized to those arguments.
 
-@item 
+@item
 @meta{predicate} is bound to a predicate that identifies conditions of
 type @meta{condition-type} or any of its subtypes.
 
-@item 
+@item
 Each @meta{accessor} is bound to a procedure that extracts the
 corresponding field from a condition of type @meta{condition-type}.
 @end itemize
@@ -3709,7 +3709,7 @@ humans.
 
 
 @deffn {Condition Type} {&warning}
-@deffnx Procedure make-warning 
+@deffnx Procedure make-warning
 @deffnx Procedure warning? @var{obj}
 This condition type could be defined by:
 
@@ -3768,7 +3768,7 @@ This condition type could be defined by:
 
 This type describes violations of the language standard or a library
 standard, typically caused by a programming error.
-@end deffn  
+@end deffn
 
 
 @deffn {Condition Type} {&assertion}
@@ -3804,7 +3804,7 @@ a procedure that detected an exception.  Conditions of this type are
 created by the @func{error} and @func{assertion-violation} procedures of
 report section @rsixref{base errors,Errors and violations}.
 @end deffn
- 
+
 
 @deffn {Condition Type} {&who}
 @deffnx Procedure make-who-condition @var{who}
@@ -3967,10 +3967,10 @@ This condition type could be defined by:
 @example
 (define-condition-type &i/o &error
   make-i/o-error i/o-error?)
-@end example        
+@end example
 
 This is a supertype for a set of more specific I/O errors.
-@end deffn   
+@end deffn
 
 
 @deffn {Condition Type} {&i/o-read}
@@ -3985,7 +3985,7 @@ This condition type could be defined by:
 
 This condition type describes read errors that occurred during an I/O
 operation.
-@end deffn   
+@end deffn
 
 
 @deffn {Condition Type} {&i/o-write}
@@ -4001,7 +4001,7 @@ This condition type could be defined by:
 This condition type describes write errors that occurred during an I/O
 operation.
 @end deffn
-  
+
 
 @deffn {Condition Type} {&i/o-invalid-position}
 @deffnx Procedure {make-i/o-invalid-position-error} @var{position}
@@ -4020,7 +4020,7 @@ This condition type describes attempts to set the file position to an
 invalid position.  @var{position} should be the file position that the
 program intended to set.  This condition describes a range error, but
 not an assertion violation.
-@end deffn   
+@end deffn
 
 
 @deffn {Condition Type} {&i/o-filename}
@@ -4055,7 +4055,7 @@ This condition type could be defined by:
 
 A condition of this type specifies that an operation tried to operate on
 a named file with insufficient access rights.
-@end deffn   
+@end deffn
 
 
 @deffn {Condition Type} {&i/o-file-is-read-only}
@@ -4072,7 +4072,7 @@ This condition type could be defined by:
 
 A condition of this type specifies that an operation tried to operate on
 a named read--only file under the assumption that it is writeable.
-@end deffn   
+@end deffn
 
 
 @deffn {Condition Type} {&i/o-file-already-exists}
@@ -4089,7 +4089,7 @@ This condition type could be defined by:
 
 A condition of this type specifies that an operation tried to operate on
 an existing named file under the assumption that it did not exist.
-@end deffn   
+@end deffn
 
 
 @deffn {Condition Type} {&i/o-file-does-not-exist}
@@ -4106,7 +4106,7 @@ This condition type could be defined by:
 
 A condition of this type specifies that an operation tried to operate on
 an non--existent named file under the assumption that it existed.
-@end deffn   
+@end deffn
 
 
 @deffn {Condition Type} {&i/o-port}
@@ -4250,7 +4250,7 @@ symbol}s; they have implementation--specific meaning, if any.
 @quotation
 @emph{Note:} Only the name of @meta{file-options symbol} is significant.
 @end quotation
-@end deffn   
+@end deffn
 
 
 @c ------------------------------------------------------------
@@ -4632,7 +4632,7 @@ an exception with condition type @code{&assertion}.
 integer object.  If it is an integer object, the integer object does not
 necessarily correspond to a byte or character position.
 @end quotation
-@end deffn   
+@end deffn
 
 
 @deffn Procedure {port-has-set-port-position!?} @var{port}
@@ -4640,11 +4640,11 @@ necessarily correspond to a byte or character position.
 If @var{port} is a binary port, @var{pos} should be a non--negative
 exact integer object.  If @var{port} is a textual port, @var{pos} should
 be the return value of a call to @func{port-position} on @var{port}.
-   
+
 The @func{port-has-set-port-position!?} procedure returns @true{} if the
 port supports the @func{set-port-position!} operation, and @false{}
 otherwise.
-   
+
 The @func{set-port-position!} procedure raises an exception with
 condition type @code{&assertion} if the port does not support the
 operation, and an exception with condition type
@@ -4755,7 +4755,7 @@ possibly transcoder-dependent).
 @deffn Procedure {open-bytevector-input-port} @var{bytevector}
 @deffnx Procedure {open-bytevector-input-port} @var{bytevector} @var{maybe-transcoder}
 @var{maybe-transcoder} must be either a transcoder or @false{}.
-   
+
 The @func{open-bytevector-input-port} procedure returns an input port
 whose bytes are drawn from @var{bytevector}.  If @var{transcoder} is
 specified, it becomes the transcoder associated with the returned port.
@@ -4812,7 +4812,7 @@ input.
 Each of the remaining arguments may be @false{}; if any of those
 arguments is not @false{}, it must be a procedure and should behave as
 specified below.
-   
+
 @table @code
 @item (@var{read!} @var{bytevector} @var{start} @var{count})
 @var{start} will be a non--negative exact integer object, @var{count}
@@ -4831,13 +4831,13 @@ The @var{get-position} procedure (if supplied) should return an exact
 integer object representing the current position of the input port.  If
 not supplied, the custom port will not support the @func{port-position}
 operation.
-  
+
 @item (@var{set-position!} @var{pos})
 @var{pos} will be a non--negative exact integer object.  The
 @var{set-position!} procedure (if supplied) should set the position of
 the input port to @var{pos}.  If not supplied, the custom port will not
 support the @func{set-port-position!} operation.
-       
+
 @item (@var{close})
 The @var{close} procedure (if supplied) should perform any actions that
 are necessary when the input port is closed.
@@ -4863,7 +4863,7 @@ input.
 Each of the remaining arguments may be @false{}; if any of those
 arguments is not @false{}, it must be a procedure and should behave as
 specified below.
-   
+
 @table @code
 @item (@var{read!} @var{string} @var{start} @var{count})
 @var{start} will be a non--negative exact integer object, @var{count}
@@ -4882,13 +4882,13 @@ The @var{get-position} procedure (if supplied) should return a single
 value.  The return value should represent the current position of the
 input port.  If not supplied, the custom port will not support the
 @func{port-position} operation.
-  
+
 @item (@var{set-position!} @var{pos})
 The @var{set-position!} procedure (if supplied) should set the position
 of the input port to @var{pos} if @var{pos} is the return value of a
 call to @var{get-position}.  If not supplied, the custom port will not
 support the @func{set-port-position!} operation.
-       
+
 @item (@var{close})
 The @var{close} procedure (if supplied) should perform any actions that
 are necessary when the input port is closed.
@@ -4955,7 +4955,7 @@ If an end of file is reached before any bytes are available,
 @var{count} must be an exact, non--negative integer object, representing
 the number of bytes to be read. @var{bytevector} must be a bytevector
 with at least @var{start}+@var{count} elements.
-   
+
 The @func{get-bytevector-n!} procedure reads from
 @var{binary-input-port}, blocking as necessary, until @var{count} bytes
 are available from @var{binary-input-port} or until an end of file is
@@ -5035,7 +5035,7 @@ the number of characters to be read.
 The @func{get-string-n} procedure reads from @var{textual-input-port},
 blocking as necessary, until @var{count} characters are available, or
 until an end of file is reached.
-   
+
 If @var{count} characters are available before end of file,
 @func{get-string-n} returns a string consisting of those @var{count}
 characters.
@@ -5070,14 +5070,14 @@ as an exact integer object.
 
 If no characters can be read before an end of file, the end--of--file
 object is returned.
-@end deffn   
+@end deffn
 
 
 @deffn Procedure get-string-all @var{textual-input-port}
 Read from @var{textual-input-port} until an end of file, decoding
 characters in the same manner as @func{get-string-n} and
 @func{get-string-n!}.
-   
+
 If characters are available before the end of file, a string containing
 all the characters decoded from that data are returned.  If no character
 precedes the end of file, the end--of--file object is returned.
@@ -5088,7 +5088,7 @@ precedes the end of file, the end--of--file object is returned.
 Read from @var{textual-input-port} up to and including the linefeed
 character or end of file, decoding characters in the same manner as
 @func{get-string-n} and @func{get-string-n!}.
-   
+
 If a linefeed character is read, a string containing all of the text up
 to (but not including) the linefeed character is returned, and the port
 is updated to point just past the linefeed character.
@@ -5145,7 +5145,7 @@ objects that may subsequently be opened for input.
 @deffn Procedure {output-port?} @var{obj}
 Return @true{} if the argument is an output port (or a combined input
 and output port), @false{} otherwise.
-@end deffn   
+@end deffn
 
 
 @deffn Procedure {flush-output-port} @var{output-port}
@@ -5185,7 +5185,7 @@ binary port and will support the @func{port-position} and
 textual port, and whether it supports the @func{port-position} and
 @func{set-port-position!} operations is implementation--dependent (and
 possibly transcoder--dependent).
-@end deffn   
+@end deffn
 
 
 @deffn Procedure open-bytevector-output-port
@@ -5296,7 +5296,7 @@ output.
 Each of the remaining arguments may be @false{}; if any of those
 arguments is not @false{}, it must be a procedure and should behave as
 specified in the description of @func{make-custom-binary-input-port}.
-   
+
 @table @code
 @item (@var{write!} @var{bytevector} @var{start} @var{count})
 @var{start} and @var{count} will be non-negative exact integer objects,
@@ -5329,7 +5329,7 @@ output.
 Each of the remaining arguments may be @false{}; if any of those
 arguments is not @false{}, it must be a procedure and should behave as
 specified in the description of @func{make-custom-textual-input-port}.
-   
+
 @table @code
 @item (@var{write!} @var{string} @var{start} @var{count})
 @var{start} and @var{count} will be non--negative exact integer objects,
@@ -6952,16 +6952,16 @@ syntax objects or nonsymbol values at the leaves.  More formally, a
 syntax object is:
 
 @itemize
-@item 
+@item
 a pair of syntax objects,
 
-@item 
+@item
 a vector of syntax objects,
 
-@item 
+@item
 a nonpair, nonvector, nonsymbol value, or
 
-@item 
+@item
 a wrapped syntax object.
 @end itemize
 
@@ -7090,17 +7090,17 @@ More formally, an input form @emph{F} matches a pattern @emph{P} if and
 only if one of the following holds:
 
 @itemize
-@item 
+@item
 @emph{P} is an underscore (@code{_}).
 
-@item 
+@item
 @emph{P} is a pattern variable.
 
-@item 
+@item
 @emph{P} is a literal identifier and @emph{F} is an equivalent
 identifier in the sense of @func{free-identifier=?}.
 
-@item 
+@item
 @emph{P} is of the form:
 
 @example
@@ -7111,7 +7111,7 @@ identifier in the sense of @func{free-identifier=?}.
 and @emph{F} is a list of @emph{n} elements that match @emph{P_1}
 through @emph{P_n}.
 
-@item 
+@item
 @emph{P} is of the form:
 
 @example
@@ -7123,7 +7123,7 @@ and @emph{F} is a list or improper list of @emph{n} or more elements
 whose first @emph{n} elements match @emph{P_1} through @emph{P_n} and
 whose @emph{n}th cdr matches @emph{P_x}.
 
-@item 
+@item
 @emph{P} is of the form:
 
 @example
@@ -7137,7 +7137,7 @@ proper list of @emph{n} elements whose first @emph{k} elements match
 @emph{P_e}, and whose remaining @emph{n-m} elements match @emph{P_(m+1)}
 through @emph{P_n}.
 
-@item 
+@item
 @emph{P} is of the form:
 
 @example
@@ -7152,7 +7152,7 @@ match @emph{P_e}, whose next @emph{n-m} elements match @emph{P_(m+1)}
 through @emph{P_n}, and whose @emph{n}th and final cdr matches
 @emph{P_x}.
 
-@item 
+@item
 @emph{P} is of the form:
 
 @example
@@ -7163,7 +7163,7 @@ through @emph{P_n}, and whose @emph{n}th and final cdr matches
 and @emph{F} is a vector of @emph{n} elements that match @emph{P_1}
 through @emph{P_n}.
 
-@item 
+@item
 @emph{P} is of the form:
 
 @example
@@ -7177,7 +7177,7 @@ vector of @emph{n} or more elements whose first @emph{k} elements match
 @emph{P_e}, and whose remaining @emph{n-m} elements match @emph{P_(m+1)}
 through @emph{P_n}.
 
-@item 
+@item
 @emph{P} is a pattern datum (any nonlist, nonvector, nonsymbol datum)
 and @emph{F} is equal to @emph{P} in the sense of the @func{equal?}
 procedure.
@@ -7281,19 +7281,19 @@ The output produced by @func{syntax} is wrapped or unwrapped according
 to the following rules.
 
 @itemize
-@item 
+@item
 the copy of @code{(@hyperi{t} .  @hyperii{t})} is a pair if @hyperi{t}
 or @hyperii{t} contain any pattern variables,
 
-@item 
+@item
 the copy of @code{(@hyper{t} @hyper{ellipsis})} is a list if @hyper{t}
 contains any pattern variables,
 
-@item 
+@item
 the copy of @code{#(@hyperi{t} ... @hypern{t})} is a vector if any of
 @hyperi{t}, @dots{}, @hypern{t} contain any pattern variables, and
 
-@item 
+@item
 the copy of any portion of @hyper{t} not containing any pattern
 variables is a wrapped syntax object.
 @end itemize
@@ -7385,11 +7385,11 @@ objects, below.
 
 (map (rec fact
        (lambda (n)
-         (if (= n 0)                 
+         (if (= n 0)
              1
              (* n (fact (- n 1))))))
      '(1 2 3 4 5))    => (1 2 6 24 120)
- 
+
 (rec 5 (lambda (x) x)) => exception &syntax
 @end example
 @end deffn
@@ -7813,7 +7813,7 @@ where appropriate.
                 [(e0 => e1)
                  #'(let ([t e0]) (if t (e1 t) rest))]
                 [(e0 e1 e2 ...)
-                 #'(if e0 
+                 #'(if e0
                         (begin e1 e2 ...)
                         rest)]))]))])))
 @end example
@@ -7878,7 +7878,7 @@ be rewritten using @func{quasisyntax} as follows.
                             #,(f (car cmore)
                                   (cdr cmore)))]))))])))
 @end example
-                          
+
 Uses of @func{unsyntax} and @func{unsyntax-splicing} with zero or more
 than one subform are valid only in splicing (list or vector) contexts.
 @code{(unsyntax @var{template} @dots{})} is equivalent to
@@ -7973,18 +7973,18 @@ The condition object provided with the exception has the following
 condition types:
 
 @itemize
-@item 
+@item
 If @var{who} is not @false{} or can be inferred, the condition has
 condition type @code{&who}, with @var{who} as the value of its field.
 In that case, @var{who} should identify the procedure or entity that
 detected the exception.  If it is @false{}, the condition does not have
 condition type @code{&who}.
 
-@item 
+@item
 The condition has condition type @code{&message}, with @var{message} as
 the value of its field.
 
-@item 
+@item
 The condition has condition type @code{&syntax} with @var{form} and
 @var{subform} as the value of its fields.  If @var{subform} is not
 provided, the value of the subform field is @false{}.
@@ -8976,21 +8976,21 @@ this report.
 @c page
 @node concept index
 @appendix An entry for each concept
-     
+
 @printindex cp
-     
+
 @node function index
-@appendix An entry for each function. 
+@appendix An entry for each function.
 
 @printindex fn
 
 @node variable index
-@appendix An entry for each variable. 
+@appendix An entry for each variable.
 
 @printindex vr
 
 @node type index
-@appendix An entry for each type. 
+@appendix An entry for each type.
 
 @printindex tp
 
@@ -8998,7 +8998,7 @@ this report.
 @bye
 
 
-@c Local Variables: 
+@c Local Variables:
 @c mode: texinfo
 @c TeX-master: t
-@c End: 
+@c End:

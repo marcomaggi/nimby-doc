@@ -15,9 +15,9 @@
 
 @end ignore
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
+@c page
+@c ------------------------------------------------------------
+@c Macro definitions.
 @c ------------------------------------------------------------
 
 @macro version{}
@@ -40,7 +40,7 @@ Marco Maggi
 @acronym{GPL}
 @end macro
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+@c ------------------------------------------------------------
 
 @macro nvm{}
 NekoVM
@@ -66,8 +66,8 @@ NekoVM
 @acronym{FFI}
 @end macro
 
-@macro xml{}
-@acronym{XML}
+@macro axml{}
+@acronym{AXML}
 @end macro
 
 @macro utf8{}
@@ -90,9 +90,9 @@ NekoVM
 @acronym{NXML}
 @end macro
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+@c ------------------------------------------------------------
 
-@macro null{}
+@macro cnull{}
 @code{null}
 @end macro
 
@@ -104,7 +104,7 @@ NekoVM
 @code{false}
 @end macro
 
-@macro cfunction{NAME}
+@macro cfunc{NAME}
 @code{\NAME\()}
 @end macro
 
@@ -116,7 +116,7 @@ NekoVM
 @code{$\NAME\}
 @end macro
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+@c ------------------------------------------------------------
 
 @macro neko{}
 @command{neko}
@@ -130,9 +130,7 @@ NekoVM
 @command{nekoml}
 @end macro
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @titlepage
 @title NekoVM
 @subtitle @version{}
@@ -156,23 +154,21 @@ copy of the license is included in the section entitled ``GNU Free
 Documentation License''.
 @end titlepage
 
-
 @c ------------------------------------------------------------
 
 @ifinfo
 @dircategory Development
 @direntry
-* neko: (neko).                 Unofficial documentation for NekoVM. 
+* neko: (neko).                 Unofficial documentation for NekoVM.
 @end direntry
 @end ifinfo
 
-@c ------------------------------------------------------------
+@c page
 @ifnottex
 @node Top
 @top The Neko Programming Language
 
 
-@noindent
 Neko is a high level dynamically typed programming language which can
 also be used as an embedded scripting language.  This document gathers
 unofficial documentation describing version @version{} of @nvm{}; this
@@ -206,12 +202,12 @@ Invariant Sections, no Front--Cover Texts, and no Back--Cover Texts.
 section entitled ``GNU Free Documentation License''.
 
 @menu
-* overview::                    Overview of @nvm{}. 
+* overview::                    Overview of @nvm{}.
 * programs::                    Invoking Neko programs.
 * specs::                       Neko language specification.
 * ffi::                         Foreign functions interface.
 * embedding::                   Embedding the virtual machine.
-* nxml::                        Neko in @xml{} format.
+* nxml::                        Neko in @axml{} format.
 * lib::                         Neko library.
 
 Appendices
@@ -226,10 +222,10 @@ Appendices
 
 Indexes
 
-* Concept Index::               An entry for each concept. 
-* Function Index::              An entry for each function. 
-* Variable Index::              An entry for each variable. 
-* Type Index::                  An entry for each type. 
+* Concept Index::               An entry for each concept.
+* Function Index::              An entry for each function.
+* Variable Index::              An entry for each variable.
+* Type Index::                  An entry for each type.
 
 @detailmenu
  --- The Detailed Node Listing ---
@@ -370,8 +366,8 @@ The standard library
 * lib string::                  Additional string functions.
 * lib sys::                     Interaction with the operating system.
 * lib thread::                  Creating and managing system threads.
-* lib utf8::                    Handling @utf8{} strings.
-* lib xml::                     The standard event--driven @xml{} parser. 
+* lib utf8::                    Handling @acronym{UTF8} strings.
+* lib xml::                     The standard event--driven @axml{} parser.
 * lib misc::                    Miscellaneous functions.
 
 Additionally libraries
@@ -434,14 +430,12 @@ Neko code examples
 
 @end ifnottex
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-@c ------------------------------------------------------------
+@c page
 @node overview
 @chapter Overview of @nvm{}
 
 
-@noindent
 Neko is a high level, dynamically typed, programming language which can
 also be used as an embedded scripting language.  It is designed to
 provide a common runtime for several different languages.  Neko is not
@@ -455,10 +449,8 @@ provides one of the best trade off available between simplicity,
 extensibility and speed.
 
 
-@section The Neko Virtual Machine
+@subsubheading The Neko Virtual Machine
 
-
-@noindent
 Neko has a compiler and a virtual machine (@vm{}).  The @vm{} is both
 lightweight and optimised so it offers fast code execution; it can be
 easily embedded into any application and C language libraries are
@@ -474,19 +466,15 @@ or as a Neko library to perform compile--and--run for interactive
 languages.
 
 
-@section @modneko{}
+@subsubheading @modneko{}
 
-
-@noindent
 Neko comes with several libraries.  One of these is @modneko{},
 which embeds the Neko Virtual Machine into the Apache web server, so we
 can use Neko to generate web pages.
 
 
-@section About Neko
+@subsubheading About Neko
 
-
-@noindent
 Neko is developed as part of the Research and Development effort for
 better languages at Motion--Twin.  The author of Neko is Nicolas
 Cannasse and can be contacted at @email{ncannasse@@motion-twin.com}.
@@ -503,10 +491,7 @@ and visit Neko's web site:
 
 @center @url{http://www.nekovm.org/}
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node programs
 @chapter Invoking Neko programs
 
@@ -517,10 +502,7 @@ and visit Neko's web site:
 * neko::                        The virtual machine boot program.
 @end menu
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node nekoc
 @section The Neko language compiler
 
@@ -536,8 +518,6 @@ and visit Neko's web site:
 * nekoc console::               Running the virtual machine interactively.
 @end menu
 
-
-@noindent
 The program @command{nekoc} is the Neko language compiler: it produces
 bytecode to be run under the @vm{}.  @ref{nekotools} for details on how
 to produce standalone executables.
@@ -582,14 +562,11 @@ turn on verbose mode;
 print the help screen and exit.
 @end table
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node nekoc compile
 @subsection Compiling source files
 
 
-@noindent
 Let's have a source file @file{proof.neko} like this:
 
 @example
@@ -624,14 +601,11 @@ $ nekoc red.neko green.neko blue.neko
 to produce one bytecode file for each: @file{red.n}, @file{green.n},
 @file{blue.n}.
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node nekoc release
 @subsection Cleaning bytecode for release
 
 
-@noindent
 Let's have a source file @file{proof.neko} like this:
 
 @example
@@ -661,15 +635,11 @@ $ nekoc -z proof.n
 @noindent
 this command will modify @file{proof.n} itself.
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node nekoc link
 @subsection Linking together more bytecode files
 
 
-@noindent
 The @option{-link} option of @command{nekoc} allows us to append more
 bytecode files into a single file so that the code is executed
 sequentially.
@@ -724,15 +694,11 @@ Each source file has its own namespace: the variables declared in
 @file{green.neko} and vice versa.  The only thing that linking does is
 to append code to be executed in sequence.
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node nekoc dump
 @subsection Dumping bytecode from a compiled file
 
 
-@noindent
 Let's have a source file @file{proof.neko} like this:
 
 @example
@@ -782,14 +748,11 @@ END
 This is useful for debugging the compiler and to compare the performance
 of alternative chunks of high level language code.
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node nekoc normalise
 @subsection Source files normalisation
 
 
-@noindent
 The @option{-p} option of @command{nekoc} allows us to ``normalise'' the
 source code and to detect errors without compiling; normalising means:
 removing comments, properly indenting code, adding @code{;} characters
@@ -804,15 +767,11 @@ $ nekoc -p proof.neko
 @noindent
 which will produce a normalised file called @file{proof2.neko}.
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node nekoc console
 @subsection Running the virtual machine interactively
 
 
-@noindent
 The @option{-console} option of @command{nekoc} runs the virtual machine
 in a read--eval--print loop; we type a command and end the line with a
 @code{!} followed by a return:
@@ -832,22 +791,14 @@ $ nekoc -console
 to exit send an end--of--file character (@key{Control-d} on Unix like
 terminals).
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node nekotools
 @section Miscellaneous features
 
 
 @cindex @command{nekotools}, miscellaneous features
 
-@menu
-* nekotools boot::              Building standalone executables.
-* nekotools server::            Web server.
-@end menu
 
-@noindent
 The program @command{nekotools} allows us to access a set of features
 offered by the Neko programming environment.  The synopsis is:
 
@@ -864,16 +815,18 @@ the available options are:
 print the help screen and exit.
 @end table
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+@menu
+* nekotools boot::              Building standalone executables.
+* nekotools server::            Web server.
+@end menu
 
-@c ------------------------------------------------------------
+@c page
 @node nekotools boot
 @subsection Building standalone executables
 
 
 @cindex Building standalone executables
 
-@noindent
 When run with the @code{boot} subcommand: @command{nekotools} reads a
 single bytecode file and produces a standalone executable by prepending
 to it the Neko virtual machine boot program and linking the two
@@ -912,17 +865,14 @@ $ ./proof
 
 The executable will require the Neko shared library.
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node nekotools server
 @subsection Web server
 
 
 @cindex Using the web server
 
-@noindent
+
 When run with the @code{server} subcommand: @command{nekotools} starts a
 simple web server.  It is a very small web server that runs locally for
 development purposes only; it mimics the same @api{} as @modneko{}.
@@ -944,10 +894,7 @@ directory and we can start browsing it.  If the site contains @code{.n}
 Neko bytecode files, they will be loaded and executed just like Apache
 @modneko{} does.
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node neko
 @section The Neko virtual machine boot program
 
@@ -955,7 +902,7 @@ Neko bytecode files, they will be loaded and executed just like Apache
 @cindex Shared libraries
 @cindex @code{.ndll}, extension of shared libraries
 
-@noindent
+
 The Neko virtual machine is one binary called @command{neko} included in
 the @nvm{} distribution.  We can call it anytime using:
 
@@ -985,10 +932,7 @@ directory but also using the @env{NEKOPATH} environment variable, which
 can list several search paths separated by @code{:}.
 @end defvr
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node specs
 @chapter Neko language specification
 
@@ -1010,22 +954,18 @@ can list several search paths separated by @code{:}.
 * specs modules::               Modules.
 @end menu
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node specs notation
 @section Notation for functions documentation
 
 
-@noindent
 Here's the notation of types for function arguments and return values
 that is used in the following language specification, and that should be
 used when documenting libraries, too:
 
 @enumerate
 @item
-the basic types are indicated with: @null{}, @code{int}, @code{float},
+the basic types are indicated with: @cnull{}, @code{int}, @code{float},
 @code{bool}, @code{string}, @code{array}, @code{object},
 @code{function};
 
@@ -1062,8 +1002,8 @@ types: @code{@{ x => int, y => int @}} which means an object having at
 least two fields @code{x} and @code{y} of type @code{int};
 
 @item
-if the @null{} value is accepted as well as some other type, we can
-write, for example @code{int?}, which means @code{int} or @null{};
+if the @cnull{} value is accepted as well as some other type, we can
+write, for example @code{int?}, which means @code{int} or @cnull{};
 
 @item
 if several types are accepted we can separate them with pipe characters
@@ -1083,15 +1023,11 @@ the user of the library should not rely on its actual implementation
 since we can change it in the future.
 @end enumerate
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node specs syntax
 @section Syntax of the language
 
 
-@noindent
 The syntax of the Neko language is designed to be easy to parse and easy
 to generate.  It is not specifically designed to be written by a
 programmer, but rather to be generated from a higher level language.
@@ -1226,19 +1162,16 @@ comparisons;
 @end enumerate
 @end itemize
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node specs values
 @section Values.
 
 
-@noindent
 A value in Neko can be one of the following:
 
 @table @emph
 @item Null
-the special value @null{} is used for uninitialised variables as well as
+the special value @cnull{} is used for uninitialised variables as well as
 programmer/language specific coding techniques;
 
 @item Integer
@@ -1299,15 +1232,11 @@ characters; the length of a string is determined by the number of bytes
 in it, and not by the number of characters before the first @code{\0}.
 @end itemize
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node specs flow
 @section Execution flow
 
 
-@noindent
 Here's some explanation on how each expression is evaluated.
 
 @menu
@@ -1317,10 +1246,7 @@ Here's some explanation on how each expression is evaluated.
 * specs flow ops::              Operations on basic types.
 @end menu
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node specs flow values
 @subsection Evaluation of values
 
@@ -1355,14 +1281,11 @@ details);
 evaluates to the value currently bound to this variable name.
 @end table
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node specs flow exprs
 @subsection Evaluation of expressions
 
 
-@noindent
 Before evaluating any expression, all subexpressions are evaluated in an
 unspecified order; @code{v} here represent the value obtained from
 evaluation of subexpressions:
@@ -1372,7 +1295,7 @@ evaluation of subexpressions:
 the evaluation order follows the order of the declarations; the value of
 the last expression, @code{vk}, is returned as result, unless the
 program does not contain any expressions, in which case it returns
-@null{};
+@cnull{};
 
 @item @{ i1 => v1 , i2 => v2 ... @}
 this will create an object with fields @code{i1...ik} set to the values
@@ -1399,7 +1322,7 @@ evaluates to @code{v};
 
 @item var i1 = v1, i2 = v2, .... ik = vk
 each variable @code{i} is set to the corresponding value @code{v}, or to
-@null{} if no initialisation expression is provided;
+@cnull{} if no initialisation expression is provided;
 
 @item while .... | do ... while ...
 implements the classic @code{while} loop; its value is the one returned
@@ -1447,7 +1370,7 @@ a label;
 evaluates @code{e} and tests it against each @code{eia} sequentially
 until it is found to be equal, then returns value of the corresponding
 expression @code{eib}; if no value is found to be equal to @code{e}, the
-value of the @code{edef} expression is returned; @null{} is returned if
+value of the @code{edef} expression is returned; @cnull{} is returned if
 @code{default} is not specified.
 @end table
 
@@ -1456,22 +1379,17 @@ consider the boolean @true{} to be true.  We might need to add a
 @builtin{istrue} opcode before each expression in order to convert the
 expression result into a boolean.
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node specs flow vars
 @subsection Handling of variables
 
 
-@noindent
 When an identifier is found, it must be resolved to a scope containing
 the variable's value.  The search starts in the local scope.
 
 
 @subsubsection Local scope
 
-
-@noindent
 The local scope contains all variables defined with the @code{var}
 keyword in previous syntactical blocks.  In the following sample
 @code{x} resolves to the value @code{3}:
@@ -1534,12 +1452,10 @@ var x = 3;
 f(); // will print "null"
 @end example
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+@c ------------------------------------------------------------
 
 @subsubsection Function scope
 
-
-@noindent
 Local variables can be used inside functions if they're accessible at
 the time the function is declared.  In this case, the value of the
 variable is a copy of its value at the time the function was defined:
@@ -1586,12 +1502,10 @@ f1(); // print 2
 ...
 @end example
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+@c ------------------------------------------------------------
 
 @subsubsection Global scope
 
-
-@noindent
 When a variable is not found in the local scope or in the local function
 environment, it is a global variable.  A global variable can be accessed
 throughout the whole file, it is shared among all code.
@@ -1607,12 +1521,18 @@ f(); // print 1
 $print(x); // print 2
 @end example
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node specs flow ops
 @subsection Operations on basic types
 
+
+Basic types are numbers (integer and float), booleans (bool), the
+@cnull{} value, strings, objects, arrays and functions.  There are
+several operations available for them.
+
+In the following tables: on the row is the type of the first operand, on
+the column is the type of the second operand; an @code{X} means that the
+operation is invalid and will raise an exception.
 
 @menu
 * specs flow ops arithmetic::   Arithmetic operations.
@@ -1624,19 +1544,7 @@ $print(x); // print 2
 * specs flow ops conversion::   Conversion.
 @end menu
 
-
-@noindent
-Basic types are numbers (integer and float), booleans (bool), the
-@null{} value, strings, objects, arrays and functions.  There are
-several operations available for them.
-
-In the following tables: on the row is the type of the first operand, on
-the column is the type of the second operand; an @code{X} means that the
-operation is invalid and will raise an exception.
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node specs flow ops arithmetic
 @subsubsection Arithmetic operations
 
@@ -1649,7 +1557,6 @@ operation is invalid and will raise an exception.
 @findex @code{__add}
 @findex @code{__radd}
 
-@noindent
 Operation addition (@code{+}): the result is either the type of the
 returned value, or @code{concat} if we use string concatenation (in that
 case, the two values are converted to strings and then concatenated
@@ -1734,15 +1641,11 @@ Return @true{} if a value is the float NaN.
 Return if a value is the float @code{+Infinite}.
 @end deftypefn
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node specs flow ops bitwise
 @subsubsection Bitwise operations
 
 
-@noindent
 The following operations are available for integers only.  For
 performance reasons, Neko integers are signed and have 31 bits only, so
 the ``unsigned'' part is of 30 bits only.
@@ -1756,7 +1659,7 @@ Left bit shift.
 Right bit shift.
 @end deffn
 
-@deffn {Bitwise Binary Operation}>>>
+@deffn {Bitwise Binary Operation} >>>
 Right unsigned bit shift.
 @end deffn
 
@@ -1775,9 +1678,7 @@ Xor bits.
 Using these operations with one or more non--integer operands will raise
 an exception.
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node specs flow ops boolean
 @subsubsection Boolean operations
 
@@ -1790,7 +1691,7 @@ Convert any value to a boolean.  The result of applying @builtin{istrue}
 to a value depends on its type:
 
 @table @asis
-@item @null{}
+@item @cnull{}
 yields @false{};
 
 @item integer
@@ -1808,7 +1709,7 @@ yields @true{};
 @end table
 
 @noindent
-only the values @null{}, @false{}, and @code{0} (integer) evaluate to
+only the values @cnull{}, @false{}, and @code{0} (integer) evaluate to
 @false{}.
 @end deftypefn
 
@@ -1816,13 +1717,10 @@ only the values @null{}, @false{}, and @code{0} (integer) evaluate to
 @deftypefn {Neko Builtin} bool $not (@var{v} : any)
 The inverse of @builtin{istrue}; return the opposite of the boolean that
 would have been returned by @builtin{istrue}: @true{} if @var{v} is
-@false{} or @null{} or @code{0}.
+@false{} or @cnull{} or @code{0}.
 @end deftypefn
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node specs flow ops logic
 @subsubsection Logic operations
 
@@ -1830,7 +1728,6 @@ would have been returned by @builtin{istrue}: @true{} if @var{v} is
 @findex @code{&&}
 @findex @code{||}
 
-@noindent
 Logic boolean operations are short--circuited: if the first operand of
 an @code{&&} is false or the first operand of an @code{||} is true, then
 the second operand is not evaluated, and the first value is returned;
@@ -1842,14 +1739,11 @@ equivalent to @code{if (a == true) a else b} with @code{a} being
 evaluated only once.  We might prefer to call @builtin{istrue} on each
 argument before performing the operation.
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node specs flow ops comparison
 @subsubsection Equality and comparison
 
 
-@noindent
 Comparison occurs when the following operations are performed.
 
 @deffn {Comparison Operation} ==
@@ -1914,7 +1808,7 @@ the two strings;
 
 @item acmp
 compares the addresses of @code{a} and @code{b}; it returns @code{0} if
-they're equal, @null{} otherwise;
+they're equal, @cnull{} otherwise;
 @c @code{-1} if @code{a < b}, and @code{+1} if @code{a > b};
 
 @item bcmp
@@ -1927,10 +1821,10 @@ does ``object comparison''; if the two objects' addresses are equal,
 then it returns @code{0}; otherwise it calls the method @code{__compare}
 on the first object, with the second object as argument; if the returned
 value is an integer, the integer is returned by @builtin{compare}, else
-@null{} is returned;
+@cnull{} is returned;
 
 @item -
-means that the comparison is invalid, the returned value is @null{} when
+means that the comparison is invalid, the returned value is @cnull{} when
 using @builtin{compare} and @false{} when using an operator.
 @end table
 @end deftypefn
@@ -1958,10 +1852,7 @@ using their memory address.  We can use @builtin{pcompare} instead of
 @builtin{compare} if we want to optimise our integer comparisons.
 @end deftypefn
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node specs flow ops assignment
 @subsubsection Assignment
 
@@ -1981,7 +1872,6 @@ using their memory address.  We can use @builtin{pcompare} instead of
 @findex @code{++=}
 @findex @code{--=}
 
-@noindent
 The following operations are available to modify the value of a
 variable, object field, array slot@dots{}
 
@@ -2004,9 +1894,7 @@ $print(a ++= 1);        // 1
 $print(a);              // 2
 @end example
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node specs flow ops conversion
 @subsubsection Conversion
 
@@ -2016,7 +1904,7 @@ $print(a);              // 2
 
 
 @deftypefn {Neko Builtin} int $int (@var{value} : string|float)
-Convert a string or a float to an integer; return @null{} if the
+Convert a string or a float to an integer; return @cnull{} if the
 argument cannot be converted to an integer.  Examples:
 
 @example
@@ -2028,7 +1916,7 @@ $int($array(4)); // null
 
 
 @deftypefn {Neko Builtin} float $float (@var{value} : string|integer)
-Convert a string or integer to a float; return @null{} if the argument
+Convert a string or integer to a float; return @cnull{} if the argument
 cannot be converted to an integer.  Examples:
 
 @example
@@ -2059,15 +1947,11 @@ number of arguments of the function (or @code{-1} if multiple
 arguments).
 @end deftypefn
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node specs rtti
 @section Runtime type information
 
 
-@noindent
 No matter if our language is statically or dynamically typed, we can
 always access @rtti{} in Neko.  @rtti{} is powerful because we can
 decide which behaviour to adopt depending on some value at runtime.  The
@@ -2133,17 +2017,13 @@ manipulate them at runtime.
 Variables holding integer identifiers for Neko built in data types.
 @end defvr
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node specs funcs
 @section Functions and function calls
 
 
 @findex @code{function}
 
-@noindent
 Defining new functions is easy: since functions are values, we can
 simply assign them to a local or a global variable:
 
@@ -2246,13 +2126,17 @@ Return a variable arguments function that, when called, will callback
 @var{f} with the array of arguments.
 @end deftypefn
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node specs objects
 @section Objects
 
+
+Objects are some kind of optimised hash tables.  All fields names are
+hashed into an integer value that is used as the key into a look up
+table.  Insertion of a new field is O(n), access to a field is O(log n).
+If we're generating Neko code from a statically typed programming
+language, we might prefer arrays for storing fields, since they provide
+O(1) access.
 
 @menu
 * specs objects making::        Creating objects.
@@ -2264,26 +2148,14 @@ Return a variable arguments function that, when called, will callback
 * specs objects misc::          Other functions.
 @end menu
 
-
-@noindent
-Objects are some kind of optimised hash tables.  All fields names are
-hashed into an integer value that is used as the key into a look up
-table.  Insertion of a new field is O(n), access to a field is O(log n).
-If we're generating Neko code from a statically typed programming
-language, we might prefer arrays for storing fields, since they provide
-O(1) access.
-
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node specs objects making
 @subsection Creating objects
 
 
 @deftypefn {Neko Builtin} object $new (@var{o} : object?)
 Create and return an object.  The return value is a copy of the existing
-object @var{o} or a new, empty, object if @var{o} is @null{}:
+object @var{o} or a new, empty, object if @var{o} is @cnull{}:
 
 @example
 o  = $new(null); // new empty object
@@ -2291,7 +2163,7 @@ o2 = $new(o);    // makes a copy of "o"
 @end example
 
 @noindent
-if @var{o} is not an object or @null{}: throw an exception.
+if @var{o} is not an object or @cnull{}: throw an exception.
 @end deftypefn
 
 
@@ -2334,10 +2206,7 @@ var o = @{
 @}
 @end example
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node specs objects access
 @subsection Setting and getting values
 
@@ -2350,7 +2219,7 @@ of collision.
 
 @deftypefn {Neko Builtin} any $objset (@var{o} : object, @var{field_id} : int, @var{value} : any)
 Set the field identified by @var{field_id} in @var{o} to @var{value} and
-return @var{value} if @var{o} is an object or @null{} otherwise.
+return @var{value} if @var{o} is an object or @cnull{} otherwise.
 Example:
 
 @example
@@ -2368,7 +2237,7 @@ happens when the field is set using the dot operator.
 
 
 @deftypefn {Neko Builtin} any $objget (@var{o} : object, @var{field_id} : int)
-Return the field identified by @var{field_id} in @var{o}, or @null{} if
+Return the field identified by @var{field_id} in @var{o}, or @cnull{} if
 the such field does not exist or @var{o} is not an object.  Example
 
 @example
@@ -2378,7 +2247,7 @@ $objset(o, id, "value");
 $print($objget(o, id));
 @end example
 
-If a field is not defined when accessed for reading: @null{} is
+If a field is not defined when accessed for reading: @cnull{} is
 returned.
 @end deftypefn
 
@@ -2398,14 +2267,11 @@ to print the field names of an object, for debugging or other purposes.
 
 
 @deftypefn {Neko Builtin} string $field (@var{n} : int)
-Reverse the hashed value of a field's name.  Return @null{} if @var{n}
+Reverse the hashed value of a field's name.  Return @cnull{} if @var{n}
 is not in the table of fields.
 @end deftypefn
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node specs objects inspect
 @subsection Inspecting objects
 
@@ -2413,7 +2279,7 @@ is not in the table of fields.
 @deftypefn {Neko Builtin} bool $objfield (@var{o} : object, @var{field_id} : int)
 Check for a field existence; return true if @var{o} is an object which
 has a field identified by @var{field_id}.  This operation works even if
-the field is set to @null{}.  Example:
+the field is set to @cnull{}.  Example:
 
 @example
 $objfield(o, $hash("field"));    // true if "o" has "field"
@@ -2477,17 +2343,13 @@ s.y     = 4;
 $print("rho = " + s.rho + " theta = " + s.theta "\n");
 @end example
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node specs objects methods
 @subsection Defining methods
 
 
 @cindex @code{this}
 
-@noindent
 A method is a function stored in an object field.  When a function is
 called using the dot operator or the built in operation
 @builtin{objcall}, the function can access a special variable named
@@ -2535,18 +2397,14 @@ $print(this); // 1
 @deftypefn {Neko Builtin} any $objcall (@var{o} : any, @var{field_id} : int, @var{args} : array)
 Call the function stored in the field identified by @var{field_id} in
 @var{o} with arguments taken from the array @var{args}; return the
-return value of the function or @null{} if @var{o} is not an object.
+return value of the function or @cnull{} if @var{o} is not an object.
 @end deftypefn
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node specs objects overloading
 @subsection Operators overloading
 
 
-@noindent
 Several operators can be overloaded: when they're applied to objects
 they are actually calling methods.  If the overloaded method is not
 defined when an operation occurs, an exception is raised.
@@ -2567,7 +2425,7 @@ Compare two different objects.  The method is called with the first
 object stored in @code{this} and the second object as parameter.
 
 Notice that, as per the specs of Neko: comparison between an object and
-a non--object returns @null{} directly, without examining the fields of
+a non--object returns @cnull{} directly, without examining the fields of
 the object itself.  This means that @function{__compare} is invoked only
 whenever a comparison between two objects happens, and the invoked
 @function{__compare} is the one of the objects to the left.  Neko does
@@ -2630,10 +2488,7 @@ Called when an object is accessed as an array for writing, using
 @code{a[i] = v} actually calls @code{a.__set(i,v)}.
 @end deftypefn
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node specs objects protos
 @subsection Prototypes
 
@@ -2641,7 +2496,6 @@ Called when an object is accessed as an array for writing, using
 @findex @builtin{objgetproto}
 @findex @builtin{objsetproto}
 
-@noindent
 Each object can have a ``prototype'' which is also an object.  When a
 field is accessed for reading and is not found in an object, it is
 searched in its prototype, then in the prototype of the prototype, and
@@ -2653,12 +2507,12 @@ Prototypes can be accessed using @builtin{objgetproto} and
 @example
 var proto = $new(null);
 proto.foo = function() @{ $print(this.msg) @}
- 
+
 var o = $new(null);
 o.msg = "hello";
 $objsetproto(o,proto);
 o.foo(); // print "hello"
- 
+
 $objsetproto(o,null); // remove proto
 o.foo(); // exception
 @end example
@@ -2673,10 +2527,7 @@ Set the prototype of the object.
 Get the prototype of the object.
 @end deftypefn
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node specs objects misc
 @subsection Other functions
 
@@ -2690,15 +2541,11 @@ $objremove(o, $hash("field"));
 @end example
 @end deftypefn
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node specs array
 @section Arrays
 
 
-@noindent
 Array is a Neko type, not an object.  If in our high level language
 arrays are objects, then we can write an object wrapper using an array
 value to store the data, and matching the @api{} of our language.
@@ -2709,7 +2556,7 @@ used as key, will cause an exception to be raised.
 
 When getting a value: if the integer key is in the range of the array
 bounds (between @code{0} and @code{size - 1}), then the value returned
-is the one stored at that index; else it's @null{}.  That is:
+is the one stored at that index; else it's @cnull{}.  That is:
 @strong{no} error is raised if the index is out of bounds.
 
 When setting a value: if the integer key is out of bounds, then the
@@ -2725,7 +2572,7 @@ empty array with the given number of slots.  Examples:
 @example
 var a = $array(1,3,"test"); // array with three values
 var b = $amake(0);          // empty array
- 
+
 $print(a[0]);   // prints 1
 $print(a[2]);   // prints "test"
 $print(a[3]);   // prints null
@@ -2826,23 +2673,11 @@ var array_compare = function (a, b) @{
 @};
 @end example
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node specs string
 @section Strings
 
 
-@menu
-* specs string make::           Creating strings.
-* specs string access::         Accessing characters.
-* specs string copy::           Copying strings.
-* specs string inspect::        Inspecting strings.
-@end menu
-
-
-@noindent
 Strings are a type and not objects.  They are arrays of bytes, so they
 can be convenient to store a large quantity of small numbers or binary
 data.
@@ -2856,8 +2691,8 @@ with Neko's standard library.  @ref{lib file} for details.
 Neko strings are just buffers of bytes, so they are independent from any
 encoding.  The encoding depends on the @api{} we're using to manipulate
 strings.  We can use either the built in operations which manipulate
-bytes (then suitable for @acronym{ISO}) or the @utf8{} @api{} (in the
-standard library) which manipulates @utf8{} char codes.  @ref{lib utf8}
+bytes (then suitable for @acronym{ISO}) or the @acronym{UTF8} @api{} (in the
+standard library) which manipulates @acronym{UTF8} char codes.  @ref{lib utf8}
 for details.
 
 Literal strings can contain any character, including newlines and binary
@@ -2881,10 +2716,14 @@ tab;
 000 and 255.
 @end table
 
+@menu
+* specs string make::           Creating strings.
+* specs string access::         Accessing characters.
+* specs string copy::           Copying strings.
+* specs string inspect::        Inspecting strings.
+@end menu
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node specs string make
 @subsection Creating strings
 
@@ -2908,23 +2747,20 @@ Strings can contain a maximum of 2 ^ 29 - 1 characters, or
 Convert any value to a string.  This will make a copy of string.
 @end deftypefn
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node specs string access
 @subsection Accessing characters
 
 
 @deftypefn {Neko Builtin} int? $sget (@var{s} : string, @var{position} : int)
 Return the @var{position}th char of a string as integer in the range
-@code{[0, 255]}, or @null{} if @var{position} is out of bounds.
+@code{[0, 255]}, or @cnull{} if @var{position} is out of bounds.
 @end deftypefn
 
 
 @deftypefn {Neko Builtin} int? $sset (@var{s} : string, @var{position} : int, @var{c} : int)
 Set the @var{position}th char of a string to @code{@var{c} % 255}.
-Return @var{c} itself or @null{} if @var{position} is out of bounds.
+Return @var{c} itself or @cnull{} if @var{position} is out of bounds.
 @end deftypefn
 
 
@@ -2936,15 +2772,11 @@ $sset(s,0,3684);        // set byte 0 to 3624 mod 256
 $print( $sget(s,0) );   // prints 40
 @end example
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node specs string copy
 @subsection Copying strings
 
 
-@noindent
 Notice that assigning a constant string does not copy it, so the
 constant content can be modified.  Also, equal constant strings can be
 collapsed into the same string, so we have to be careful about
@@ -2975,7 +2807,7 @@ $print( $ssub(s,1,3) ); // prints "ell"
 
 @deftypefn {Neko Builtin} void $sblit (@var{dst} : string, @var{dst_pos} : int, @var{src} : string, @var{src_pos} : int, @var{len} : int)
 Copy @var{len} chars from @var{src_pos} of @var{src} to @var{dst_pos} of
-@var{dst}; return the number of bytes copied or @null{} if the copy
+@var{dst}; return the number of bytes copied or @cnull{} if the copy
 failed.  An exception is raised if the arguments select ranges that are
 out of strings bounds.  Examples:
 
@@ -2987,10 +2819,7 @@ $print(s2); // prints "string to blit"
 @end example
 @end deftypefn
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node specs string inspect
 @subsection Inspecting strings
 
@@ -3002,7 +2831,7 @@ Return the size of a string.
 
 @deftypefn {Neko Builtin} int $sfind (@var{s} : string, @var{position} : int, @var{pattern} : string)
 Return the index of the first occurrence of @var{pattern} in @var{s},
-beginning the search at @var{position}.  Return @null{} if not found.
+beginning the search at @var{position}.  Return @cnull{} if not found.
 An exception is raised if @var{position} is out of bounds.  Example:
 
 @example
@@ -3012,10 +2841,7 @@ $print($sfind(s,20,"to"));      // prints null
 @end example
 @end deftypefn
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node specs exceptions
 @section Exceptions
 
@@ -3025,8 +2851,6 @@ $print($sfind(s,20,"to"));      // prints null
 @findex @builtin{excstack}
 @findex @builtin{callstack}
 
-
-@noindent
 Exceptions are often referred to as ``non local jumps'' or ``non local
 exits''.  They are a very good way to handle errors than can happen at
 several calls between the function that yields an error and the handler
@@ -3071,7 +2895,7 @@ place it was catched.  The stack is composed of the following items:
 
 @itemize
 @item
-@null{} when it's a C function;
+@cnull{} when it's a C function;
 
 @item
 a string when it's a module without debug informations;
@@ -3115,13 +2939,15 @@ stack.  Never returns.
 Return the current call stack.  Same format as @builtin{excstack}.
 @end deftypefn
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node specs hash tables
 @section Hash tables
 
+
+Neko's hash tables are abstract types; they can only be manipulated
+using the following operations.  A hash table stores the key/value
+binding in one chained list per bucket; adding a new binding with the
+same key will @strong{mask} the previous one.
 
 @menu
 * specs hash tables making::    Creating hash tables.
@@ -3129,17 +2955,7 @@ Return the current call stack.  Same format as @builtin{excstack}.
 * specs hash tables inspect::   Inspecting tables.
 @end menu
 
-
-@noindent
-Neko's hash tables are abstract types; they can only be manipulated
-using the following operations.  A hash table stores the key/value
-binding in one chained list per bucket; adding a new binding with the
-same key will @strong{mask} the previous one.
-
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node specs hash tables making
 @subsection Creating hash tables
 
@@ -3154,15 +2970,11 @@ Resize the table to have @var{new_size} buckets; note that the size is
 usually automatically handled.
 @end deftypefn
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node specs hash tables access
 @subsection Accessing elements
 
 
-@noindent
 The hash function cannot be overridden, but the comparison function
 between keys can be: we just have to provide a custom function as
 argument to the built in operations @builtin{hget}, @builtin{hmem},
@@ -3171,7 +2983,7 @@ argument to the built in operations @builtin{hget}, @builtin{hmem},
 In the following description: to compare the @var{key} argument to the
 keys in the hash table, the built in operations will use the comparison
 function selected with the @var{compar} argument, or @builtin{compare}
-if @var{compar} is @null{}.
+if @var{compar} is @cnull{}.
 
 Remember that a comparison function must return a ternary result:
 @code{0} for equality, @code{+1} or @code{-1} otherwise; from the point
@@ -3194,7 +3006,7 @@ $print($hkey("hello")); // prints 15247414
 
 @deftypefn {Neko Builtin} any $hget (@var{table} : 'hash, @var{key} : any, @var{compar} : function:2?)
 Look for the values bound to @var{key} in @var{table}; return the first
-value found or @null{} if no value is found.  Examples:
+value found or @cnull{} if no value is found.  Examples:
 
 @example
 var T = $hnew(10);
@@ -3237,10 +3049,7 @@ such a value exists and remove it from the table, return @false{}
 otherwise.
 @end deftypefn
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node specs hash tables inspect
 @subsection Inspecting tables
 
@@ -3282,16 +3091,13 @@ Return the number of elements in @var{table}.
 Return the number of buckets in @var{table}.
 @end deftypefn
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node specs goto
 @section Labels and gotos
 
 
 @findex @builtin{goto}
 
-@noindent
 It is sometimes useful to be able to jump directly at some code
 location; labels provide a way to mark a location in the code and the
 builtin @builtin{goto} can jump to it:
@@ -3315,12 +3121,10 @@ The builtin @builtin{goto} can only be used with a valid label identifier,
 in that case only, the identifier is treated as a label and not as a
 variable.
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+@c ------------------------------------------------------------
 
 @subsection Gotos and stack preservation
 
-
-@noindent
 In all cases, gotos to labels are preserving the stack.  For example in
 the following case, the variable @code{x} is popped out of the stack
 when the goto occurs:
@@ -3345,12 +3149,10 @@ next:
 @}
 @end example
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+@c ------------------------------------------------------------
 
 @subsection Gotos and exceptions
 
-
-@noindent
 In the same way gotos are preserving the stack, they are also preserving
 the exception handlers, so that the following program is correctly
 compiled:
@@ -3379,9 +3181,7 @@ try @{
 @}
 @end example
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node specs misc
 @section Miscellaneous builtins
 
@@ -3395,10 +3195,7 @@ Can print any value.
 Return the version of Neko: @code{135} means @code{1.3.5}.
 @end deftypefn
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node specs modules
 @section Modules
 
@@ -3407,7 +3204,6 @@ Return the version of Neko: @code{135} means @code{1.3.5}.
 @cindex Loading modules
 @cindex Loading shared libraries
 
-@noindent
 A Neko module is a set of constants and functions defined in a Neko file
 that is compiled and installed in a location reachable by the Neko
 virtual machine.  @ref{neko} for details about running the virtual
@@ -3466,7 +3262,7 @@ of arguments accepted by the primitive.
 If success, a Neko function is returned to be used to call the
 primitive.  If not found, an exception is thrown.
 
-Example of loading the C language primitive @cfunction{file_open} from
+Example of loading the C language primitive @cfunc{file_open} from
 the Neko standard library, and binding it to the Neko symbol
 @code{file_open}:
 
@@ -3478,28 +3274,11 @@ The Neko standard library is a file called @file{std.ndll}; the ``name''
 of the library is the file name with the extension stripped.
 @end deftypefn
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node ffi
 @chapter Foreign functions interface
 
 
-@menu
-* ffi example::                 A small example.
-* ffi values::                  Manipulating values.
-* ffi objects::                 Working with objects.
-* ffi callbacks::               Function callbacks.
-* ffi abstracts::               Abstracts and kinds.
-* ffi varargs::                 Variable arguments functions.
-* ffi int32::                   Using 32 bits integers.
-* ffi memory::                  Managing memory.
-* ffi misc::                    Misc @api{} functions.
-@end menu
-
-
-@noindent
 The @nvm{} itself has enough operations to compute any value.  However
 it cannot do everything, like accessing files, connecting to network
 servers, or display and manage a @gui{} window with menus and buttons.
@@ -3514,25 +3293,33 @@ only need to include the @file{neko.h} file which is part of the Neko
 distribution, and to link with the Neko library (@file{libneko.so} on
 Unix, @file{libneko.dylib} on OSX, and @file{neko.lib} on Windows).
 
+@menu
+* ffi example::                 A small example.
+* ffi values::                  Manipulating values.
+* ffi objects::                 Working with objects.
+* ffi callbacks::               Function callbacks.
+* ffi abstracts::               Abstracts and kinds.
+* ffi varargs::                 Variable arguments functions.
+* ffi int32::                   Using 32 bits integers.
+* ffi memory::                  Managing memory.
+* ffi misc::                    Misc @api{} functions.
+@end menu
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node ffi example
 @section A small example
 
 
-@noindent
 Here's an ``Hello World'' sample on how to write a Neko primitive in C:
 
 @example
 #include <neko.h>
- 
+
 value test()
 @{
   return alloc_string("Hello world");
 @}
- 
+
 DEFINE_PRIM(test,0); // function 'test' with 0 arguments
 @end example
 
@@ -3555,26 +3342,11 @@ name_of_the_library@@name_of_the_function
 @noindent
 we can then define several primitives in the same library.
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node ffi values
 @section Manipulating values
 
 
-@menu
-* ffi values types::            Data types.
-* ffi values const::            Constant values.
-* ffi values predicates::       Type predicates.
-* ffi values assert::           Asserting the types of values.
-* ffi values access::           Access functions.
-* ffi values alloc::            Allocation functions.
-* ffi values print::            Printing values.
-* ffi values buffers::          Buffers.
-@end menu
-
-
-@noindent
 There are several kind of @api{} functions:
 
 @table @code
@@ -3595,20 +3367,22 @@ functions enable us to convert a C value to a Neko value;
 @noindent
 notice that most (almost all) of these functions are actually C macros.
 
+@menu
+* ffi values types::            Data types.
+* ffi values const::            Constant values.
+* ffi values predicates::       Type predicates.
+* ffi values assert::           Asserting the types of values.
+* ffi values access::           Access functions.
+* ffi values alloc::            Allocation functions.
+* ffi values print::            Printing values.
+* ffi values buffers::          Buffers.
+@end menu
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node ffi values types
 @subsection Data types
 
 
-@menu
-* ffi values types other::      Other data types.
-@end menu
-
-
-@noindent
 The following types of values are available:
 
 @example
@@ -3636,7 +3410,7 @@ collected.
 The type of constants that identify types.  Defined values follow.
 @end deftp
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+@c ------------------------------------------------------------
 
 @deffn {C Language Type Constant} VAL_INT
 The identifier of integers.
@@ -3644,7 +3418,7 @@ The identifier of integers.
 
 
 @deffn {C Language Type Constant} VAL_NULL
-The identifier of @null{}.
+The identifier of @cnull{}.
 @end deffn
 
 
@@ -3697,10 +3471,11 @@ The identifier of primitive functions.
 The identifier of 32-bits integers.
 @end deffn
 
+@menu
+* ffi values types other::      Other data types.
+@end menu
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node ffi values types other
 @subsubsection Other data types
 
@@ -3715,16 +3490,13 @@ An alias for a C language floating point number type; defined to be
 The type of an object's field.
 @end deftp
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node ffi values const
 @subsection Constant values
 
 
 @deftypevr {C Language Variable} value val_null
-The @null{} value.
+The @cnull{} value.
 @end deftypevr
 
 
@@ -3733,16 +3505,13 @@ The @null{} value.
 The @true{} and @false{} values.
 @end deftypevr
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node ffi values predicates
 @subsection Type predicates
 
 
 @deftypefn {C Macro} int val_is_null (value @var{v})
-Check if a value is @null{}.
+Check if a value is @cnull{}.
 @end deftypefn
 
 
@@ -3795,15 +3564,11 @@ Check if a value is an abstract of the kind @var{k}.
 Check if a value is either an integer or a float.
 @end deftypefn
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node ffi values assert
 @subsection Asserting the types of values
 
 
-@noindent
 Often, when we're writing primitives, we expect the arguments to be of
 one given type.  So the first thing done in primitives is to check that
 the types are correct and have an exception raised if not.  Neko
@@ -3811,7 +3576,7 @@ provides several functions for that.
 
 
 @deftypefn {C Macro} void val_check (value @var{v}, @var{type})
-If @var{v} is not of type @var{type}: call @cfunction{neko_error}.
+If @var{v} is not of type @var{type}: call @cfunc{neko_error}.
 @var{type} is used by the C preprocessor to compose the type check
 function like this: @code{val_is_##@var{type}}.  Usage example:
 
@@ -3825,13 +3590,13 @@ val_check(v, int);
 
 @deftypefn {C Macro} void val_check_kind (value @var{v}, vkind @var{t})
 If @var{v} is not an abstract value of kind @var{t}: call
-@cfunction{neko_error}.
+@cfunc{neko_error}.
 @end deftypefn
 
 
 @deftypefn {C Macro} void val_check_function (value @var{v}, int @var{arity})
 If @var{v} is not a function or the number of arguments it accepts is
-not @var{arity}: call @cfunction{neko_error}.
+not @var{arity}: call @cfunc{neko_error}.
 @end deftypefn
 
 
@@ -3845,15 +3610,11 @@ Simply @code{return} the C @code{NULL} value.  This special value will
 be catched by the virtual machine that will raise an exception.
 @end deftypefn
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node ffi values access
 @subsection Access functions
 
 
-@noindent
 In order to use the following functions, we must be sure first that the
 type of the value is correct by using the functions described in
 @ref{ffi values assert}.  If we do not the behaviour is undefined.
@@ -3915,10 +3676,7 @@ Retrieve the kind of an abstract value.
 @end deftypefn
 
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node ffi values alloc
 @subsection Allocation functions
 
@@ -3927,7 +3685,7 @@ Retrieve the kind of an abstract value.
 Return a value from a C @code{int}.
 @end deftypefn
 
-      
+
 @deftypefn {C Macro} value alloc_bool (@var{b})
 Return a value from a C boolean which can be anything; notice that
 @code{0} is false and Neko @true{} either.
@@ -3939,7 +3697,7 @@ Return a value from a C boolean which can be anything; notice that
 Return a value from a C float.
 @end deftypefn
 
-      
+
 @deftypefn {C Function} value alloc_array (unsigned int @var{size})
 @deftypefnx {C Function} value neko_alloc_array (unsigned int @var{size})
 Create a Neko array of the given size.
@@ -3969,21 +3727,18 @@ Return a copy of the @var{size} first bytes of the string @var{str} as a
 value.
 @end deftypefn
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node ffi values print
 @subsection Printing values
 
 
-@noindent
 Using what we have learned from the Neko @api{}, we can now write a
 function that prints any value:
 
 @example
 #include <stdio.h>
 #include <neko.h>
- 
+
 value
 print (value v)
 @{
@@ -4019,7 +3774,7 @@ print (value v)
 
   return val_null;
 @}
- 
+
 DEFINE_PRIM(print,1);
 @end example
 
@@ -4029,7 +3784,7 @@ for each type, while we could simply dispatch using @code{val_type}:
 @example
 #include <stdio.h>
 #include <neko.h>
- 
+
 value
 print (value v)
 @{
@@ -4068,7 +3823,7 @@ print (value v)
   @}
   return val_null;
 @}
- 
+
 DEFINE_PRIM(print,1);
 @end example
 
@@ -4080,14 +3835,11 @@ such problem can only arise from a buggy C primitive.
 @strong{*FIXME*} This is not true because not all the @code{VAL_} values
 are in this function.
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node ffi values buffers
 @subsection Buffers
 
 
-@noindent
 The printing of a value is a little more complex than what is described
 in @ref{ffi values print}.  In particular, in case of objects we must
 call the @code{__string} method to retrieve a representation of the
@@ -4139,7 +3891,7 @@ buffer_append_sub(b, begin, end - begin);
 
 @noindent
 the problem is that differences between pointers are not of type
-@code{int}; same for @cfunction{strlen}.
+@code{int}; same for @cfunc{strlen}.
 
 Neko type @code{int_val} is defined to be @code{intptr_t}, which for
 the @gnu{} C Library is defined to be @code{long int}; see the file
@@ -4157,7 +3909,7 @@ buffer.
 Example of buffer usage:
 
 @example
-value 
+value
 print2 (value @var{v1}, value @var{v2})
 @{
   buffer b = alloc_buffer("Values");
@@ -4170,14 +3922,11 @@ print2 (value @var{v1}, value @var{v2})
 @}
 @end example
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node ffi objects
 @section Working with objects
 
 
-@noindent
 Objects in Neko are also values, and there are several functions in the
 Neko @api{} to access and modify object's fields.
 
@@ -4186,9 +3935,7 @@ Neko @api{} to access and modify object's fields.
 * ffi objects methods::         Object methods.
 @end menu
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node ffi objects api
 @subsection Objects @api{}
 
@@ -4217,7 +3964,7 @@ function returns a field identifier from a field name.
 @deftypefnx {C Function} value neko_val_field (value @var{o}, field @var{f})
 Access an object field for reading; return @code{val_null} if the field
 is not found in @var{o}.  @var{f} is the field identifier returned by
-@cfunction{val_id}.
+@cfunc{val_id}.
 @end deftypefn
 
 
@@ -4255,7 +4002,7 @@ and @code{y} from two values:
 
 @example
 #include <neko.h>
- 
+
 value
 make_point (value x, value y)
 @{
@@ -4269,24 +4016,21 @@ make_point (value x, value y)
   alloc_field(o,val_id("y"),y);
   return o;
 @}
- 
+
 DEFINE_PRIM(make_point, 2);
 @end example
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node ffi objects methods
 @subsection Object methods
 
 
-@noindent
 If we want to add a method @code{__string} to the object in order to
 display its content when printed, we can do the following:
 
 @example
 #include <neko.h>
- 
+
 value
 point_to_string (void)
 @{
@@ -4305,7 +4049,7 @@ point_to_string (void)
   neko_val_buffer(b, y);
   return neko_buffer_to_string(b);
 @}
- 
+
 value
 make_point (value x, value y)
 @{
@@ -4323,28 +4067,25 @@ Let's see what is done here:
 
 @itemize
 @item
-in @cfunction{make_point} we are setting the field @code{__string} of
+in @cfunc{make_point} we are setting the field @code{__string} of
 the object @code{o} to a function value allocated with
-@cfunction{alloc_function}, which takes 3 parameters: the address of the
+@cfunc{alloc_function}, which takes 3 parameters: the address of the
 C function, the number of arguments, and a name for the function that
 will help for debugging and errors location;
 @item
-in @cfunction{point_to_string} we are first retrieving
-@cfunction{neko_val_this} which is the current @code{this} value; since
+in @cfunc{point_to_string} we are first retrieving
+@cfunc{neko_val_this} which is the current @code{this} value; since
 it might not be an object, we test it first before accessing its fields
 @code{x} and @code{y}; then we want to construct, as object's
 representation, the string @code{Point : x , y} with the values of
 @code{x} and @code{y}, we're using a buffer for this.
 @end itemize
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node ffi callbacks
 @section Function callbacks
 
 
-@noindent
 At some point, we might need to call back a value function or an object
 method.
 
@@ -4353,7 +4094,7 @@ method.
 @deftypefnx {C Function} void neko_val_callEx (value @var{vthis}, value @var{f}, value * @var{args}, int @var{nargs}, value * @var{exc})
 This is the most general callback function; all the other callback
 functions are only some easier ways of making calls to
-@cfunction{val_callEx}.  Arguments' descriptions follows:
+@cfunc{val_callEx}.  Arguments' descriptions follows:
 
 @table @var
 @item vthis
@@ -4371,7 +4112,7 @@ the number of arguments stored into @var{args};
 @item exc
 a value pointer to store an exception if it is raised in a subcall; if
 @code{NULL}, exceptions will not be catched and they will go through the
-function calling @cfunction{val_callEx}.
+function calling @cfunc{val_callEx}.
 @end table
 
 The function @var{f} must have either a variable number of arguments
@@ -4379,7 +4120,7 @@ The function @var{f} must have either a variable number of arguments
 exception will be raised.
 
 If the call is successful, the value returned by @var{f} is returned by
-@cfunction{val_callEx}.
+@cfunc{val_callEx}.
 @end deftypefn
 
 
@@ -4420,9 +4161,9 @@ callback:
 
 @example
 #include <neko.h>
- 
+
 value * function_storage = NULL;
- 
+
 static value
 set_handler (value f)
 @{
@@ -4433,14 +4174,14 @@ set_handler (value f)
   *function_storage = f;
   return val_null;
 @}
- 
+
 DEFINE_PRIM(set_handler,1);
 @end example
 
 Since the function is a value, we have to store it into a place that can
 be accessed by the garbage collector; this is why we allocate a
-@code{function_storage} with @cfunction{alloc_root}.  The
-@cfunction{alloc_root} parameter is the number of values that can be
+@code{function_storage} with @cfunc{alloc_root}.  The
+@cfunc{alloc_root} parameter is the number of values that can be
 stored in the allocated pointer.
 
 Once the callback is set, we can call it from C by using the following
@@ -4452,14 +4193,12 @@ value ret = val_call1(*function_storage, alloc_string("Hello"));
 // ... handle the ret value
 @end example
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-@c ------------------------------------------------------------
+@c page
 @node ffi abstracts
 @section Abstracts and kinds
 
 
-@noindent
 Most of the time, when we have to write an interface from Neko to a C
 library, we get some pointer to some mallocated memory.  We can't safely
 return this value to the Neko program for the following reasons:
@@ -4500,7 +4239,7 @@ DEFINE_KIND(k_mykind);
 @end example
 
 Now that we have a kind, we can create an abstract value of this kind
-using the @cfunction{alloc_abstract} Neko @api{} function:
+using the @cfunc{alloc_abstract} Neko @api{} function:
 
 @example
 value
@@ -4516,9 +4255,9 @@ It is possible to store another value in the data part of an abstract,
 since it will still be checked by the garbage collector.
 
 When we get back a value into one of our primitives, we can check if
-it's an abstract value using @cfunction{val_is_abstract} then check its
-kind using the @cfunction{val_is_kind} @api{} function and then access
-its data using the @cfunction{val_data} @api{} function:
+it's an abstract value using @cfunc{val_is_abstract} then check its
+kind using the @cfunc{val_is_kind} @api{} function and then access
+its data using the @cfunc{val_data} @api{} function:
 
 @example
 value
@@ -4533,7 +4272,7 @@ dosomething (value v)
 @end example
 
 Instead of writing these checks all the time, we can use the
-@cfunction{val_check_kind} macro which is more convenient:
+@cfunc{val_check_kind} macro which is more convenient:
 
 @example
 value
@@ -4573,7 +4312,7 @@ finalize (value v)
 @{
   free_data(val_data(v));
 @}
- 
+
 value
 create (void)
 @{
@@ -4588,17 +4327,15 @@ create (void)
 We can remove the finalise function from an abstract value by calling
 @code{val_gc(v,NULL)}.
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-@c ------------------------------------------------------------
+@c page
 @node ffi varargs
 @section Variable arguments functions
 
 
-@noindent
 If we want to pass more than five arguments, or a variable number of
 arguments, in a single Neko--to--C function call, we can use the
-@cfunction{DEFINE_PRIM_MULT} macro:
+@cfunc{DEFINE_PRIM_MULT} macro:
 
 @example
 value
@@ -4613,45 +4350,38 @@ DEFINE_PRIM_MULT(myprim);
 @noindent
 then, pass @code{-1} as the number of arguments to @builtin{loadprim}.
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node ffi int32
 @section Using 32 bits integers
 
 
-@noindent
 As explained before, Neko integers are only signed 31 bits.  While this
 is enough for most of the cases, there are times where we want to use
 the full 32 bits.  It was then added a common @code{int32} abstract
 type.
 
-We can use @cfunction{val_is_int32} to check that the value is either an
-integer or an @code{int32}.  And @cfunction{val_int32} will return the
+We can use @cfunc{val_is_int32} to check that the value is either an
+integer or an @code{int32}.  And @cfunc{val_int32} will return the
 corresponding integer.  If we want to check that the value is exactly an
 @code{int32}, then we can use @code{val_is_kind(i,k_in32)}.
 
-To create an @code{int32} value, we can use @cfunction{alloc_int32}.
-Please note that unlike @cfunction{alloc_int}a which is a fast macro,
-@cfunction{alloc_int32} allocate some memory to store the integer so it
+To create an @code{int32} value, we can use @cfunc{alloc_int32}.
+Please note that unlike @cfunc{alloc_int}a which is a fast macro,
+@cfunc{alloc_int32} allocate some memory to store the integer so it
 is slower.
 
 In the case most of our integers are using only 31 bits but we still
 want to be able to use the full 32 bits, we can use the
-@cfunction{alloc_best_int} macro that will use either
-@cfunction{alloc_int} or @cfunction{alloc_int32} depending on the needed
+@cfunc{alloc_best_int} macro that will use either
+@cfunc{alloc_int} or @cfunc{alloc_int32} depending on the needed
 bits.  Use then the @code{val_check(i,int32)} and @code{val_is_int32(v)}
 macros in order to accept both kind of integers.
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node ffi memory
 @section Managing memory
 
 
-@noindent
 When we're working with abstracts, we might want to allocate
 garbage--collected memory so we don't have to add finalise functions for our
 data (finalise functions are more expensive than garbage--collected memory).
@@ -4664,7 +4394,7 @@ equivalent to @code{malloc(nbytes)} but the memory will be automatically
 collected when unreachable from the @vm{}.  Please note that C static
 values are not reachable by the @vm{}.
 
-The memory allocated with @cfunction{alloc} will be scanned by the
+The memory allocated with @cfunc{alloc} will be scanned by the
 garbage collector so we can store values and other allocated pointers
 into it.  As long as our pointer is reachable these values will also be
 reachable so they will not be collected.
@@ -4708,10 +4438,7 @@ Free a previously allocated root value array.
 Try to avoid the use of roots and static values as much as possible.
 Always store data into abstract values if possible.
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node ffi misc
 @section Misc @api{} functions
 
@@ -4726,7 +4453,7 @@ that will be @code{0} if @code{a = b}, @code{-1} if @code{a < b},
 
 
 @defmac invalid_comparison
-A constant value returned by @cfunction{val_compare} when the two
+A constant value returned by @cfunc{val_compare} when the two
 operands of a comparison cannot be compared.
 @end defmac
 
@@ -4757,41 +4484,35 @@ exception will contain our error message as well as the C file name and
 the line where the error occurred.
 @end deftypefn
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-@c ------------------------------------------------------------
+@c page
 @node embedding
 @chapter Embedding the @vm{}
 
 
-@menu
-* embedding example::           Example of embedding the @vm{}.
-* embedding threads::           Multithreading.
-@end menu
-
-
-@noindent
 The Neko Virtual Machine and its C @ffi{} are packaged into a single
 shared library (@file{libneko.so} on Unix systems and @code{neko.dll} on
 Windows).  Along with the garbage collector library (@file{libgc} on
 Unix and @file{gc.dll} on Windows) it is all we need to add to our
 application in order to be able to run a Neko program.
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+@menu
+* embedding example::           Example of embedding the @vm{}.
+* embedding threads::           Multithreading.
+@end menu
 
-@c ------------------------------------------------------------
+@c page
 @node embedding example
 @section Example of embedding the @vm{}
 
 
-@noindent
 Here's a code snippet that initialises a @vm{} and runs a Neko module
 inside it, then it accesses some data:
 
 @example
 #include <stdio.h>
 #include <neko_vm.h>
- 
+
 value
 load (char * file)
 @{
@@ -4817,7 +4538,7 @@ load (char * file)
     @}
   return ret;
 @}
- 
+
 void
 execute (value module)
 @{
@@ -4826,7 +4547,7 @@ execute (value module)
   value ret;
 
   if (! val_is_int(x))
-    return; 
+    return;
   printf("x = %d\n",val_int(x));
   if (! val_is_function(f,1))
     return;
@@ -4835,7 +4556,7 @@ execute (value module)
     return;
   printf("f(x) = %d\n",val_int(ret));
 @}
- 
+
 int
 main (int argc, char *argv[])
 @{
@@ -4845,7 +4566,7 @@ main (int argc, char *argv[])
   neko_global_init(NULL);
   vm = neko_vm_alloc(NULL);
   neko_vm_select(vm);
- 
+
   module = load("mymodule.n");
   if (NULL == module)
     @{
@@ -4853,11 +4574,11 @@ main (int argc, char *argv[])
       return -1;
     @}
   execute(module);
- 
-  neko_global_free();    
+
+  neko_global_free();
   return 0;
 @}
-@end example 
+@end example
 
 We can use it to load the following @file{mymodule.neko} file after
 compilation:
@@ -4867,21 +4588,18 @@ $exports.x = 33;
 $exports.f = function(x) @{ return x * 2 + 1; @}
 @end example
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node embedding threads
 @section Multithreading
 
 
-@noindent
 @nvm{} supports multithreading and multiple @vm{} instances; it means
 that we can run some Neko code into a multithreaded program, as long as
 we respect the following guidelines:
 
 @enumerate
 @item
-we can allocate a @vm{} with @cfunction{neko_vm_alloc}; the @vm{} holds
+we can allocate a @vm{} with @cfunc{neko_vm_alloc}; the @vm{} holds
 the Neko stack and registers;
 
 @item
@@ -4894,7 +4612,7 @@ the local thread current @vm{} by calling @code{neko_vm_select(neko_vm
 
 @item
 we can retrieve the selected @vm{} for the current thread by calling
-@cfunction{neko_vm_current};
+@cfunc{neko_vm_current};
 
 @item
 a single @vm{} should not be used to execute code on several threads at
@@ -4909,13 +4627,11 @@ abstracts values (files, regular expressions@dots{}) from multiple
 threads can results in crashes.  Try to always keep these data
 structures in the thread that allocated them in the first place.
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-@c ------------------------------------------------------------
+@c page
 @node nxml
-@chapter Neko in @xml{} format
+@chapter Neko in @axml{} format
 
 
-@noindent
 Neko sources syntax is easy to read but can sometimes be difficult to
 generate; also, it does not permit embedding file and line numbers
 informations.  For example: if we convert a file in our language,
@@ -4927,16 +4643,13 @@ For these reasons, an extension of the neko syntax is proposed: it is
 called @nxml{}.  This is not a different format: we can easily mix
 @nxml{} and Neko sources together.  We can put some @nxml{} expressions
 in Neko sources and some Neko sources into an @nxml{} document.  @nxml{}
-is based on @xml{} and it represents a Neko Abstract Syntax Tree
+is based on @axml{} and it represents a Neko Abstract Syntax Tree
 (@acronym{AST}).
 
+@c ------------------------------------------------------------
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+@subsubheading @nxml{} nodes
 
-@section @nxml{} nodes
-
-
-@noindent
 In order to use the @nxml{} syntax we start with @code{<nxml>} and
 finish with @code{</nxml>}; all @nxml{} nodes inside are Neko
 expressions.  @nxml{} blocks are like Neko blocks; for example:
@@ -4956,7 +4669,7 @@ the literal float @code{1.5};
 the literal string @code{a string};
 
 @item <v v="id"/>
-the identifier @code{id} (includes special identifiers such as @null{},
+the identifier @code{id} (includes special identifiers such as @cnull{},
 @true{}, @false{} and @code{this});
 
 @item <b>e1 e2 e3...</b>
@@ -5052,12 +4765,10 @@ fib = function(n) @{
 </o>
 @end example
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+@c ------------------------------------------------------------
 
-@section File position
+@subsubheading File position
 
-
-@noindent
 The additional attribute @code{p} can be placed on every @nxml{} node in
 order to specify from which original file and line the expression is
 generated.  For example @code{<i v="33" p="myfile.l:478"/>} is the
@@ -5092,13 +4803,10 @@ is listing two integers from @code{myfile.l}, the first is @code{33} at
 line @code{478} and the second is @code{34} at line @code{480} (478 +
 2).
 
+@c ------------------------------------------------------------
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+@subsubheading @nxml{} to Neko
 
-@section @nxml{} to Neko
-
-
-@noindent
 There is a @nxml{} to Neko generator which is available using the
 @command{nekoc} compiler.  Simply run @code{nekoc myfile.neko}
 containing Neko/@nxml{} syntax, it will create a @file{myfile2.neko}
@@ -5107,10 +4815,7 @@ that will only contain Neko source code.
 There is no Neko to @nxml{} generator right now, although it should be
 possible to write one very easily.
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node lib
 @chapter Neko library
 
@@ -5136,8 +4841,8 @@ The standard library
 * lib string::                  Additional string functions.
 * lib sys::                     Interaction with the operating system.
 * lib thread::                  Creating and managing system threads.
-* lib utf8::                    Handling @utf8{} strings.
-* lib xml::                     The standard event--driven @xml{} parser. 
+* lib utf8::                    Handling @acronym{UTF8} strings.
+* lib xml::                     The standard event--driven @axml{} parser.
 * lib misc::                    Miscellaneous functions.
 
 Additionally libraries
@@ -5150,15 +4855,11 @@ Additionally libraries
 * lib zlib::                    Compression library.
 @end menu
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node lib loading
 @section Loading the standard library
 
 
-@noindent
 The following is an example module that can be used to load the Neko
 standard library.  The module must be compiled and installed in a
 reachable directory, for example, under the name @file{stdlib.n}.
@@ -5180,7 +4881,7 @@ var current_data = std.date_now();
 @noindent
 using the @code{std.} prefix.
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+@c ------------------------------------------------------------
 
 @example
 // stdlib.neko --
@@ -5222,7 +4923,7 @@ $exports.file_contents          = stdload("file_contents",      1);
 $exports.file_stdin             = stdload("file_stdin",         0);
 $exports.file_stdout            = stdload("file_stdout",        0);
 $exports.file_stderr            = stdload("file_stderr",        0);
-  
+
 $exports.math_atan2             = stdload("math_atan2",         2);
 $exports.math_pow               = stdload("math_pow",           2);
 $exports.math_abs               = stdload("math_abs",           1);
@@ -5399,18 +5100,13 @@ $exports.int32_address          = stdload("int32_address",      1);
 /// end of file
 @end example
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node lib list
 @section The list custom type
 
 
 @cindex @code{#list} custom type
 
-
-@noindent
 Sometimes the Neko library makes use of a custom list type to organise a
 sequence of values; a @code{#list} is a tree of nested arrays organised
 like a Lisp list:
@@ -5428,7 +5124,7 @@ like a Lisp list:
 to build such a tree of arrays we can use code like this:
 
 @example
-var the_list = $array("one", 
+var the_list = $array("one",
                       $array("two",
                              $array("three", null)));
 @end example
@@ -5458,13 +5154,14 @@ while (null != ell)
 
 @ref{examples list} for a Neko module that manipulates lists.
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node lib int32
 @section Using 32 bits integers
 
+
+Int32 is an abstract type that can be used to store the full 32 bits of
+an integer.  The type @code{'int32} means that the value is a real
+int32.  The type @code{#int32} means @code{(int | 'int32)}.
 
 @menu
 * lib int32 make::              Constructors.
@@ -5476,15 +5173,7 @@ while (null != ell)
 @end menu
 
 
-@noindent
-Int32 is an abstract type that can be used to store the full 32 bits of
-an integer.  The type @code{'int32} means that the value is a real
-int32.  The type @code{#int32} means @code{(int | 'int32)}.
-
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node lib int32 make
 @subsection Constructors
 
@@ -5493,10 +5182,7 @@ int32.  The type @code{#int32} means @code{(int | 'int32)}.
 Allocate an int32 from any integer or float.
 @end deftypefn
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node lib int32 conversion
 @subsection Conversion
 
@@ -5511,10 +5197,7 @@ Otherwise an error is raised.
 Return a float representing the integer.
 @end deftypefn
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node lib int32 comparison
 @subsection Comparison
 
@@ -5523,10 +5206,7 @@ Return a float representing the integer.
 Compare two integers.
 @end deftypefn
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node lib int32 arithmetics
 @subsection Arithmetic operations
 
@@ -5544,7 +5224,7 @@ Subtract two integers.
 @deftypefn {Neko Function} #int32 int32_mul (@var{a} : #int32, @var{b} : #int32)
 Multiply two integers.
 @end deftypefn
- 
+
 
 @deftypefn {Neko Function} #int32 int32_div (@var{a} : #int32, @var{b} : #int32)
 Divide two integers.  An error is raised on division by zero.
@@ -5555,13 +5235,9 @@ Divide two integers.  An error is raised on division by zero.
 Return the negative value of an integer.
 @end deftypefn
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node lib int32 bitwise
 @subsection Bitwise operations
-
 
 
 @deftypefn {Neko Function} #int32 int32_ushr (@var{value} : #int32, @var{amount} : #int32)
@@ -5578,23 +5254,23 @@ Perform bit left shifting.
 Perform bit right shifting.
 @end deftypefn
 
- 
+
 @deftypefn {Neko Function} #int32 int32_mod (@var{value} : #int32, @var{base} : #int32)
 Return the modulo of one integer by the other.  An error is raised if
 @var{base} is zero.
 @end deftypefn
- 
+
 
 @deftypefn {Neko Function} #int32 int32_complement (@var{value} : #int32)
 Return the bitwise one--complement integer of @var{value}.
 @end deftypefn
- 
+
 
 @deftypefn {Neko Function} #int32 int32_or (@var{a} : #int32, @var{b} : #int32)
 Return the bitwise OR between two integers.
 @end deftypefn
 
- 
+
 @deftypefn {Neko Function} #int32 int32_and (@var{a} : #int32, @var{b} : #int32)
 Return the bitwise AND between two integers.
 @end deftypefn
@@ -5603,11 +5279,8 @@ Return the bitwise AND between two integers.
 @deftypefn {Neko Function} #int32 int32_xor (@var{a} : #int32, @var{b} : #int32)
 Return the bitwise XOR of two integers.
 @end deftypefn
- 
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node lib int32 misc
 @subsection Miscellaneous operations
 
@@ -5618,15 +5291,11 @@ constant.  It is not unique either unless we are sure we are running on
 a 32 bits platform.
 @end deftypefn
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node lib buffer
 @section Buffers
 
 
-@noindent
 A buffer can store any value as a string and will only allocate the
 total needed space when requested.  It makes a copy of each value when
 stored so modifying them later is not a problem.
@@ -5663,15 +5332,11 @@ Build and return a string holding the buffer contents.
 Clean the buffer contents, leaving it empty.
 @end deftypefn
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node lib date
 @section Date
 
 
-@noindent
 The date module uses standard C functions in order to manipulate 32 bits
 integers.  Dates are represented as the number of seconds elapsed since
 1st January 1970.
@@ -5703,8 +5368,8 @@ we can subtract it from a date.
 
 
 @deftypefn {Neko Function} string date_format (@var{date} : 'int32, @var{fmt} : string?)
-Format a date using the C language function @cfunction{strftime}.  If
-@var{fmt} is @null{} then the default format is used.
+Format a date using the C language function @cfunc{strftime}.  If
+@var{fmt} is @cnull{} then the default format is used.
 @end deftypefn
 
 
@@ -5736,22 +5401,11 @@ minutes as string, @code{s} holds the seconds as string.
 Return the local Timezone (in seconds).
 @end deftypefn
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node lib file
 @section File
 
 
-@menu
-* lib file open::               Opening and closing files.
-* lib file io::                 Input/output upon files.
-* lib file seek::               Setting the position.
-@end menu
-
-
-@noindent
 The file @api{} can be used for different kind of file I/O; it is mostly
 based upon the standard C language functions.
 
@@ -5763,15 +5417,19 @@ Return a standard channel.
 @end deftypefn
 
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+@menu
+* lib file open::               Opening and closing files.
+* lib file io::                 Input/output upon files.
+* lib file seek::               Setting the position.
+@end menu
 
-@c ------------------------------------------------------------
+@c page
 @node lib file open
 @subsection Opening and closing files
 
 
 @deftypefn {Neko Function} 'file file_open (@var{pathname} : string, @var{access} : string)
-Call @cfunction{fopen} with the given @var{pathname} and access rights.
+Call @cfunc{fopen} with the given @var{pathname} and access rights.
 Return the opened file or throw an exception if an error occurs.
 @end deftypefn
 
@@ -5793,10 +5451,7 @@ Write up to @var{l} chars from the string @var{s} starting at position
 positive number.
 @end deftypefn
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node lib file io
 @subsection Input/output upon files
 
@@ -5828,16 +5483,13 @@ Flush the file buffer.
 Read the content of the file and return it.
 @end deftypefn
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node lib file seek
 @subsection Setting the position
 
 
 @deftypefn {Neko Function} void file_seek (@var{f} : 'file, @var{pos} : int, @var{mode} : int)
-Use @cfunction{fseek} to move the file position.
+Use @cfunc{fseek} to move the file position.
 @end deftypefn
 
 
@@ -5850,16 +5502,13 @@ Return the current position in the file.
 Tell if we have reached the end of the file.
 @end deftypefn
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node lib math
 @section Mathematical functions
 
 
 @deftypefn {Neko Function} float math_atan2 (@var{y} : number, @var{x} : number)
-Return the @cfunction{atan2} calculus.
+Return the @cfunc{atan2} calculus.
 @end deftypefn
 
 
@@ -5937,27 +5586,20 @@ Return the arccosine.
 Return the arcsine.
 @end deftypefn
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node lib md5
 @section MD5
 
 
 @deftypefn {Neko Function} string make_md5 (@var{value} : any)
-Build a MD5 digest (16 bytes binary string) from any value. 
+Build a MD5 digest (16 bytes binary string) from any value.
 @end deftypefn
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node lib memory
 @section Memory
 
 
-@noindent
 An @api{} for memory manipulation and statistics.
 
 
@@ -5966,15 +5608,11 @@ Calculate the quite precise amount of @vm{} memory reachable from this
 value.
 @end deftypefn
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node lib module
 @section Modules
 
 
-@noindent
 An @api{} for reflexion of Neko bytecode modules.
 
 
@@ -6079,15 +5717,11 @@ Set the nth global.
 Return the code size of the module.
 @end deftypefn
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node lib process
 @section Process
 
 
-@noindent
 An @api{} for starting and communication with sub processes.
 
 
@@ -6101,8 +5735,8 @@ var p = process_run("ls", $amake("-l", "-R"));
 @var{cmd} must be the pathname of the executable file or the name of the
 executable file; in the latter case the environment is examined to find
 the executable on the system.  On Unix like systems the C functions
-@cfunction{fork} and @cfunction{execvp} are used, on Windows systems
-@cfunction{CreateProcess} is used.
+@cfunc{fork} and @cfunc{execvp} are used, on Windows systems
+@cfunc{CreateProcess} is used.
 
 If there are no arguments we have to use @code{$amake(0)} as value of
 @var{args}.
@@ -6152,10 +5786,7 @@ Returns the process' id.
 Close the process' input/output channels and terminate the process.
 @end deftypefn
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node lib random
 @section Pseudo--random numbers generation
 
@@ -6179,17 +5810,13 @@ Return a random integer modulo @var{max}.
 Return a random float.
 @end deftypefn
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node lib serialise
 @section Serialisation
 
 
 @findex __serialize
 
-@noindent
 Serialisation can be used in order to store permanently some runtime
 value.  Serialisation of all values is possible, except @emph{abstracts}
 with the special cases of @code{'int32} and @code{'hash} which are
@@ -6218,10 +5845,7 @@ Deserialise a stored value.  Need a loader to look for modules if some
 bytecode functions have been serialised.
 @end deftypefn
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node lib socket
 @section @acronym{TCP} and @acronym{UDP} sockets
 
@@ -6237,10 +5861,7 @@ bytecode functions have been serialised.
 * lib socket misc::             Miscellaneous functions.
 @end menu
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node lib socket creating
 @subsection Creating sockets
 
@@ -6266,10 +5887,7 @@ Close a socket.  Any subsequent operation on this socket will fail.
 Prevent the socket from further reading or writing or both.
 @end deftypefn
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node lib socket client
 @subsection Connecting as client
 
@@ -6295,10 +5913,7 @@ socket_connect(client, ip, port);
 socket_close(sock);
 @end example
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node lib socket server
 @subsection Setting up a server
 
@@ -6340,9 +5955,7 @@ socket_close(sock);
 socket_close(server);
 @end example
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node lib socket io
 @subsection Sending and receiving
 
@@ -6384,7 +5997,7 @@ socket_close(client);
 @end example
 
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+@c ------------------------------------------------------------
 
 @subsubsection Data using buffers
 
@@ -6433,7 +6046,7 @@ socket_close(client);
 @end example
 
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+@c ------------------------------------------------------------
 
 @subsubsection Whole strings
 
@@ -6473,7 +6086,7 @@ socket_close(server);
 socket_close(client);
 @end example
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+@c ------------------------------------------------------------
 
 @subsubsection Configuration
 
@@ -6485,19 +6098,16 @@ Turn on/off the socket blocking mode.
 
 @deftypefn {Neko Function} void socket_set_timeout (@var{sock} : 'socket, @var{timeout} : number?)
 Set the socket send and recv timeout in seconds to the given value (or
-@null{} for blocking).
+@cnull{} for blocking).
 @end deftypefn
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node lib socket select
 @subsection Selecting events on sockets
 
 
 @deftypefn {Neko Function} {'socket array? array} socket_select (@var{read} : 'socket array?, @var{write} : 'socket array?, @var{others} : 'socket array?, @var{timeout} : number?)
-Perform the @cfunction{select} operation.  Arguments description:
+Perform the @cfunc{select} operation.  Arguments description:
 
 @table @var
 @item read
@@ -6513,11 +6123,11 @@ must be an array of sockets for which we want to know if an exception
 was detected;
 
 @item timeout
-is in seconds or @null{} if infinite.
+is in seconds or @cnull{} if infinite.
 @end table
 
 If we are not interested in events of a kind: we must set @var{read},
-@var{write} or @var{others} to @null{}, @strong{not} to the empty array.
+@var{write} or @var{others} to @cnull{}, @strong{not} to the empty array.
 
 The return value is an array of 3 elements, one for each kind of event:
 the element with index @code{0} for read--ready sockets; the element
@@ -6527,8 +6137,8 @@ with index @code{1} for write--ready sockets; the element with index
 The elements of the returned array can be:
 
 @table @asis
-@item @null{}
-if @null{} was used as parameter for a kind, then @null{} is stored in
+@item @cnull{}
+if @cnull{} was used as parameter for a kind, then @cnull{} is stored in
 the returned array for that kind;
 
 @item @code{'socket array}
@@ -6593,10 +6203,7 @@ socket_close(server);
 socket_close(client);
 @end example
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node lib socket poll
 @subsection Polling events on sockets
 
@@ -6684,15 +6291,11 @@ This is similar to @function{socket_select} except that
 sockets to check.
 @end deftypefn
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node lib socket poll events ex
 @subsubsection Example of polling for events
 
 
-@noindent
 Example of exchanging a character through @code{localhost:8080} using
 the complex @function{socket_poll_events} interface:
 
@@ -6815,14 +6418,11 @@ socket_close(server);
 socket_close(client);
 @end example
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node lib socket poll read ex
 @subsubsection Example of polling for available data
 
 
-@noindent
 Example of exchanging a character through @code{localhost:8080} using
 the simple @function{socket_poll} interface:
 
@@ -6868,9 +6468,8 @@ socket_close(server);
 socket_close(client);
 @end example
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-@c ------------------------------------------------------------
+@c page
 @node lib socket resolver
 @subsection Resolving addresses
 
@@ -6904,10 +6503,7 @@ $print(host_reverse(host_resolve("localhost")));
 Return the local host name.
 @end deftypefn
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node lib socket misc
 @subsection Miscellaneous functions
 
@@ -6939,10 +6535,7 @@ $print("hostname: " + host_to_string(host[0])
 @end example
 @end deftypefn
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node lib string
 @section Additional string functions
 
@@ -7024,15 +6617,12 @@ var dec  = base_decode(enc, base);
 // dec == "the quick fox jumps over the lazy dog"
 @end example
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node lib sys
 @section Interaction with the operating system
 
 
-@subsection Environment variables
+@subsubheading Environment variables
 
 
 @deftypefn {Neko Function} string? get_env (@var{s} : string)
@@ -7051,7 +6641,7 @@ Return all the (key,value) pairs in the environment as a chained list.
 @end deftypefn
 
 
-@subsection Time related functions
+@subsubheading Time related functions
 
 
 @deftypefn {Neko Function} void sys_sleep (@var{n} : number)
@@ -7075,7 +6665,7 @@ started (in seconds).
 @end deftypefn
 
 
-@subsection Current working directory
+@subsubheading Current working directory
 
 
 @deftypefn {Neko Function} string get_cwd (void)
@@ -7088,7 +6678,7 @@ Set current working directory.
 @end deftypefn
 
 
-@subsection System properties
+@subsubheading System properties
 
 
 @deftypefn {Neko Function} string sys_string (void)
@@ -7102,7 +6692,7 @@ Return @true{} if we are on a 64 bits system.
 @end deftypefn
 
 
-@subsection Shell commands
+@subsubheading Shell commands
 
 
 @deftypefn {Neko Function} int sys_command (@var{s} : string)
@@ -7110,7 +6700,7 @@ Run a shell command and return its exit code.
 @end deftypefn
 
 
-@subsection Process termination
+@subsubheading Process termination
 
 
 @deftypefn {Neko Function} void sys_exit (@var{code} : int)
@@ -7118,7 +6708,7 @@ Exit with the given error code.  Never return.
 @end deftypefn
 
 
-@subsection File system
+@subsubheading File system
 
 
 @deftypefn {Neko Function} bool sys_exists (@var{pathname} : string)
@@ -7142,7 +6732,7 @@ Rename the file or directory.  Exception on error.
 
 
 @deftypefn {Neko Function} {@{ gid => int, uid => int, atime => 'int32, mtime => 'int32, ctime => 'int32, dev => int, ino => int, nlink => int, rdev => int, size => int, mode => int @}} sys_stat (@var{pathname} : string)
-Apply the @cfunction{stat} function to the given file or directory.
+Apply the @cfunc{stat} function to the given file or directory.
 @end deftypefn
 
 
@@ -7158,7 +6748,7 @@ Create a directory with the specified rights.
 @end deftypefn
 
 
-@deftypefn {Neko Function} void sys_remove_dir (@var{pathname} : string) 
+@deftypefn {Neko Function} void sys_remove_dir (@var{pathname} : string)
 Remove a directory.  Exception on error.
 @end deftypefn
 
@@ -7180,7 +6770,7 @@ Return the path of the executable.
 @end deftypefn
 
 
-@subsection Miscellaneous functions
+@subsubheading Miscellaneous functions
 
 
 @deftypefn {Neko Function} int sys_getch (@var{b} : bool)
@@ -7192,10 +6782,7 @@ Read a character from @code{stdin} with or without echo.
 Returns the current process identifier.
 @end deftypefn
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node lib thread
 @section Creating and managing system threads
 
@@ -7209,9 +6796,7 @@ Returns the current process identifier.
 * lib thread storage::          Handling thread local storage.
 @end menu
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node lib thread create
 @subsection Creating threads
 
@@ -7226,10 +6811,7 @@ Create a thread that will be running the function
 Return the current thread.
 @end deftypefn
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node lib thread message
 @subsection Sending and receiving messages
 
@@ -7243,13 +6825,10 @@ Send a message into the target thread message queue.
 Read a message from the message queue.  If @var{block} is @true{}, the
 function only returns when a message is available.  If @var{block} is
 @false{} and no message is available in the queue, the function will
-immediately return @null{}.
+immediately return @cnull{}.
 @end deftypefn
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node lib thread deque
 @subsection Handling deques
 
@@ -7271,14 +6850,11 @@ Add a message at the @strong{head} of the queue.
 
 @deftypefn {Neko Function} any? deque_pop (@var{d} : 'deque, @var{block} : bool)
 Pop a message from the @strong{head} of the queue.  If @var{block} is
-true: block until a message is available; else return @null{}
+true: block until a message is available; else return @cnull{}
 immediately.
 @end deftypefn
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node lib thread lock
 @subsection Handling locks
 
@@ -7297,13 +6873,10 @@ many times.
 
 @deftypefn {Neko Function} bool lock_wait (@var{lock} : 'lock, @var{timeout} : number?)
 Waits for a lock to be released, then acquire it.  If @var{timeout} (in
-seconds) is not @null{} and expires then the returned value is @false{}.
+seconds) is not @cnull{} and expires then the returned value is @false{}.
 @end deftypefn
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node lib thread mux
 @subsection Handling mutexes
 
@@ -7333,10 +6906,7 @@ Release a mutex that has been acquired by the current thread.  The
 behavior is undefined if the current thread does not own the mutex.
 @end deftypefn
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node lib thread storage
 @subsection Handling thread local storage
 
@@ -7345,7 +6915,7 @@ behavior is undefined if the current thread does not own the mutex.
 Creates thread local storage.  A thread local storage area can hold a
 value that will be different depending on the local thread.
 
-@strong{Warning} We must set the @acronym{TLS} value to @null{} before
+@strong{Warning} We must set the @acronym{TLS} value to @cnull{} before
 exiting the thread or the memory will never be collected.
 @end deftypefn
 
@@ -7359,18 +6929,14 @@ Set the value of the @acronym{TLS} for the local thread.
 Return the value set by @function{tls_set} for the local thread.
 @end deftypefn
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node lib utf8
-@section Handling @utf8{} strings
+@section Handling @acronym{UTF8} strings
 
 
-@noindent
 Most of the operations are optimised for speed; they might still succeed
-on some malformed @utf8{} string.  The only function that completely
-checks the @utf8{} format is @function{utf8_validate}.  Other functions
+on some malformed @acronym{UTF8} string.  The only function that completely
+checks the @acronym{UTF8} format is @function{utf8_validate}.  Other functions
 might raise exceptions or not depending on the malformed data.
 
 
@@ -7380,7 +6946,7 @@ Create a new buffer with an initial @var{size} in bytes.
 
 
 @deftypefn {Neko Function} void utf8_buf_add (@var{b} : 'buf, @var{c} : int)
-Add a valid @utf8{} char (in the range @code{[0, 0x10FFFF]}) to
+Add a valid @acronym{UTF8} char (in the range @code{[0, 0x10FFFF]}) to
 the buffer.
 @end deftypefn
 
@@ -7393,7 +6959,7 @@ to add chars is possible but not very efficient.
 
 
 @deftypefn {Neko Function} int utf8_buf_length (@var{b} : 'buf)
-Return the number of @utf8{} chars stored in the buffer.
+Return the number of @acronym{UTF8} chars stored in the buffer.
 @end deftypefn
 
 
@@ -7403,41 +6969,38 @@ Return the current size of the buffer in bytes.
 
 
 @deftypefn {Neko Function} bool utf8_validate (@var{s} : string)
-Validate if a string is encoded using the @utf8{} format.
+Validate if a string is encoded using the @acronym{UTF8} format.
 @end deftypefn
 
 
 @deftypefn {Neko Function} int utf8_length (@var{s} : string)
-Return the number of @utf8{} chars in the string.
+Return the number of @acronym{UTF8} chars in the string.
 @end deftypefn
 
 
 @deftypefn {Neko Function} string utf8_sub (@var{s} : string, @var{pos} : int, @var{len} : int)
-Return a part of an @utf8{} string.
+Return a part of an @acronym{UTF8} string.
 @end deftypefn
 
 
 @deftypefn {Neko Function} int utf8_get (@var{s} : string, @var{n} : int)
-Return the nth char in an @utf8{} string.  This might be
+Return the nth char in an @acronym{UTF8} string.  This might be
 inefficient if @var{n} is big.
 @end deftypefn
 
 
 @deftypefn {Neko Function} void utf8_iter (@var{s} : string, @var{f} : ((int -> void)))
-Call @var{f} with each of @utf8{} char of the string.
+Call @var{f} with each of @acronym{UTF8} char of the string.
 @end deftypefn
 
 
 @deftypefn {Neko Function} int utf8_compare (@var{s1} : string, @var{s2} : string)
-Compare two @utf8{} strings according to @utf8{} char codes.
+Compare two @acronym{UTF8} strings according to @acronym{UTF8} char codes.
 @end deftypefn
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node lib xml
-@section The standard event--driven @xml{} parser. 
+@section The standard event--driven @axml{} parser.
 
 
 @deftypefn {Neko Function} void parse_xml (@var{xml} : string, @var{events} : object)
@@ -7446,10 +7009,10 @@ object method in events:
 
 @table @code
 @item void xml (name : string, attribs : object)
-when an @xml{} node is found;
+when an @axml{} node is found;
 
 @item void done (void)
-when an @xml{} node is closed;
+when an @axml{} node is closed;
 
 @item void pcdata (s : string)
 when @code{PCData} are chars found;
@@ -7461,14 +7024,11 @@ when a @code{CData} session is found;
 when some comment or special header is found.
 @end table
 
-We can implement the events so they build the appropriate @xml{} data
+We can implement the events so they build the appropriate @axml{} data
 structure needed by our language.
 @end deftypefn
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node lib misc
 @section Miscellaneous functions
 
@@ -7518,18 +7078,14 @@ linked.
 
 @deftypefn {Neko Function} void print_redirect (@var{f} : function:1?)
 Set a redirection function for all printed values.  Setting it to
-@null{} will cancel the redirection and restore previous printer.
+@cnull{} will cancel the redirection and restore previous printer.
 @end deftypefn
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node lib cgi
 @section Apache access when running @modneko{}
 
 
-@noindent
 The following functions are defined only when running @modneko{}, they
 are @strong{not} in the standard library.
 
@@ -7645,15 +7201,11 @@ returns the current cache.
 @end table
 @end deftypefn
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node lib mysql
 @section Connecting and using MySQL databases
 
 
-@noindent
 The following functions are available only if the interface library has
 been built and installed; the library is called @file{mysql.ndll} and
 can be loaded using the following Neko module:
@@ -7762,15 +7314,11 @@ Return the nth field of the current row as an integer (or 0).
 Return the nth field of the current row as a float (or 0).
 @end deftypefn
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node lib sqlite
 @section Connecting to and using Sqlite databases
 
 
-@noindent
 Sqlite is a small embeddable @acronym{SQL} database that stores all its
 data into a single file.  See @url{http://sqlite.org} for more details.
 
@@ -7840,7 +7388,7 @@ Return the number of fields in the result.
 
 
 @deftypefn {Neko Function} object? result_next (@var{r} : 'result)
-Return the next row in the result or @null{} if no more result.
+Return the next row in the result or @cnull{} if no more result.
 @end deftypefn
 
 
@@ -7858,15 +7406,11 @@ Return the nth field of the current result row as an integer.
 Return the nth field of the current result row as a float.
 @end deftypefn
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node lib regexp
 @section Regular expressions using the @acronym{PCRE} engine
 
 
-@noindent
 The following functions are available only if the regexp library has
 been built and installed; the library file name is @file{regexp.ndll}.
 To access the functions we can load the following module:
@@ -7907,7 +7451,7 @@ case insensitive matching;
 treat the input as a multiline string;
 
 @item u
-run in @utf8{} mode;
+run in @acronym{UTF8} mode;
 
 @item g
 turn off greedy behaviour.
@@ -7953,15 +7497,11 @@ Return the position of the nth block matched by the regexp.  If @var{n}
 is @code{0} then return the whole matched substring position.
 @end deftypefn
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node lib gui
 @section Core native user interface support
 
 
-@noindent
 This @api{} uses native Win32 @api{} on Windows, Carbon @api{} on
 @acronym{OSX}, and @acronym{GTK2} on Linux.  The following functions are
 available only if the @gui{} library has been built and installed; the
@@ -8012,15 +7552,11 @@ while running the @gui{} event loop.  This can be used to perform @gui{}
 updates in the @gui{} thread using results processed by another thread.
 @end deftypefn
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node lib zlib
 @section Compression library
 
 
-@noindent
 The following @api{} gives access to the popular ZLib compression
 library, used in several file formats such as @acronym{ZIP} and
 @acronym{PNG}.
@@ -8094,7 +7630,7 @@ Open a decompression stream.
 @end deftypefn
 
 
-@deftypefn {Neko Function} {@{ done => bool, read => int, write => int@}} inflate_buffer (@var{i} : 'istream, @var{src} : string, @var{srcpos} : int, @var{dst} : string, @var{dstpos} : int) 
+@deftypefn {Neko Function} {@{ done => bool, read => int, write => int@}} inflate_buffer (@var{i} : 'istream, @var{src} : string, @var{srcpos} : int, @var{dst} : string, @var{dstpos} : int)
 Decompresses a string and store the output into a string.
 @end deftypefn
 
@@ -8121,17 +7657,13 @@ Update an adler32 value with a substring.
 Update a @acronym{CRC32} value with a substring.
 @end deftypefn
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node faq
 @appendix Frequently asked questions
 
 
 @appendixsec How is Neko different from .Net's @acronym{CLR} or the Java's @acronym{JVM}?
 
-@noindent
 The .Net's @acronym{CLR} and the Java Virtual Machine are both defined
 by a bytecode language with a static type system based on classes.  As a
 result, you can easily run languages that have a type system compatible
@@ -8241,25 +7773,19 @@ pure @acronym{ANSI} C with only some differences for specific things
 such as some standard library functions for system @api{} and dynamic
 loading.
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node mod_neko
 @appendix An introduction to @modneko{}
 
 
-@noindent
 @modneko{} is an Apache module for Neko: it makes possible to run Neko
 programs on the server side, in order to serve web pages using Apache.
 Here's a step--by--step tutorial on how to configure and use @modneko{}.
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+@c ------------------------------------------------------------
 
 @appendixsec Quick configuration
 
-
-@noindent
 If we don't have @modneko{} compiled or we don't want to setup
 Apache, we can use a @modneko{} emulator by using the Neko Web
 Server.  It is a very small web server running locally for development
@@ -8283,12 +7809,10 @@ website directory and we can start browsing it.  If it contains Neko
 bytecode files, extension @code{.n}, they will be loaded and executed
 just like Apache @modneko{} does.
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+@c ------------------------------------------------------------
 
 @appendixsec Apache configuration
 
-
-@noindent
 To use Apache with @modneko{}, once Neko is correctly configured,
 we can edit the Apache configuration file, @file{httpd.conf}, in order
 to add @modneko{}.  Each statement must be added on a single line
@@ -8327,12 +7851,10 @@ add @code{index.n} to the list of @code{DirectoryIndex};
 now we can restart Apache to check that @modneko{} is correctly
 loaded.
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+@c ------------------------------------------------------------
 
 @appendixsec Some tests
 
-
-@noindent
 We can simply edit a Neko file and print a welcome message:
 
 @example
@@ -8359,12 +7881,10 @@ $print("PARAMS = " + get_params());
 We can now set @acronym{HTTP} parameters @code{<THE-URL>?p1=v1;p2=v2...}
 and see them displayed on the web page.
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+@c ------------------------------------------------------------
 
 @appendixsec Script versus application
 
-
-@noindent
 Usage of Neko is separated into two different phases: compile and run.
 We cannot directly see the modifications we are making to the script
 since we need to compile it first: this is a disadvantage.  However,
@@ -8397,16 +7917,16 @@ will be the function called for every request.  Here's an example:
 
 @example
 $print("Initializing...");
- 
+
 // this is the entry point
 entry = function() @{
   $print("Main...");
 @}
- 
+
 // setup the entry point
 set_main = $loader.loadprim("mod_neko@@cgi_set_main",1);
 set_main(entry);
- 
+
 // call it the first time as well
 entry();
 @end example
@@ -8421,26 +7941,21 @@ If we recompile, this will change the time stamp of the @code{.n} file so
 it will reload and initialise it again.  That means we should be able to
 reload everything we need at loading time.
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node nekoml
 @appendix A quick guide to NekoML
 
 
-@noindent
 NekoML is a high--order functional language with type inference.  It can
 be seen as Neko with a powerful static type system.  It is very suitable
 for complex data structure manipulations, such as the ones performed by
 compilers.  NekoML is inspired by OCaml, but walks different ways for
 some points.
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+@c ------------------------------------------------------------
 
 @appendixsec Types
 
-
-@noindent
 NekoML comes with several builtin types, and we can define our own types
 quite easily:
 
@@ -8566,12 +8081,10 @@ lists constructors:
 @end example
 @end itemize
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+@c ------------------------------------------------------------
 
 @appendixsec Syntax
 
-
-@noindent
 The syntax of NekoML if similar to the syntax of Neko, but with some
 additional constructs:
 
@@ -8652,9 +8165,7 @@ function rec g() @{
 @end example
 @end itemize
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node examples
 @appendix Neko code examples
 
@@ -8665,10 +8176,7 @@ function rec g() @{
                                 abstract numbers.
 @end menu
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node examples list
 @appendixsec A module that manipulates lists
 
@@ -8677,9 +8185,9 @@ function rec g() @{
 // Part of: Marco's Test modules
 // Contents: Lisp like lists using arrays
 // Date: Sun Aug 17, 2008
-// 
+//
 // Abstract
-// 
+//
 // This module exports a  set of function to manipulate Neko
 // '#list' values.  Sometimes the  Neko library makes use of
 // a custom  list type to  organise a sequence of  values; a
@@ -8712,7 +8220,7 @@ function rec g() @{
 //    is made up of pairs;
 //
 // 4. each pair in a list can hold a value;
-// 
+//
 // 5. the length of the  list is the number of values, which
 //    equals the number of pairs.
 //
@@ -8721,30 +8229,30 @@ function rec g() @{
 // values  will cause  undefined behaviour.   Predicates and
 // assertion  functions are provided  to validate  lists and
 // pairs.
-// 
+//
 // Copyright (c) 2008 Marco Maggi <marcomaggi@@gna.org>
 //
 // What follows is a list of contributors to this module:
-// 
+//
 // Copyright (c) 2008 Vitali Falileev <insideable@@gmail.com>
-// 
+//
 // This  is free  software; you  can redistribute  it and/or
 // modify  it under  the  terms of  the  GNU Lesser  General
 // Public  License   as  published  by   the  Free  Software
 // Foundation;  either version  2.1 of  the License,  or (at
 // your option) any later version.
-// 
+//
 // This library is  distributed in the hope that  it will be
 // useful,  but  WITHOUT  ANY  WARRANTY;  without  even  the
 // implied  warranty  of MERCHANTABILITY  or  FITNESS FOR  A
 // PARTICULAR  PURPOSE.  See the  GNU Lesser  General Public
 // License for more details.
-// 
+//
 // You should have received a copy of the GNU Lesser General
 // Public License along with  this library; if not, write to
 // the  Free  Software Foundation,  Inc.,  59 Temple  Place,
 // Suite 330, Boston, MA 02111-1307 USA.
-// 
+//
 
 //page
 // ------------------------------------------------------------
@@ -9188,7 +8696,7 @@ $exports.head = function (ell, count) @{
 // elements from ELL.
 $exports.tail = function (ell, count) @{
   $exports.reverse($exports.head($exports.reverse(ell), count));
-@};  
+@};
 
 // ------------------------------------------------------------
 
@@ -9297,7 +8805,7 @@ var do_append = function (args) @{
   while (i < $asize(args))
     @{
       var ell = args[i];
-      
+
       while (null != ell)
         @{
           result = $array(ell[0], result);
@@ -9388,9 +8896,8 @@ $exports.list_to_array = function (ell) @{
 @end example
 
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-@c ------------------------------------------------------------
+@c page
 @node examples o32
 @appendixsec An object interface to @code{'int32} abstract numbers
 
@@ -9399,9 +8906,9 @@ $exports.list_to_array = function (ell) @{
 // Part of: Marco's Test modules
 // Contents: object interface to #int32
 // Date: Wed Aug 20, 2008
-// 
+//
 // Abstract
-// 
+//
 // This module  exports an  object interface to  handle Neko
 // 'int32  values.   This  module  defines  a  protocol  for
 // handling objects wrapping  'int32 through the object type
@@ -9411,7 +8918,7 @@ $exports.list_to_array = function (ell) @{
 // named "n" holding an  abstract Neko value of 'int32 kind;
 // its  prototype  is the  value  of  "o32_proto" from  this
 // module.
-// 
+//
 // Copyright (c) 2008 Marco Maggi <marcomaggi@@gna.org>
 //
 // This  is free  software; you  can redistribute  it and/or
@@ -9419,18 +8926,18 @@ $exports.list_to_array = function (ell) @{
 // Public  License   as  published  by   the  Free  Software
 // Foundation;  either version  2.1 of  the License,  or (at
 // your option) any later version.
-// 
+//
 // This library is  distributed in the hope that  it will be
 // useful,  but  WITHOUT  ANY  WARRANTY;  without  even  the
 // implied  warranty  of MERCHANTABILITY  or  FITNESS FOR  A
 // PARTICULAR  PURPOSE.  See the  GNU Lesser  General Public
 // License for more details.
-// 
+//
 // You should have received a copy of the GNU Lesser General
 // Public License along with  this library; if not, write to
 // the  Free  Software Foundation,  Inc.,  59 Temple  Place,
 // Suite 330, Boston, MA 02111-1307 USA.
-// 
+//
 
 //page
 // ------------------------------------------------------------
@@ -9546,7 +9053,7 @@ var o32_compare = function (num) @{
 // Synopsis: #o32 o32_radd (num : #o32|string|number)
 //
 // Return the sum between "this" and NUM.
-// 
+//
 // When dealing with numbers:  left and right adding are the
 // same; when dealing with strings: left and right adding is
 // different.  This is why we have two add functions.
@@ -9729,9 +9236,8 @@ make = basic_new;
 @end example
 
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-@c ------------------------------------------------------------
+@c page
 @node Software License
 @appendix @gnu{} Lesser General Public License
 
@@ -10300,9 +9806,8 @@ Ty Coon, President of Vice
 That's all there is to it!
 
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-@c ------------------------------------------------------------
+@c page
 @node Documentation License
 @appendix GNU Free Documentation License
 
@@ -10701,39 +10206,34 @@ recommend releasing these examples in parallel under your choice of
 free software license, such as the GNU General Public License,
 to permit their use in free software.
 
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-@c ------------------------------------------------------------
+@c page
 @node References
 @appendix Bibliography and references
 
 
-@noindent
 @nvm{} Home Page:
 
 @center @url{http://www.nekovm.org/}
 
-
-@c  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node Concept Index
 @appendix An entry for each concept
-     
+
 @printindex cp
-     
+
 @node Function Index
-@appendix An entry for each function. 
+@appendix An entry for each function.
 
 @printindex fn
 
 @node Variable Index
-@appendix An entry for each variable. 
+@appendix An entry for each variable.
 
 @printindex vr
 
 @node Type Index
-@appendix An entry for each type. 
+@appendix An entry for each type.
 
 @printindex tp
 
@@ -10743,5 +10243,4 @@ to permit their use in free software.
 @c end of file
 @c Local Variables:
 @c mode: texinfo
-@c page-separator: \"^@c -+$\"
 @c End:

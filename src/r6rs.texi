@@ -32,7 +32,7 @@
 @c RNRS document macros.
 @c ------------------------------------------------------------
 
-@macro cite{NAME}
+@macro acite{NAME}
 [@sc{\NAME\}]
 @end macro
 
@@ -291,10 +291,10 @@ Appendices
 
 Indexes
 
-* concept index::               An entry for each concept. 
-* function index::              An entry for each function. 
-* variable index::              An entry for each variable. 
-* type index::                  An entry for each type. 
+* concept index::               An entry for each concept.
+* function index::              An entry for each function.
+* variable index::              An entry for each variable.
+* type index::                  An entry for each type.
 
 @detailmenu
  --- The Detailed Node Listing ---
@@ -564,23 +564,23 @@ of Scheme;
 derive its power from simplicity, a small number of generally useful
 core syntactic forms and procedures, and no unnecessary restrictions on
 how they are composed;
-  
+
 @item
 allow programs to define new procedures and new hygienic syntactic
 forms;
-  
+
 @item
 support the representation of program source code as data;
-  
+
 @item
 make procedure calls powerful enough to express any form of sequential
 control, and allow programs to perform non--local control operations
 without the use of global program transformations;
-  
+
 @item
 allow interesting, purely functional programs to run indefinitely
 without terminating or running out of memory on finite--memory machines;
-  
+
 @item
 allow educators to use the language to teach programming effectively, at
 various levels and with a variety of pedagogical approaches; and
@@ -597,13 +597,13 @@ In addition, this report is intended to:
 allow programmers to create and distribute substantial programs and
 libraries, e.g., implementations of Scheme Requests for Implementation,
 that run without modification in a variety of Scheme implementations;
-  
+
 @item
 support procedural, syntactic, and data abstraction more fully by
 allowing programs to define hygiene--bending and hygiene--breaking
 syntactic abstractions and new unique datatypes along with procedures
 and hygienic macros in any scope;
-  
+
 @item
 allow programmers to rely on a level of automatic run--time type and
 bounds checking sufficient to ensure type safety; and
@@ -735,7 +735,7 @@ Following Algol, Scheme is a statically scoped programming language.
 Each use of a variable is associated with a lexically apparent binding
 of that variable.
 
-Scheme has latent as opposed to manifest types @cite{WaiteGoos}.  Types
+Scheme has latent as opposed to manifest types @acite{WaiteGoos}.  Types
 are associated with objects (also called values) rather than with
 variables.  (Some authors refer to languages with latent types as
 untyped, weakly typed or dynamically typed languages.)  Other languages
@@ -1577,7 +1577,7 @@ recommends, but does not require, that the @acronym{IEEE}
 floating--point standards be followed by implementations that use
 floating--point representations, and that implementations using other
 representations should match or exceed the precision achievable using
-these floating--point standards @cite{ieee}.
+these floating--point standards @acite{ieee}.
 
 In particular, implementations that use floating--point representations
 must follow these rules: A floating--point result must be represented
@@ -1765,7 +1765,7 @@ name: @meta{character tabulation} (U+0009), @meta{linefeed} (U+000A),
 The lexical syntax determines how a character sequence is split into a
 sequence of lexemes, omitting non--significant portions such as comments
 and whitespace.  The character sequence is assumed to be text according
-to the Unicode standard @cite{Unicode}.  Some of the lexemes, such as
+to the Unicode standard @acite{Unicode}.  Some of the lexemes, such as
 identifiers, representations of number objects, strings etc., of the
 lexical syntax are syntactic data in the datum syntax, and thus
 represent objects.  Besides the formal account of the syntax, this
@@ -2097,7 +2097,7 @@ For example:
 #\((x)          U+0028 followed by another datum, parenthesized x
 #\x00110000     &lexical exception out of range
 #\x000000001    U+0001
-#\xD800         &lexical exception in excluded range 
+#\xD800         &lexical exception in excluded range
 @end example
 
 (The notation @code{&lexical} means that the line in question is a
@@ -2135,21 +2135,21 @@ always start with a backslash (@code{\}):
 @item \a
 alarm, U+0007
 @item \b
-backspace, U+0008 
+backspace, U+0008
 @item \t
-character tabulation, U+0009 
+character tabulation, U+0009
 @item \n
-linefeed, U+000A 
+linefeed, U+000A
 @item \v
-line tabulation, U+000B 
+line tabulation, U+000B
 @item \f
-formfeed, U+000C 
+formfeed, U+000C
 @item \r
-return, U+000D 
+return, U+000D
 @item \"
-doublequote, U+0022 
+doublequote, U+0022
 @item \
-backslash, U+005C 
+backslash, U+005C
 @item \<intraline whitespace><line ending> <intraline whitespace>
 nothing
 @item \x<hex scalar value>;
@@ -2233,7 +2233,7 @@ implementation.  The default precision has at least as much precision as
 set by the user.
 
 @example
-3.1415926535898F0 
+3.1415926535898F0
        Round to single, perhaps 3.141593
 0.6L0
        Extend to long, perhaps .600000000000000
@@ -2271,7 +2271,7 @@ by calling the following procedure:
        [x 1.0 (/ x 2.0)])
     ((= 1.0 (+ 1.0 x)) n)))
 @end example
-@end quotation      
+@end quotation
 
 @quotation
 @emph{Note} When the underlying floating--point representation is
@@ -2464,25 +2464,25 @@ expression that evaluates to a bytevector.
 Each of these is an abbreviation:
 
 @table @code
-@item '<datum>     
+@item '<datum>
 for @code{(quote <datum>)},
 
-@item `<datum>     
+@item `<datum>
 for @code{(quasiquote <datum>)},
 
-@item ,<datum>     
+@item ,<datum>
 for @code{(unquote <datum>)},
 
-@item ,@@<datum>     
+@item ,@@<datum>
 for @code{(unquote-splicing <datum>)},
 
-@item #'<datum>     
+@item #'<datum>
 for @code{(syntax <datum>)},
 
-@item #`<datum>     
+@item #`<datum>
 for @code{(quasisyntax <datum>)},
 
-@item #,<datum>     
+@item #,<datum>
 for @code{(unsyntax <datum>)}, and
 
 @item #,@@<datum>
@@ -2545,7 +2545,7 @@ Chapters ``Libraries'' and ``Top--level programs'' describe the syntax
 and semantics of libraries and top--level programs, respectively.
 Chapter ``Base library'' describes a base library that defines many of
 the constructs traditionally associated with Scheme.  A separate report
-@cite{R6RS-libraries} describes the various @emph{standard libraries}
+@acite{R6RS-libraries} describes the various @emph{standard libraries}
 provided by a Scheme system.
 
 The division between the base library and the other standard libraries
@@ -3359,33 +3359,33 @@ A library definition must have the following form:
 A library declaration contains the following elements:
 
 @itemize
-@item 
+@item
 The @meta{library name} specifies the name of the library (possibly with
 version).
 
-@item 
+@item
 The @code{export} subform specifies a list of exports, which name a
 subset of the bindings defined within or imported into the library.
 
-@item 
+@item
 The @code{import} subform specifies the imported bindings as a list of
 import dependencies, where each dependency specifies:
 
 @itemize -
-@item 
+@item
 the imported library's name, and, optionally, constraints on its
 version,
 
-@item 
+@item
 the relevant levels, e.g. expand or run time,
 
-@item 
+@item
 the subset of the library's exports to make available within the
 importing library, and the local names to use within the importing
 library for each of the library's exports.
 @end itemize
 
-@item 
+@item
 The @meta{library body} is the library body, consisting of a sequence of
 definitions followed by a sequence of expressions.  The definitions may
 be both for local (unexported) and exported bindings, and the
@@ -3574,22 +3574,22 @@ imported and the names of those bindings can be adjusted with the
 described below.
 
 @itemize
-@item 
+@item
 An @code{only} form produces a subset of the bindings from another
 @meta{import set}, including only the listed @meta{identifier}s.  The
 included @meta{identifier}s must be in the original @meta{import set}.
 
-@item 
+@item
 An @code{except} form produces a subset of the bindings from another
 @meta{import set}, including all but the listed @meta{identifier}s.  All
 of the excluded @meta{identifier}s must be in the original @meta{import
 set}.
 
-@item 
+@item
 A @code{prefix} form adds the @meta{identifier} prefix to each name from
 another @meta{import set}.
 
-@item 
+@item
 A @code{rename} form:
 
 @example
@@ -3639,7 +3639,7 @@ returning twice to the continuation of the last body expression is
 unspecified.
 
 @quotation
-@emph{Note:} 
+@emph{Note:}
 The names @code{library}, @code{export}, @code{import}, @code{for},
 @code{run}, @code{expand}, @code{meta}, @code{import}, @code{ export},
 @code{only}, @code{except}, @code{prefix}, @code{rename}, @code{and},
@@ -3841,8 +3841,8 @@ Examples for various @meta{import spec}s and @meta{export spec}s:
     (cons (- (car b) amt)
           (+ (cdr b) amt)))
   (define (pop b)
-    (display "Boom! ") 
-    (display (* (car b) (cdr b))) 
+    (display "Boom! ")
+    (display (* (car b) (cdr b)))
     (newline)))
 
 (library (party)
@@ -3890,7 +3890,7 @@ Examples for macros and phases:
          (let loop ((rest (cdr l)))
            (cond
             [(null? rest) (find-dup (cdr l))]
-            [(bound-identifier=? (car l) (car rest)) 
+            [(bound-identifier=? (car l) (car rest))
              (car rest)]
             [else (loop (cdr rest))])))))
 
@@ -3905,7 +3905,7 @@ Examples for macros and phases:
          (not (find-dup (syntax (id ...))))
          (syntax
            (call-with-values
-               (lambda () expr) 
+               (lambda () expr)
              (lambda (id ...) body0 body ...)))]))))
 
 (library (let-div)
@@ -4104,7 +4104,7 @@ x   =>  28
 
 @subsubheading Procedure calls
 
-@deffn Syntax (@meta{operator} @hyperi{operand} @dots{})
+@deffn Syntax @meta{operator} @hyperi{operand} @dots{}
 A procedure call consists of expressions for the procedure to be called
 and the arguments to be passed to it, with enclosing parentheses.  A
 form in an expression context is a procedure call if @meta{operator} is
@@ -4209,12 +4209,12 @@ are ``hygienic'' and ``referentially transparent'' and thus preserve
 Scheme's lexical scoping.
 
 @itemize
-@item 
+@item
 If a macro transformer inserts a binding for an identifier (variable or
 keyword) not appearing in the macro use, the identifier is in effect
 renamed throughout its scope to avoid conflicts with other identifiers.
 
-@item 
+@item
 If a macro transformer inserts a free reference to an identifier, the
 reference refers to the binding that was visible where the transformer
 was specified, regardless of any local bindings that may surround the
@@ -4544,8 +4544,8 @@ definitions may appear.
 
 @deffn Syntax define @meta{variable} @hyper{expression}
 @deffnx Syntax define @meta{variable}
-@deffnx Syntax define @meta{variable} @hyper{formals}) @hyper{body}
-@deffnx Syntax define (@meta{variable} . @hyper{formal}) @hyper{body})
+@deffnx Syntax define @meta{variable} @hyper{formals} @hyper{body}
+@deffnx Syntax define (@meta{variable} . @hyper{formal}) @hyper{body}
 The first from of @func{define} binds @meta{variable} to a new location
 before assigning the value of @meta{expression} to it.
 
@@ -5255,7 +5255,7 @@ its region, making it possible to define mutually recursive procedures.
             (if (zero? n)
                 \schfalse
                 (even? (- n 1))))))
-  (even? 88))   
+  (even? 88))
 => #t
 @end example
 
@@ -5420,7 +5420,7 @@ The @meta{begin} keyword has two different roles, depending on its
 context:
 
 @itemize
-@item 
+@item
 It may appear as a form in a @meta{body}, @meta{library body}, or
 @meta{top-level body}, or directly nested in a @func{begin} form that
 appears in a body.  In this case, the @func{begin} form must have the
@@ -5428,12 +5428,12 @@ shape specified in the first header line.  This use of @func{begin} acts
 as a @emph{splicing} form: the forms inside the @meta{body} are spliced
 into the surrounding body, as if the @func{begin} wrapper were not
 actually present.
-  
+
 A @func{begin} form in a @meta{body} or @meta{library body} must be
 non--empty if it appears after the first @meta{expression} within the
 body.
 
-@item 
+@item
 It may appear as an ordinary expression and must have the shape
 specified in the second header line.  In this case, the
 @meta{expression}s are evaluated sequentially from left to right, and
@@ -5482,40 +5482,40 @@ partial specification of @func{eqv?} must hold for all implementations.
 The @func{eqv?} procedure returns @true{} if one of the following holds:
 
 @itemize
-@item 
+@item
 @vari{obj} and @varii{obj} are both booleans and are the same according
 to the @func{boolean=?} procedure.
 
-@item 
+@item
 @vari{obj} and @varii{obj} are both symbols and are the same according
 to the @func{symbol=?} procedure.
 
-@item 
+@item
 @vari{obj} and @varii{obj} are both exact number objects and are
 numerically equal (see @code{=}).
 
-@item 
+@item
 @vari{obj} and @varii{obj} are both inexact number objects, are
 numerically equal (see @code{=}), and yield the same results (in the
 sense of @func{eqv?}) when passed as arguments to any other procedure
 that can be defined as a finite composition of Scheme's standard
 arithmetic procedures.
 
-@item 
+@item
 @vari{obj} and @varii{obj} are both characters and are the same
 character according to the @code{char=?} procedure.
 
-@item 
+@item
 Both @vari{obj} and @varii{obj} are the empty list.
 
-@item 
+@item
 @vari{obj} and @varii{obj} are objects such as pairs, vectors,
 bytevectors (library chapter ``Bytevectors''), strings, hashtables,
 records (library chapter ``Records''), ports (library section ``Port
 I/O''), or hashtables (library chapter ``Hash tables'') that refer to
 the same locations in the store.
 
-@item 
+@item
 @vari{obj} and @varii{obj} are record--type descriptors that are
 specified to be @func{eqv?} in library section ``Procedural layer''.
 @end itemize
@@ -5524,53 +5524,53 @@ The @func{eqv?} procedure returns @false{} if one of the following
 holds:
 
 @itemize
-@item 
+@item
 @vari{obj} and @varii{obj} are of different types.
 
-@item 
+@item
 @vari{obj} and @varii{obj} are booleans for which the @func{boolean=?}
 procedure returns @false{}.
 
-@item 
+@item
 @vari{Obj} and @varii{obj} are symbols for which the @func{symbol=?}
 procedure returns @false{}.
 
-@item 
+@item
 One of @vari{obj} and @varii{obj} is an exact number object but the
 other is an inexact number object.
 
-@item 
+@item
 @vari{obj} and @varii{obj} are rational number objects for which the
 @code{=} procedure returns @false{}.
 
-@item 
+@item
 @vari{Obj} and @varii{obj} yield different results (in the sense of
 @func{eqv?}) when passed as arguments to any other procedure that can be
 defined as a finite composition of Scheme's standard arithmetic
 procedures.
 
-@item 
+@item
 @vari{obj} and @varii{obj} are characters for which the @func{char=?}
 procedure returns @false{}.
 
-@item 
+@item
 One of @vari{obj} and @varii{obj} is the empty list, but the other is
 not.
 
-@item 
+@item
 @vari{obj} and @varii{obj} are objects such as pairs, vectors,
 bytevectors (library chapter ``Bytevectors''), strings, records (library
 chapter ``Records''), ports (library section ``Port I/O''), or
 hashtables (library chapter ``Hashtables'') that refer to distinct
 locations.
 
-@item 
+@item
 @vari{obj} and @varii{obj} are pairs, vectors, strings, or records, or
 hashtables, where the applying the same accessor (i.e. @func{car},
 @func{cdr}, @func{vector-ref}, @func{string-ref}, or record accessors)
 to both yields results for which @func{eqv?} returns @false{}.
 
-@item 
+@item
 @vari{obj} and @varii{obj} are procedures that would behave differently
 (return different values or have different side effects) for some
 arguments.
@@ -7028,10 +7028,10 @@ More precisely, the set of lists is defined as the smallest set @var{X}
 such that:
 
 @itemize
-@item 
+@item
 The empty list is in @var{X}.
 
-@item 
+@item
 If @var{list} is in @var{X}, then any pair whose cdr field contains
 @var{list} is also in @var{X}.
 @end itemize
@@ -7405,7 +7405,7 @@ Despite this complexity, most things that a literate human would call a
 (although several sequences of Unicode scalar values may represent that
 same character).  For example, Roman letters, Cyrillic letters, Hebrew
 consonants, and most Chinese characters fall into this category.
-  
+
 Unicode scalar values exclude the range @code{#xD800} to @code{#xDFFF},
 which are part of the range of Unicode @emph{code points}.  However, the
 Unicode code points in this range, the so--called @emph{surrogates}, are
@@ -7769,18 +7769,18 @@ The condition object provided with the exception has the following
 condition types:
 
 @itemize
-@item 
+@item
 If @var{who} is not @false{}, the condition has condition type
 @code{&who}, with @var{who} as the value of its field.  In that case,
 @var{who} should be the name of the procedure or entity that detected
 the exception.  If it is @false{}, the condition does not have condition
 type @code{&who}.
 
-@item 
+@item
 The condition has condition type @code{&message}, with @var{message} as
 the value of its field.
 
-@item 
+@item
 The condition has condition type @code{&irritants}, and its field has as
 its value a list of the @var{irritant}s.
 @end itemize
@@ -7833,7 +7833,7 @@ of the assertion failure.
 @node base control
 @section Control features
 
- 
+
 This chapter describes various primitive procedures which control the
 flow of program execution in special ways.
 
@@ -7936,7 +7936,7 @@ procedure might be defined as follows:
 
 @example
 (define (values . things)
-  (call-with-current-continuation 
+  (call-with-current-continuation
     (lambda (cont) (apply cont things))))
 @end example
 
@@ -8114,7 +8114,7 @@ procedure named by @meta{variable}.
         ((< (car numbers) 0)
          (loop (cdr numbers)
                nonneg
-               (cons (car numbers) neg))))) 
+               (cons (car numbers) neg)))))
 =>  ((6 1 3) (-5 -2))
 @end example
 @end deffn
@@ -8177,7 +8177,7 @@ Examples:
 `((foo ,(- 10 3))
   ,@@(cdr '(c)) . ,(car '(cons)))        => ((foo 7) . cons)
 
-`#(10 5 ,(sqrt 4) ,@@(map sqrt '(16 9)) 8)      
+`#(10 5 ,(sqrt 4) ,@@(map sqrt '(16 9)) 8)
                                         => #(10 5 2 4 3 8)
 
 (let ((name 'foo))
@@ -8227,7 +8227,7 @@ may be equivalent to either of the following expressions:
 @example
 '((1 2) 3 4 five 6)
 
-(let ((a 3)) 
+(let ((a 3))
   (cons '(1 2)
         (cons a (cons 4 (cons 'five '(6))))))
 @end example
@@ -8265,7 +8265,7 @@ production rules.  Imagine a copy of the following rules for @emph{D =
     | @meta{splicing unquotation @emph{D}}
 @meta{splicing unquotation @emph{D}} ->
       (unquote-splicing @arbno{@meta{qq template @emph{D-1}}})
-    | (unquote @arbno{@meta{qq template @emph{D-1}}}) 
+    | (unquote @arbno{@meta{qq template @emph{D-1}}})
 @end example
 
 In @func{quasiquotation}s, a @meta{list qq template @emph{D}} can
@@ -8518,13 +8518,13 @@ More formally, an input form @emph{F} matches a pattern @emph{P} if and
 only if one of the following holds:
 
 @itemize
-@item 
+@item
 @emph{P} is an underscore (@code{_}).
 
-@item 
+@item
 @emph{P} is a pattern variable.
 
-@item 
+@item
 @emph{P} is a literal identifier and @emph{F} is an identifier such that
 both @emph{P} and @emph{F} would refer to the same binding if both were
 to appear in the output of the macro outside of any bindings inserted
@@ -8532,7 +8532,7 @@ into the output of the macro.  (If neither of two like--named
 identifiers refers to any binding, i.e., both are undefined, they are
 considered to refer to the same binding.)
 
-@item 
+@item
 @emph{P} is of the form:
 
 @example
@@ -8543,7 +8543,7 @@ considered to refer to the same binding.)
 and @emph{F} is a list of @emph{n} elements that match @emph{P_1}
 through @emph{P_n}.
 
-@item 
+@item
 @emph{P} is of the form:
 
 @example
@@ -8555,7 +8555,7 @@ and @emph{F} is a list or improper list of @emph{n} or more elements
 whose first @emph{n} elements match @emph{P_1} through @emph{P_n} and
 whose @emph{n}th cdr matches @emph{P_x}.
 
-@item 
+@item
 @emph{P} is of the form:
 
 @example
@@ -8569,7 +8569,7 @@ through @emph{P_k}, whose next @emph{m-k} elements each match
 @emph{P_e}, and whose remaining @emph{n-m} elements match @emph{P_(m+1)}
 through @emph{P_n}.
 
-@item 
+@item
 @emph{P} is of the form:
 
 @example
@@ -8584,7 +8584,7 @@ match @emph{P_e}, whose next @emph{n-m} elements match @emph{P_(m+1)}
 through @emph{P_n}, and whose @emph{n}th and final cdr matches
 @emph{P_x}.
 
-@item 
+@item
 @emph{P} is of the form:
 
 @example
@@ -8595,7 +8595,7 @@ through @emph{P_n}, and whose @emph{n}th and final cdr matches
 and @emph{F} is a vector of @emph{n} elements that match @emph{P_1}
 through @emph{P_n}.
 
-@item 
+@item
 @emph{P} is of the form:
 
 @example
@@ -8609,7 +8609,7 @@ vector of @emph{n} or more elements whose first @emph{k} elements match
 @emph{P_e}, and whose remaining @emph{n-m} elements match @emph{P_(m+1)}
 through @emph{P_n}.
 
-@item 
+@item
 @emph{P} is a pattern datum (any nonlist, nonvector, nonsymbol datum)
 and @emph{F} is equal to @emph{P} in the sense of the @func{equal?}
 procedure.
@@ -8743,7 +8743,7 @@ context is always determined with respect to a particular lambda
 expression.
 
 @itemize
-@item 
+@item
 The last expression within the body of a lambda expression, shown as
 @meta{tail expression} below, occurs in a tail context.
 
@@ -8753,7 +8753,7 @@ The last expression within the body of a lambda expression, shown as
   @arbno{@meta{expression}} @meta{tail expression})
 @end example
 
-@item 
+@item
 If one of the following expressions is in a tail context, then the
 subexpressions shown as @meta{tail expression} are in a tail context.
 These were derived from specifications of the syntax of the forms
@@ -9394,66 +9394,66 @@ This chapter describes most of the changes that have been made to Scheme
 since the ``Revised^5 Report'' was published:
 
 @itemize
-@item 
+@item
 Scheme source code now uses the Unicode character set.  Specifically,
 the character set that can be used for identifiers has been greatly
 expanded.
 
-@item 
+@item
 Identifiers can now start with the characters @code{->}.
 
-@item 
+@item
 Identifiers and symbol literals are now case--sensitive.
 
-@item 
+@item
 Identifiers and representations of characters, booleans, number objects,
 and @code{.} must be explicitly delimited.
 
-@item 
+@item
 @code{#} is now a delimiter.
 
-@item 
+@item
 Bytevector literal syntax has been added.
 
-@item 
+@item
 Matched square brackets can be used synonymously with parentheses.
 
-@item 
+@item
 The read--syntax abbreviations @code{#'} (for @func{syntax}),
 @code{#\backquote} (for @func{quasisyntax}), @code{#}, (for
 @func{unsyntax}), and @code{#,@@} (for @func{unsyntax-splicing}) have
 been added.
 
-@item 
+@item
 @code{#} can no longer be used in place of digits in number
 representations.
 
-@item 
+@item
 The external representation of number objects can now include a mantissa
 width.
 
-@item 
+@item
 Literals for NaNs and infinities were added.
 
-@item 
+@item
 String and character literals can now use a variety of escape sequences.
 
-@item 
+@item
 Block and datum comments have been added.
 
-@item 
+@item
 The @code{#!r6rs} comment for marking report--compliant lexical syntax
 has been added.
 
-@item 
+@item
 Characters are now specified to correspond to Unicode scalar values.
 
-@item 
+@item
 Many of the procedures and syntactic forms of the language are now part
 of the @rsixlibrary{base} library.  Some procedures and syntactic forms
 have been moved to other libraries.
 
-@multitable {@code{scheme-report-environment}} @tab {@rsixlibrary{mutable-strings}}
+@multitable {@code{scheme-report-environment}} {@rsixlibrary{mutable-strings}}
 @headitem Identifier @tab moved to
 @item @code{assoc} @tab @rsixlibrary{lists}
 @item @code{assv} @tab @rsixlibrary{lists}
@@ -9513,7 +9513,7 @@ have been moved to other libraries.
 @item @code{write-char} @tab @rsixlibrary{io simple}
 @end multitable
 
-@item 
+@item
 The base language has the following new procedures and syntactic forms:
 
 @example
@@ -9529,11 +9529,11 @@ assertion-violation     assert                  call/cc
 identifier-syntax
 @end example
 
-@item 
+@item
 The following procedures have been removed: @func{char-ready?},
 @func{transcript-on}, @func{transcript-off}, @func{load}.
 
-@item 
+@item
 The case--insensitive string comparisons:
 
 @example
@@ -9547,83 +9547,83 @@ operate on the case--folded versions of the strings rather than as the
 simple lexicographic ordering induced by the corresponding character
 comparison procedures.
 
-@item 
+@item
 Libraries have been added to the language.
 
-@item 
+@item
 A number of standard libraries are described in a separate report.
 
-@item 
+@item
 Many situations that ``were an error'' now have defined or constrained
 behavior.  In particular, many are now specified in terms of the
 exception system.
 
-@item 
+@item
 The full numerical tower is now required.
 
-@item 
+@item
 The semantics for the transcendental functions has been specified more
 fully.
 
-@item 
+@item
 The semantics of @func{expt} for zero bases has been refined.
 
-@item 
+@item
 In @func{syntax-rules} forms, a @code{_} may be used in place of the
 keyword.
 
-@item 
+@item
 The @func{let-syntax} and @func{letrec-syntax} no longer introduce a new
 environment for their bodies.
 
-@item 
+@item
 For implementations that support NaNs or infinities, many arithmetic
 operations have been specified on these values consistently with @ieee{}
 754.
 
-@item 
+@item
 For implementations that support a distinct @code{-0.0}, the semantics
 of many arithmetic operations with regard to @code{-0.0} has been
 specified consistently with @ieee{} 754.
 
-@item 
+@item
 Scheme's real number objects now have an exact zero as their imaginary
 part.
 
-@item 
+@item
 The specification of @func{quasiquote} has been extended.  Nested
 quasiquotations work correctly now, and @func{unquote} and
 @func{unquote-splicing} have been extended to several operands.
 
-@item 
+@item
 Procedures now may or may not refer to locations.  Consequently,
 @func{eqv?} is now unspecified in a few cases where it was specified
 before.
 
-@item 
+@item
 The mutability of the values of @func{quasiquote} structures has been
 specified to some degree.
 
-@item 
+@item
 The dynamic environment of the @var{before} and @var{after} procedures
 of @func{dynamic-wind} is now specified.
 
-@item 
+@item
 Various expressions that have only side effects are now allowed to
 return an arbitrary number of values.
 
-@item 
+@item
 The order and semantics for macro expansion has been more fully
 specified.
 
-@item 
+@item
 Internal definitions are now defined in terms of @func{letrec*}.
 
-@item 
+@item
 The old notion of program structure and Scheme's top--level environment
 has been replaced by top--level programs and libraries.
 
-@item 
+@item
 The denotational semantics has been replaced by an operational semantics
 based on an earlier semantics for the language of the ``Revised^5
 Report''.
@@ -9645,21 +9645,21 @@ Report''.
 @c page
 @node concept index
 @appendix An entry for each concept
-     
+
 @printindex cp
-     
+
 @node function index
-@appendix An entry for each function. 
+@appendix An entry for each function.
 
 @printindex fn
 
 @node variable index
-@appendix An entry for each variable. 
+@appendix An entry for each variable.
 
 @printindex vr
 
 @node type index
-@appendix An entry for each type. 
+@appendix An entry for each type.
 
 @printindex tp
 

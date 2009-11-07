@@ -71,16 +71,16 @@ TO DO LIST
 @c C language macros.
 @c ------------------------------------------------------------
 
-@macro null{}
+@macro cnull{}
 @acronym{NULL}
 @end macro
 
-@macro cfunction{NAME}
+@macro cfunc{NAME}
 @code{\NAME\()}
 @end macro
 
 @macro malloc{}
-@cfunction{malloc}
+@cfunc{malloc}
 @end macro
 
 @c ------------------------------------------------------------
@@ -133,7 +133,7 @@ copyright notice.
 @titlepage
 @title Boehm--Demers--Weiser Garbage Collection Library
 @subtitle @version{}
-@author @authorname{}
+@author Hans--J. Boehm, Alan J. Demers
 @page
 @vskip 0pt plus 1filll
 @insertcopying
@@ -144,11 +144,10 @@ copyright notice.
 @ifinfo
 @dircategory Development
 @direntry
-* gc: (gc).                     Boehm--Demers--Weiser garbage collection library.
+* gc: (gc).                     Boehm--Demers--Weiser garbage
+                                collection library.
 @end direntry
 @end ifinfo
-
-@c ------------------------------------------------------------
 
 @c page
 @ifnottex
@@ -159,7 +158,7 @@ copyright notice.
 @insertcopying
 
 @menu
-* overview::                    Overview of the library. 
+* overview::                    Overview of the library.
 * install::                     Installation and portability.
 * api::                         The C interface to the allocator.
 * bugs::                        Bugs.
@@ -176,10 +175,10 @@ Appendices
 
 Indexes
 
-* Concept Index::               An entry for each concept. 
-* Function Index::              An entry for each function. 
-* Variable Index::              An entry for each variable. 
-* Type Index::                  An entry for each type. 
+* Concept Index::               An entry for each concept.
+* Function Index::              An entry for each function.
+* Variable Index::              An entry for each variable.
+* Type Index::                  An entry for each type.
 
 @detailmenu
  --- The Detailed Node Listing ---
@@ -249,7 +248,7 @@ Debugging facilities
 @noindent
 The Boehm--Demers--Weiser conservative garbage collector can be used as
 a garbage collecting replacement for the standard C language
-@cfunction{malloc} function or the C++ language @code{new} operator.  It
+@cfunc{malloc} function or the C++ language @code{new} operator.  It
 allows to allocate memory basically as we normally would, without
 explicitly deallocating objects that are no longer useful.  The
 collector automatically recycles memory when it determines that it can
@@ -281,7 +280,7 @@ called ``blocks''.
 When this document states that a function ``fails conspicuously'' in
 case of error, it means that the program will be aborted.  This happens
 with functions that have to be used somewhat like the standard C
-@cfunction{assert} facility.
+@cfunc{assert} facility.
 
 @c ------------------------------------------------------------
 
@@ -359,15 +358,15 @@ outlining some of the additional features implemented in the collector.
 @noindent
 The collector includes its own memory allocator.  The allocator obtains
 memory from the system in a platform--dependent way.  Under Unix, it
-uses either @cfunction{malloc}, @cfunction{sbrk}, or @cfunction{mmap}.
+uses either @cfunc{malloc}, @cfunc{sbrk}, or @cfunc{mmap}.
 
 Most static data used by the allocator, as well as that needed by the
 rest of the garbage collector is stored inside the @code{_GC_arrays}
 structure.  This allows the garbage collector to easily ignore the
 collectors own data structures when it searches for root pointers.
 Other allocator and collector internal data structures are allocated
-dynamically with @cfunction{GC_scratch_alloc}.
-@cfunction{GC_scratch_alloc} does not allow for deallocation, and is
+dynamically with @cfunc{GC_scratch_alloc}.
+@cfunc{GC_scratch_alloc} does not allow for deallocation, and is
 therefore used only for permanent data structures.
 
 The allocator allocates objects of different kinds.  Different kinds are
@@ -380,7 +379,7 @@ without special precautions.  In spite of that, it is very likely that
 most C clients of the collector currently use at most two kinds:
 @code{NORMAL} and @code{PTRFREE} objects.  The @command{gcj} run time
 (the @gnu{} compiler for Java) also makes heavy use of a kind (allocated
-with @cfunction{GC_gcj_malloc}) that stores type information at a known
+with @cfunc{GC_gcj_malloc}) that stores type information at a known
 offset in method tables.
 
 The collector uses a two level allocator.  A large block is defined to
@@ -388,10 +387,10 @@ be one larger than half of @code{HBLKSIZE}, which is a power of 2,
 typically on the order of the page size.
 
 Large block sizes are rounded up to the next multiple of @code{HBLKSIZE}
-and then allocated by @cfunction{GC_allochblk}.  Recent versions of the
+and then allocated by @cfunc{GC_allochblk}.  Recent versions of the
 collector use an approximate best fit algorithm by keeping free lists
 for several large block sizes.  The actual implementation of
-@cfunction{GC_allochblk} is significantly complicated by black--listing
+@cfunc{GC_allochblk} is significantly complicated by black--listing
 issues.
 
 Small blocks are allocated in chunks of size @code{HBLKSIZE}.  Each
@@ -411,10 +410,10 @@ The exact allocated sizes are computed on demand, but subject to the
 constraint that they increase roughly in geometric progression.  Thus
 objects requested early in the execution are likely to be allocated with
 exactly the requested size, subject to alignment constraints.  See
-@cfunction{GC_init_size_map} for details.
+@cfunc{GC_init_size_map} for details.
 
 The actual size rounding operation during small object allocation is
-implemented as a table look--up in @cfunction{GC_size_map}.
+implemented as a table look--up in @cfunc{GC_size_map}.
 
 Both collector initialisation and computation of allocated sizes are
 handled carefully so that they do not slow down the small object fast
@@ -422,7 +421,7 @@ allocation path.  An attempt to allocate before the collector is
 uninitialised, or before the appropriate @code{GC_size_map} entry is
 computed, will take the same path as an allocation attempt with an empty
 free list.  This results in a call to the slow path code
-(@cfunction{GC_generic_malloc_inner}) which performs the appropriate
+(@cfunc{GC_generic_malloc_inner}) which performs the appropriate
 initialisation checks.
 
 In non--incremental mode, we make a decision about whether to garbage
@@ -483,7 +482,7 @@ pointers:
 @table @emph
 @item The registers
 Depending on the architecture, this may be done using assembly code, or
-by calling a @cfunction{setjmp} like function which saves register
+by calling a @cfunc{setjmp} like function which saves register
 contents on the stack.
 
 @item The stack(s)
@@ -516,18 +515,18 @@ information is available for the block, then the descriptor is simply a
 length.  (For other possibilities, see @file{gc_mark.h}.)
 
 At the beginning of the mark phase, all root segments (as described
-above) are pushed on the stack by @cfunction{GC_push_roots}.  (Registers
+above) are pushed on the stack by @cfunc{GC_push_roots}.  (Registers
 and eagerly processed stack sections are processed by pushing the
 referenced objects instead of the stack section itself.) If
 @code{ALL_INTERIOR_POINTERS} is not defined, then stack roots require
 special treatment.  In this case, the normal marking code ignores
-interior pointers, but @cfunction{GC_push_all_stack} explicitly checks
+interior pointers, but @cfunc{GC_push_all_stack} explicitly checks
 for interior pointers and pushes descriptors for target objects.
 
 The marker is structured to allow incremental marking.  Each call to
-@cfunction{GC_mark_some} performs a small amount of work towards marking
+@cfunc{GC_mark_some} performs a small amount of work towards marking
 the heap.  It maintains explicit state in the form of
-@cfunction{GC_mark_state}, which identifies a particular sub--phase.  Some
+@cfunc{GC_mark_state}, which identifies a particular sub--phase.  Some
 other pieces of state, most notably the mark stack, identify how much
 work remains to be done in each sub--phase.  The normal progression of
 mark states for a stop--the--world collection is:
@@ -543,8 +542,8 @@ be false, so the mark state is advanced to
 uncollectable objects, roots, and then mark everything reachable from
 them.  @code{scan_ptr} is advanced through the heap until all
 uncollectable objects are pushed, and objects reachable from them are
-marked.  At that point, the next call to @cfunction{GC_mark_some} calls
-@cfunction{GC_push_roots} to push the roots.  It the advances the mark
+marked.  At that point, the next call to @cfunc{GC_mark_some} calls
+@cfunc{GC_push_roots} to push the roots.  It the advances the mark
 state to
 
 @item
@@ -556,7 +555,7 @@ emptying the mark stack.  Once this is completed, the state changes to
 @code{MS_NONE} indicating that reachable objects are marked.
 @end enumerate
 
-The core mark routine @cfunction{GC_mark_from}, is called repeatedly by
+The core mark routine @cfunc{GC_mark_from}, is called repeatedly by
 several of the sub--phases when the mark stack starts to fill up.  It is
 also called repeatedly in @code{MS_ROOTS_PUSHED} state to empty the mark
 stack.  The routine is designed to only perform a limited amount of
@@ -698,8 +697,8 @@ sweeper.
 
 
 @noindent
-Both @cfunction{GC_register_disappearing_link} and
-@cfunction{GC_register_finalizer} add the request to a corresponding
+Both @cfunc{GC_register_disappearing_link} and
+@cfunc{GC_register_finalizer} add the request to a corresponding
 hash table.  The hash table is allocated out of collected memory, but
 the reference to the finalisable object is hidden from the collector.
 Currently finalisation requests are processed non--incrementally at the
@@ -784,7 +783,7 @@ mechanisms:
 @enumerate
 @item
 Through explicit mutator cooperation.  Currently this requires the use
-of @cfunction{GC_malloc_stubborn}, and is rarely used.
+of @cfunc{GC_malloc_stubborn}, and is rarely used.
 
 @item
 (@code{MPROTECT_VDB}) By write--protecting physical pages and catching
@@ -804,8 +803,8 @@ this case the one in Xerox PCR.
 @item
 (@code{DEFAULT_VDB}) By treating all pages as dirty.  This is the
 default if none of the other techniques is known to be usable, and
-@cfunction{GC_malloc_stubborn} is not used.  Practical only for testing,
-or if the vast majority of objects use @cfunction{GC_malloc_stubborn}.
+@cfunc{GC_malloc_stubborn} is not used.  Practical only for testing,
+or if the vast majority of objects use @cfunc{GC_malloc_stubborn}.
 @end enumerate
 
 @c ------------------------------------------------------------
@@ -827,7 +826,7 @@ be allocated only to small pointer--free objects.
 
 The collector understands two different kinds of black--listing.  A page
 may be black listed for interior pointer references
-(@cfunction{GC_add_to_black_list_stack}), if it was the target of a near
+(@cfunc{GC_add_to_black_list_stack}), if it was the target of a near
 miss from a location that requires interior pointer recognition,
 e.g. the stack, or the heap if @code{GC_all_interior_pointers} is set.
 In this case, we also avoid allocating large blocks that include this
@@ -835,11 +834,11 @@ page.
 
 If the near miss came from a source that did not require interior
 pointer recognition, it is black--listed with
-@cfunction{GC_add_to_black_list_normal}.  A page black--listed in this
+@cfunc{GC_add_to_black_list_normal}.  A page black--listed in this
 way may appear inside a large object, so long as it is not the first
 page of a large object.
 
-The @cfunction{GC_allochblk} routine respects black--listing when
+The @cfunc{GC_allochblk} routine respects black--listing when
 assigning a block to a particular object kind and size.  It occasionally
 drops (i.e. allocates and forgets) blocks that are completely
 black--listed in order to avoid excessively long large block free lists
@@ -925,7 +924,7 @@ the local allocator.  A thread that only allocates a handful of objects
 of a given size will not build up its own free list for that size.  This
 avoids wasting space for unpopular objects sizes or kinds.
 
-Once the counter passes a threshold, @cfunction{GC_malloc_many} is
+Once the counter passes a threshold, @cfunc{GC_malloc_many} is
 called to allocate roughly @code{HBLKSIZE} space and put it on the
 corresponding local free list.  Further allocations of that size and
 kind then use this free list, and no longer need to acquire the
@@ -945,9 +944,9 @@ transferred back to the global free list.
 
 Note that if the collector is configured for thread--local allocation,
 @gc{} versions before 7.0 do not invoke the thread--local allocator by
-default: @cfunction{GC_malloc} only uses thread--local allocation in
+default: @cfunc{GC_malloc} only uses thread--local allocation in
 version 7 and later.  In @gc{} vesions earlier that 7.0,
-@cfunction{GC_MALLOC} (all caps) may be directed to use thread--local
+@cfunc{GC_MALLOC} (all caps) may be directed to use thread--local
 allocation by using the following instead of including @file{gc.h}:
 
 @example
@@ -975,7 +974,7 @@ indispensable in cases in which system resources are embedded in complex
 data structures (e.g. file descriptors in the Cord package).
 
 @gc{} provides the necessary functionality through the function
-@cfunction{GC_register_finalizer}, declared in @file{gc.h}, or by
+@cfunc{GC_register_finalizer}, declared in @file{gc.h}, or by
 inheriting from @code{gc_cleanup} in @file{gc_cpp.h}.
 
 However, finalisation should not be used in the same way as C++
@@ -1002,7 +1001,7 @@ cases that would be hard to handle explicitly;
 
 @item
 if scarce resources are managed with finalisation, the allocation
-routine for that resource (e.g. @cfunction{open} for file handles)
+routine for that resource (e.g. @cfunc{open} for file handles)
 should force a garbage collection (two if that doesn't suffice) if it
 finds itself short of the resource;
 
@@ -1074,7 +1073,7 @@ have split @code{A} into @code{A1} and @code{A2} such that any
 references to @code{A} become references to @code{A1}, @code{A1} points
 to @code{A2} but not vice--versa, only fields needed for finalisation
 are stored in @code{A2}, and @code{A2} is enabled for finalisation
-(@cfunction{GC_register_disappearing_link} provides an alternative
+(@cfunc{GC_register_disappearing_link} provides an alternative
 mechanism that does not require breaking up objects).
 
 Thus assume that @code{A} actually does need access to @code{B} during
@@ -1109,8 +1108,8 @@ B_final (void * object, void * client_data)
 @}
 @end example
 
-If @code{B} happens to be finalised first (that is: @cfunction{B_final}
-is applied to @code{B} before @cfunction{A_final} is applied to
+If @code{B} happens to be finalised first (that is: @cfunc{B_final}
+is applied to @code{B} before @cfunc{A_final} is applied to
 @code{A}), @code{A} will see a dangling pointer during its finalisation.
 But a main goal of garbage collection is to avoid dangling pointers!
 
@@ -1135,7 +1134,7 @@ global data structure, to be cleared by the finaliser of @code{A}:
 @example
     .............
    .             .accidental reference
-   v             .        
+   v             .
 A |======|  B |========|  global_table |============|
                ^                           |
                |                           |wanted reference
@@ -1181,8 +1180,8 @@ finalisable objects are typically not a problem.  Finalisable objects
 are typically rare.  There are several ways to reduce spurious
 dependencies between finalisable objects.  Splitting objects as
 discussed above is one technique.  The collector also provides
-@cfunction{GC_register_disappearing_link}, which explicitly sets to
-@null{} a pointer before determining finalisation ordering.
+@cfunc{GC_register_disappearing_link}, which explicitly sets to
+@cnull{} a pointer before determining finalisation ordering.
 
 Some so called ``operating systems'' fail to clean up some resources
 associated with a process.  These resources must be deallocated at all
@@ -1202,7 +1201,7 @@ the process exits, they can be explicitly deallocated at that time.
 There are certain situations in which cycles between finalisable objects
 are genuinely unavoidable; most notably, C++ compilers introduce
 self--cycles to represent inheritance.  The function
-@cfunction{GC_register_finalizer_ignore_self} tells the finalisation
+@cfunc{GC_register_finalizer_ignore_self} tells the finalisation
 part of the collector to ignore self cycles.  This is used by the C++
 interface.
 
@@ -1280,15 +1279,15 @@ of processors detected by the collector.  The dedicated threads are
 created once at initialisation time.
 
 A second effect of this flag is to switch to a more concurrent
-implementation of @cfunction{GC_malloc_many}, so that free lists can be
+implementation of @cfunc{GC_malloc_many}, so that free lists can be
 built, and memory can be cleared, by more than one thread concurrently.
 
 @item
 Building the collector with @code{-DTHREAD_LOCAL_ALLOC} adds support for
 thread local allocation.  Before @gc{} version 7.0, it did not, by
 itself, cause thread--local allocation to be used.  Since version 7.0,
-this causes @cfunction{GC_malloc}, @cfunction{GC_malloc_atomic}, and
-@cfunction{GC_gcj_malloc} to be redefined to perform thread--local
+this causes @cfunc{GC_malloc}, @cfunc{GC_malloc_atomic}, and
+@cfunc{GC_gcj_malloc} to be redefined to perform thread--local
 allocation.
 
 Memory returned from thread--local allocators is completely
@@ -1297,7 +1296,7 @@ may be used by other threads.  The only difference is that, if the
 thread allocates enough memory of a certain kind, it will build a
 thread--local free list for objects of that kind, and allocate from
 that.  This greatly reduces locking.  The thread--local free lists are
-refilled using @cfunction{GC_malloc_many}.
+refilled using @cfunc{GC_malloc_many}.
 
 An important side effect of this flag is to replace the default
 spin--then--sleep lock to be replace by a spin--then--queue based
@@ -1316,11 +1315,11 @@ define the macro @code{GC_REDIRECT_TO_LOCAL}, and then include the
 @file{gc.h} header in each client source file;
 
 @item
-invoke @cfunction{GC_thr_init} before any allocation;
+invoke @cfunc{GC_thr_init} before any allocation;
 
 @item
-allocate using @cfunction{GC_MALLOC}, @cfunction{GC_MALLOC_ATOMIC},
-and/or @cfunction{GC_GCJ_MALLOC}.
+allocate using @cfunc{GC_MALLOC}, @cfunc{GC_MALLOC_ATOMIC},
+and/or @cfunc{GC_GCJ_MALLOC}.
 @end enumerate
 
 @c ------------------------------------------------------------
@@ -1355,7 +1354,7 @@ Hence the amount of additional code required for parallel marking is
 minimal.
 
 It should be possible to use generational collection in the presence of
-the parallel collector, by calling @cfunction{GC_enable_incremental}.
+the parallel collector, by calling @cfunc{GC_enable_incremental}.
 This does not result in fully incremental collection, since parallel
 mark phases cannot currently be interrupted, and doing so may be too
 expensive.
@@ -1394,7 +1393,7 @@ With the simple thread--safe collector, built with
 @code{-DLINUX_THREADS}, the execution time increased to 10.3 seconds, or
 23.5 elapsed seconds with two clients.
 
-The times for the @cfunction{malloc} and @cfunction{free} version with
+The times for the @cfunc{malloc} and @cfunc{free} version with
 the @gnu{} C Library are 10.51 (standard library, Pthreads not linked),
 20.90 (one thread, Pthreads linked), and 24.55 seconds respectively.
 The benchmark favours a garbage collector, since most objects are small.
@@ -1410,13 +1409,13 @@ lock acquisition.  The standard allocation primitives thus perform
 slightly worse than without @code{-DTHREAD_LOCAL_ALLOC}, and should be
 avoided in time--critical code.
 
-(The results using @cfunction{pthread_mutex_lock} directly for
+(The results using @cfunc{pthread_mutex_lock} directly for
 allocation locking would have been worse still, at least for older
 versions of LinuxThreads.  With @code{THREAD_LOCAL_ALLOC}, we first
 repeatedly try to acquire the lock with
-@cfunction{pthread_mutex_try_lock}, busy waiting between attempts.
+@cfunc{pthread_mutex_try_lock}, busy waiting between attempts.
 After a fixed number of attempts, we use
-@cfunction{pthread_mutex_lock}.)
+@cfunc{pthread_mutex_lock}.)
 
 These measurements do not use incremental collection, nor was
 prefetching enabled in the marker.  We used the C version of the
@@ -1463,8 +1462,8 @@ running an older kernel were far less encouraging.
 @noindent
 The garbage collector may be used as a leak detector. In this case, the
 primary function of the collector is to report objects that were
-allocated (typically with @cfunction{GC_MALLOC}), not deallocated
-(normally with @cfunction{GC_FREE}), but are no longer accessible.
+allocated (typically with @cfunc{GC_MALLOC}), not deallocated
+(normally with @cfunc{GC_FREE}), but are no longer accessible.
 Since the object is no longer accessible, there is normally no way to
 deallocate the object at a later time; thus it can be safely assumed
 that the object has been ``leaked''.
@@ -1484,7 +1483,7 @@ detection support.  Version 5.3 adds the following features:
 @enumerate
 @item
 leak detection mode can be initiated at run time by setting
-@cfunction{GC_find_leak} instead of building the collector with
+@cfunc{GC_find_leak} instead of building the collector with
 @code{FIND_LEAK} defined; this variable should be set to a non--zero
 value at program start--up;
 
@@ -1509,15 +1508,15 @@ change the program so that all allocation and deallocation goes through
 the garbage collector;
 
 @item
-arrange to call @cfunction{GC_gcollect} at appropriate points to check
+arrange to call @cfunc{GC_gcollect} at appropriate points to check
 for leaks (for sufficiently long running programs, this will happen
 implicitly, but probably not with sufficient frequency).
 @end enumerate
 
 The second step can usually be accomplished with the
 @code{-DREDIRECT_MALLOC=GC_malloc} option when the collector is built,
-or by defining @cfunction{malloc}, @cfunction{calloc},
-@cfunction{realloc} and @cfunction{free} to call the corresponding
+or by defining @cfunc{malloc}, @cfunc{calloc},
+@cfunc{realloc} and @cfunc{free} to call the corresponding
 garbage collector functions.  But this, by itself, will not yield very
 informative diagnostics, since the collector does not keep track of
 information about how objects were allocated.  The error reports will
@@ -1539,7 +1538,7 @@ The same is generally true of thread support.  However, as of 6.0alpha4,
 correct leak reports should be generated with LinuxThreads.
 
 On a few platforms (currently Solaris/SPARC, Irix, and, with
--DSAVE_CALL_CHAIN, Linux/X86), @cfunction{GC_MALLOC} also causes some
+-DSAVE_CALL_CHAIN, Linux/X86), @cfunc{GC_MALLOC} also causes some
 more information about its call stack to be saved in the object.  Such
 information is reproduced in the error reports in very non--symbolic
 form, but it can be very useful with the aid of a debugger.
@@ -1565,7 +1564,7 @@ The following header file @file{leak_detector.h} is included in the
 
 Assume the collector has been built with @code{-DFIND_LEAK} (for very
 new versions of the collector, we could instead add the statement
-@code{GC_find_leak = 1} as the first statement in @cfunction{main}.
+@code{GC_find_leak = 1} as the first statement in @cfunc{main}.
 
 The program to be tested for leaks can then look like:
 
@@ -1592,7 +1591,7 @@ main (void)
       p[i] = malloc(sizeof(int)+i);
     @}
   CHECK_LEAKS();
-@}	
+@}
 @end example
 
 On an Intel X86 Linux system this produces on the @code{stderr} stream:
@@ -1628,12 +1627,12 @@ Leaked composite object at 0xef621fc8 (leak_test.c:8, sz=4)
 @end example
 
 In the latter two cases some additional information is given about how
-@cfunction{malloc} was called when the leaked object was allocated.  For
+@cfunc{malloc} was called when the leaked object was allocated.  For
 Solaris, the first line specifies the arguments to
-@cfunction{GC_debug_malloc} (the actual allocation routine), the second
-the program counter inside @cfunction{main}, the third the arguments to
-@cfunction{main}, and finally the program counter inside the caller to
-@cfunction{main} (i.e. in the C start--up code).
+@cfunc{GC_debug_malloc} (the actual allocation routine), the second
+the program counter inside @cfunc{main}, the third the arguments to
+@cfunc{main}, and finally the program counter inside the caller to
+@cfunc{main} (i.e. in the C start--up code).
 
 In the Irix case, only the address inside the caller to main is given.
 
@@ -1675,7 +1674,7 @@ Build the collector and install it in directory foo as follows:
 @example
 $ configure --prefix=foo --enable-full-debug --enable-redirect-malloc --disable-threads
 $ make
-$ make install 
+$ make install
 @end example
 
 With a very recent collector on Linux, it may be safe to omit the
@@ -1759,13 +1758,13 @@ significant issue for most programs occupying a small fraction of the
 possible address space.
 
 There are a number of routines which modify the pointer recognition
-algorithm.  @cfunction{GC_register_displacement} allows certain interior
+algorithm.  @cfunc{GC_register_displacement} allows certain interior
 pointers to be recognised even if @code{ALL_INTERIOR_POINTERS} is not
-defined.  @cfunction{GC_malloc_ignore_off_page} allows some pointers
+defined.  @cfunc{GC_malloc_ignore_off_page} allows some pointers
 into the middle of large objects to be disregarded, greatly reducing the
 probability of accidental retention of large objects.  For most
 purposes it seems best to compile with @code{ALL_INTERIOR_POINTERS} and
-to use @cfunction{GC_malloc_ignore_off_page} if you get collector
+to use @cfunc{GC_malloc_ignore_off_page} if you get collector
 warnings from allocations of very large objects.  See
 @file{README.debugging} for details.
 
@@ -1776,20 +1775,20 @@ is thus suggested that the standard @malloc{} be used only for
 memory regions, such as I/O buffers, that are guaranteed not to contain
 pointers to garbage collectable memory.  Pointers in C language
 automatic, static, or register variables, are correctly recognised.
-(Note that @cfunction{GC_malloc_uncollectable} has semantics similar to
+(Note that @cfunc{GC_malloc_uncollectable} has semantics similar to
 the standard @malloc{}, but allocates objects that are traced
 by the collector.)
 
 @strong{Warning} The collector does not always know how to find pointers
 in data areas that are associated with dynamic libraries.  This is easy
 to remedy @strong{if} you know how to find those data areas on your
-operating system (see @cfunction{GC_add_roots}).  Code for doing this
+operating system (see @cfunc{GC_add_roots}).  Code for doing this
 under SunOS, IRIX 5.X and 6.X, HP/UX, Alpha OSF/1, Linux, and win32 is
 included and used by default.  (See @file{README.win32} for win32
 details.)  On other systems pointers from dynamic library data areas may
 not be considered by the collector.  If you're writing a program that
 depends on the collector scanning dynamic library data areas, it may be
-a good idea to include at least one call to @cfunction{GC_is_visible} to
+a good idea to include at least one call to @cfunc{GC_is_visible} to
 ensure that those areas are visible to the collector.
 
 Note that the garbage collector does not need to be informed of shared
@@ -1804,7 +1803,7 @@ standard @ansi{} C @malloc{}, by default it is unsafe to invoke
 @malloc{} call may be in progress.  Removing @code{-DNO_SIGNALS} from
 @file{Makefile} attempts to remedy that.  But that may not be reliable
 with a compiler that substantially reorders memory operations inside
-@cfunction{GC_malloc}.
+@cfunc{GC_malloc}.
 
 The allocator/collector can also be configured for thread--safe
 operation.  Full signal safety can also be achieved, but only at the
@@ -1813,7 +1812,7 @@ unacceptable.
 
 @strong{Warning} The collector does not guarantee to scan thread--local
 storage (e.g. of the kind accessed with
-@cfunction{pthread_getspecific}).  The collector does scan thread
+@cfunc{pthread_getspecific}).  The collector does scan thread
 stacks, though, so generally the best solution is to ensure that any
 pointers stored in thread--local storage are also stored on the thread's
 stack for the duration of their lifetime.  (This is arguably a
@@ -1828,7 +1827,7 @@ Things don't appear to add up for a variety of reasons, most notably
 fragmentation losses.  These are probably much more significant for the
 contrived program "test.c" than for your application.)
 
-On some machines, it may be desirable to set @cfunction{GC_stacktop} to
+On some machines, it may be desirable to set @cfunc{GC_stacktop} to
 a good approximation of the stack base.  (This enhances code portability
 on HP PA machines, since there is no good way for the collector to
 compute this value.)
@@ -1915,7 +1914,7 @@ Arrange for dynamic libraries to use the standard @malloc{}.
 This is still dangerous if the library stores a pointer to a garbage
 collected object.  But nearly all standard interfaces prohibit this,
 because they deal correctly with pointers to stack allocated objects.
-(@cfunction{strtok} is an exception.  Don't use it.)
+(@cfunc{strtok} is an exception.  Don't use it.)
 @end enumerate
 
 In all cases we assume that pointer alignment is consistent with that
@@ -2022,7 +2021,7 @@ functional, and may not be desirable.
 
 @c ------------------------------------------------------------
 
-@subsection Write--only variables			
+@subsection Write--only variables
 
 
 @defvr {Function Pointer} GC_oom_fn
@@ -2040,7 +2039,7 @@ valid pointer to a previously allocated heap object.
 
 @deftypevar int GC_find_leak
 Do not actually garbage collect, but simply report inaccessible memory
-that was not deallocated with @cfunction{GC_free}.  Initial value is
+that was not deallocated with @cfunc{GC_free}.  Initial value is
 determined by the @code{FIND_LEAK} macro.
 @end deftypevar
 
@@ -2058,7 +2057,7 @@ recognition.  @strong{Must be 0 or 1}.
 
 @deftypevar int GC_finalize_on_demand
 If non--zero, finalisers will only be run in response to an explicit
-@cfunction{GC_invoke_finalizers} call.  The default is determined by
+@cfunc{GC_invoke_finalizers} call.  The default is determined by
 whether the @code{FINALIZE_ON_DEMAND} macro is defined when the
 collector is built.
 @end deftypevar
@@ -2070,7 +2069,7 @@ This makes it a bit safer to use non--topologically--ordered
 finalisation.  The default value is determined by
 @code{JAVA_FINALIZATION} macro.
 
-Enables @cfunction{GC_register_finalizer_unreachable} to work correctly.
+Enables @cfunc{GC_register_finalizer_unreachable} to work correctly.
 @end deftypevar
 
 
@@ -2084,16 +2083,16 @@ void (* GC_finalizer_notifier)(void)
 
 Invoked at most once per garbage collection cycle.  Never invoked unless
 @code{GC_finalize_on_demand} is set.  Typically this will notify a
-finalisation thread, which will call @cfunction{GC_invoke_finalizers} in
+finalisation thread, which will call @cfunc{GC_invoke_finalizers} in
 response.
 @end defvr
 
 
 @deftypevar int GC_dont_gc
 If set to non--zero: do not collect.  In versions 6.2a1+, this overrides
-explicit @cfunction{GC_gcollect} calls.  Used as a counter, so that
+explicit @cfunc{GC_gcollect} calls.  Used as a counter, so that
 nested enabling and disabling work correctly.  Should normally be
-updated with @cfunction{GC_enable} and @cfunction{GC_disable} calls.
+updated with @cfunc{GC_enable} and @cfunc{GC_disable} calls.
 Direct assignment to @code{GC_dont_gc} is deprecated.
 @end deftypevar
 
@@ -2123,11 +2122,11 @@ Values in the tens are now perfectly reasonable, unlike for earlier GC
 versions.
 @end deftypevar
 
-			
+
 @deftypevar GC_word GC_non_gc_bytes
 Bytes not considered candidates for collection.  Used only to control
 scheduling of collections.  Updated by
-@cfunction{GC_malloc_uncollectable} and @cfunction{GC_free}.  Wizards
+@cfunc{GC_malloc_uncollectable} and @cfunc{GC_free}.  Wizards
 only.
 @end deftypevar
 
@@ -2158,7 +2157,7 @@ decrease collection time at the expense of space.
 The maximum number of garbage collections attempted before reporting out
 of memory after heap expansion fails.  Initially @code{0}.
 @end deftypevar
-			
+
 
 @deftypevar {char *} GC_stackbottom
 Cool end of user stack.  May be set in the client prior to calling any
@@ -2168,7 +2167,7 @@ set it automatically.  For multithreaded code, this is the cold end of
 the stack for the primordial thread.
 @end deftypevar
 
-				
+
 @deftypevar int GC_dont_precollect
 Do not collect as part of initialisation.  Should be set only if the
 client wants a chance to manually initialise the root set before the
@@ -2204,87 +2203,87 @@ functions.
 
 
 @defmac GC_MALLOC (@var{sz})
-Wrapper for @cfunction{GC_malloc}.
+Wrapper for @cfunc{GC_malloc}.
 @end defmac
 
 
 @defmac GC_MALLOC_ATOMIC (@var{sz})
-Wrapper for @cfunction{GC_malloc_atomic}.
+Wrapper for @cfunc{GC_malloc_atomic}.
 @end defmac
 
 
 @defmac GC_STRDUP (@var{s})
-Wrapper for @cfunction{GC_strdup}.
+Wrapper for @cfunc{GC_strdup}.
 @end defmac
 
 
 @defmac GC_MALLOC_UNCOLLECTABLE (@var{sz})
-Wrapper for @cfunction{GC_malloc_uncollectable}.
+Wrapper for @cfunc{GC_malloc_uncollectable}.
 @end defmac
 
 
 @defmac GC_MALLOC_IGNORE_OFF_PAGE (@var{sz})
-Wrapper for @cfunction{GC_malloc_ignore_off_page}.
+Wrapper for @cfunc{GC_malloc_ignore_off_page}.
 @end defmac
 
 
 @defmac GC_MALLOC_ATOMIC_IGNORE_OFF_PAGE (@var{sz})
-Wrapper for @cfunction{GC_malloc_atomic_ignore_off_page}.
+Wrapper for @cfunc{GC_malloc_atomic_ignore_off_page}.
 @end defmac
 
 
 @defmac GC_REALLOC (@var{old}, @var{sz})
-Wrapper for @cfunction{GC_realloc}.
+Wrapper for @cfunc{GC_realloc}.
 @end defmac
 
 
 @defmac GC_FREE (@var{p})
-Wrapper for @cfunction{GC_free}.
+Wrapper for @cfunc{GC_free}.
 @end defmac
 
 
 @defmac GC_REGISTER_FINALIZER (@var{p}, @var{f}, @var{d}, @var{of}, @var{od})
-Wrapper for @cfunction{GC_register_finalizer}.
+Wrapper for @cfunc{GC_register_finalizer}.
 @end defmac
 
 
 @defmac GC_REGISTER_FINALIZER_IGNORE_SELF (@var{p}, @var{f}, @var{d}, @var{of}, @var{od})
-Wrapper for @cfunction{GC_register_finalizer_ignore_self}.
+Wrapper for @cfunc{GC_register_finalizer_ignore_self}.
 @end defmac
 
 
 @defmac GC_REGISTER_FINALIZER_NO_ORDER (@var{p}, @var{f}, @var{d}, @var{of}, @var{od})
-Wrapper for @cfunction{GC_register_finalizer_no_order}.
+Wrapper for @cfunc{GC_register_finalizer_no_order}.
 @end defmac
 
 
 @defmac GC_REGISTER_FINALIZER_UNREACHABLE (@var{p}, @var{f}, @var{d}, @var{of}, @var{od})
-Wrapper for @cfunction{GC_register_finalizer_unreachable}.
+Wrapper for @cfunc{GC_register_finalizer_unreachable}.
 @end defmac
 
 
 @defmac GC_MALLOC_STUBBORN (@var{sz})
-Wrapper for @cfunction{GC_malloc_stubborn}.
+Wrapper for @cfunc{GC_malloc_stubborn}.
 @end defmac
 
 
 @defmac GC_CHANGE_STUBBORN (@var{p})
-Wrapper for @cfunction{GC_change_stubborn}.
+Wrapper for @cfunc{GC_change_stubborn}.
 @end defmac
 
 
 @defmac GC_END_STUBBORN_CHANGE (@var{p})
-Wrapper for @cfunction{GC_end_stubborn_change}.
+Wrapper for @cfunc{GC_end_stubborn_change}.
 @end defmac
 
 
 @defmac GC_GENERAL_REGISTER_DISAPPEARING_LINK (@var{link}, @var{obj})
-Wrapper for @cfunction{GC_general_register_disappearing_link}.
+Wrapper for @cfunc{GC_general_register_disappearing_link}.
 @end defmac
 
 
 @defmac GC_REGISTER_DISPLACEMENT (@var{n})
-Wrapper for @cfunction{GC_register_displacement}.
+Wrapper for @cfunc{GC_register_displacement}.
 @end defmac
 
 
@@ -2301,7 +2300,7 @@ type expression.
 
 
 @defmac GC_NEW (@var{data_type})
-Apply @cfunction{GC_MALLOC} to the size of @var{data_type}.  Example:
+Apply @cfunc{GC_MALLOC} to the size of @var{data_type}.  Example:
 
 @example
 typedef struct @{
@@ -2316,17 +2315,17 @@ mine_t *        p = GC_NEW(mine_t);
 
 
 @defmac GC_NEW_ATOMIC (@var{data_type})
-Apply @cfunction{GC_MALLOC_ATOMIC} to the size of @var{data_type}.
+Apply @cfunc{GC_MALLOC_ATOMIC} to the size of @var{data_type}.
 @end defmac
 
 
 @defmac GC_NEW_STUBBORN (@var{data_type})
-Apply @cfunction{GC_MALLOC_STUBBORN} to the size of @var{data_type}.
+Apply @cfunc{GC_MALLOC_STUBBORN} to the size of @var{data_type}.
 @end defmac
 
 
 @defmac GC_NEW_UNCOLLECTABLE (@var{data_type})
-Apply @cfunction{GC_MALLOC_uncollectable} to the size of
+Apply @cfunc{GC_MALLOC_uncollectable} to the size of
 @var{data_type}.
 @end defmac
 
@@ -2340,20 +2339,20 @@ Apply @cfunction{GC_MALLOC_uncollectable} to the size of
 
 
 @defmac GC_INIT ()
-Fully portable code should call @cfunction{GC_INIT} from the main
+Fully portable code should call @cfunc{GC_INIT} from the main
 program before making any other @code{GC_} calls.  On most platforms
 this is a no--op and the collector self--initialises.  But a number of
 platforms make that too hard.
 
-A @cfunction{GC_INIT} call is required if the collector is built with
+A @cfunc{GC_INIT} call is required if the collector is built with
 @code{THREAD_LOCAL_ALLOC} defined and the initial allocation call is not
-to @cfunction{GC_malloc} or @cfunction{GC_malloc_atomic}.
+to @cfunc{GC_malloc} or @cfunc{GC_malloc_atomic}.
 @end defmac
 
 
 @deftypefun void GC_init (void)
 Initialise the collector.  Portable clients should call
-@cfunction{GC_INIT} from the main program instead.
+@cfunc{GC_INIT} from the main program instead.
 @end deftypefun
 
 
@@ -2367,7 +2366,7 @@ Initialise the collector.  Portable clients should call
 @noindent
 The following routines are intended to be directly called by the user:
 they are general purpose allocation routines, with roughly @malloc{}
-calling conventions.  Note that usually only @cfunction{GC_malloc} is
+calling conventions.  Note that usually only @cfunc{GC_malloc} is
 necessary.
 
 All the following functions have a debugging version in the library.
@@ -2379,7 +2378,7 @@ is cleared before being returned to the user.  This function will invoke
 the garbage collector if it determines that the operation is
 appropriate.
 
-The return value may be @null{} if @gc{} is unable to acquire sufficient
+The return value may be @cnull{} if @gc{} is unable to acquire sufficient
 space from the operating system.  This is the most probable consequence
 of running out of space.  Other possible consequences are that a
 function call will fail due to lack of stack space, or that the
@@ -2395,10 +2394,10 @@ Allocate an object of @var{size_in_bytes} that is guaranteed not to
 contain pointers to other objects.  The returned object is not
 guaranteed to be cleared.
 
-A call to this function can always be replaced by @cfunction{GC_malloc},
+A call to this function can always be replaced by @cfunc{GC_malloc},
 but results in faster collection times.  The collector will probably run
 faster if large character arrays, etc. are allocated with
-@cfunction{GC_malloc_atomic} than if they are statically allocated.
+@cfunc{GC_malloc_atomic} than if they are statically allocated.
 @end deftypefun
 
 
@@ -2415,7 +2414,7 @@ If the object is stubborn, the result will have changes enabled.  It is
 an error to have changes enabled for the original object.
 
 This function follows @ansi{} conventions if @var{old_object} is
-@null{}.
+@cnull{}.
 
 This is very likely to allocate a new object, unless @code{MERGE_SIZES}
 is defined in @file{gc_priv.h}.  Even then, it is likely to recycle the
@@ -2425,8 +2424,8 @@ old object only if the object is grown in small additive increments
 
 
 @deftypefun void GC_free (void * @var{object_addr})
-Explicitly deallocate an object returned by @cfunction{GC_malloc} or
-@cfunction{GC_malloc_atomic}, dangerous if used incorrectly:
+Explicitly deallocate an object returned by @cfunc{GC_malloc} or
+@cfunc{GC_malloc_atomic}, dangerous if used incorrectly:
 
 @enumerate
 @item
@@ -2446,7 +2445,7 @@ for very small objects (<= 8 bytes), but can minimise the number of
 collections if performance is critical.
 
 Calling @code{GC_free(NULL)} does nothing, as required by @ansi{} C for
-@cfunction{free}.
+@cfunc{free}.
 @end deftypefun
 
 
@@ -2467,7 +2466,7 @@ the @option{--disable-atomic-uncollectable} option to
 
 
 @deftypefun {char *} GC_strdup (const char * @var{str})
-Like the standard @cfunction{strdup}, but store the string copy in a
+Like the standard @cfunc{strdup}, but store the string copy in a
 newly allocated object.
 @end deftypefun
 
@@ -2485,7 +2484,7 @@ released many fewer times.
 
 @defmac GC_NEXT (@var{p})
 Retrieve the next element in the list returned by
-@cfunction{GC_malloc_many}.
+@cfunc{GC_malloc_many}.
 @end defmac
 
 Example:
@@ -2571,7 +2570,7 @@ on some platforms, the file and line information is redundant, since it
 can be reconstructed from a stack trace; on such platforms it may be
 more convenient not to recompile, e.g. for leak detection; this can be
 accomplished by instructing the linker to replace
-@cfunction{malloc}/@cfunction{realloc} with these.
+@cfunc{malloc}/@cfunc{realloc} with these.
 @end enumerate
 @end deftypefun
 
@@ -2591,7 +2590,7 @@ indicate failure by invoking the corresponding @code{_print_proc}.
 
 
 @defvr {Function Pointer Variable} GC_same_obj_print_proc
-Failure function invoked by @cfunction{GC_same_obj}.  Its type is:
+Failure function invoked by @cfunc{GC_same_obj}.  Its type is:
 
 @example
 void (*GC_same_obj_print_proc) (void * p, void * q);
@@ -2600,7 +2599,7 @@ void (*GC_same_obj_print_proc) (void * p, void * q);
 
 
 @defvr {Function Pointer Variable} GC_is_valid_displacement_print_proc
-Failure function invoked by @cfunction{GC_is_valid_displacement}.  Its
+Failure function invoked by @cfunc{GC_is_valid_displacement}.  Its
 type is:
 
 @example
@@ -2610,7 +2609,7 @@ void (*GC_is_valid_displacement_print_proc) (void * p);
 
 
 @defvr {Function Pointer Variable} GC_is_visible_print_proc
-Failure function invoked by @cfunction{GC_is_visible}.  Its type is:
+Failure function invoked by @cfunc{GC_is_visible}.  Its type is:
 
 @example
 GC_API void (*GC_is_visible_print_proc) (void * p);
@@ -2633,15 +2632,15 @@ Checked pointer pre- and post- increment operations.
 
 Both the functions increment the pointer @code{*@var{p}} (not @var{p})
 by @var{how_much}, then store the result in @code{*@var{p}}; the return
-value of @cfunction{GC_pre_incr} is the value of @code{*@var{p}}
+value of @cfunc{GC_pre_incr} is the value of @code{*@var{p}}
 @strong{after} the increment, the return value of
-@cfunction{GC_post_incr} is the value of @code{*@var{p}} @strong{before}
+@cfunc{GC_post_incr} is the value of @code{*@var{p}} @strong{before}
 the increment.  Note that the second argument is in units of bytes, not
 multiples of the size of data referenced by @code{*@var{p}}.
 
-@cfunction{GC_same_obj} is used to verify that @code{*@var{p}} and
+@cfunc{GC_same_obj} is used to verify that @code{*@var{p}} and
 @code{(*@var{p})+@var{how_much}} reference the same object.
-@cfunction{GC_is_valid_displacement} is used to validate the result of
+@cfunc{GC_is_valid_displacement} is used to validate the result of
 the increment.
 @end deftypefun
 
@@ -2693,7 +2692,7 @@ Add the integer @var{n} to the pointer @var{x} and return the result; if
 @end example
 
 @noindent
-else @cfunction{GC_same_obj} is used to verify that @var{x} and
+else @cfunc{GC_same_obj} is used to verify that @var{x} and
 @code{@var{x}+@var{n}} reference the same object.  Example:
 
 @example
@@ -2713,7 +2712,7 @@ referenced by @var{x}, then store the result in @var{x} itself; if
 @end example
 
 @noindent
-else @cfunction{GC_pre_incr} is used to validate the operation.
+else @cfunc{GC_pre_incr} is used to validate the operation.
 Example:
 
 @example
@@ -2735,7 +2734,7 @@ is:
 @end example
 
 @noindent
-else @cfunction{GC_post_incr} is used to validate the operation.
+else @cfunc{GC_post_incr} is used to validate the operation.
 Example:
 
 @example
@@ -2754,8 +2753,8 @@ Store the pointer @var{q} into the location referenced by @var{p}; if
 @end example
 
 @noindent
-else @var{q} is validated with @cfunction{GC_is_valid_displacement} and
-@var{p} is validated with @cfunction{GC_is_visible}.
+else @var{q} is validated with @cfunc{GC_is_valid_displacement} and
+@var{p} is validated with @cfunc{GC_is_visible}.
 @end defmac
 
 
@@ -2775,12 +2774,12 @@ Note that with debugging allocation, this function returns a pointer to
 the actual base of the object, i.e. the debug information, not to the
 base of the user object.
 
-Return @null{} if @var{displaced_pointer} doesn't point to within a
+Return @cnull{} if @var{displaced_pointer} doesn't point to within a
 valid object.
 
 Note that a deallocated object in the garbage collected heap may be
 considered valid, even if it has been deallocated with
-@cfunction{GC_free}.
+@cfunc{GC_free}.
 @end deftypefun
 
 
@@ -2802,7 +2801,7 @@ originally requested.
 @noindent
 Stubborn objects may be changed only if the collector is explicitly
 informed.  A ``change'' is the action of storing in the object a
-non--@null{} pointer referencing another object.  The collector is
+non--@cnull{} pointer referencing another object.  The collector is
 implicitly informed of coming change when such an object is first
 allocated.
 
@@ -2813,13 +2812,13 @@ applies to dropping stubborn objects that are still changeable.
 
 @deftypefun {void *} GC_malloc_stubborn (size_t @var{size_in_bytes})
 Allocate an object and allows us to signal to @gc{} that no changes to
-it will occur after @cfunction{GC_end_stubborn_change} has been applied.
+it will occur after @cfunc{GC_end_stubborn_change} has been applied.
 @end deftypefun
 
 
-Remember that reallocating a stubborn object with @cfunction{GC_realloc}
+Remember that reallocating a stubborn object with @cfunc{GC_realloc}
 will leave it with changes @strong{enabled} and it is an error to apply
-@cfunction{GC_realloc} to an object with changes enables.
+@cfunc{GC_realloc} to an object with changes enables.
 
 
 @deftypefun void GC_change_stubborn (void * @var{object})
@@ -2831,8 +2830,8 @@ Signal to @gc{} the beginning of a change in the stubborn @var{object}.
 Signal to @gc{} the end of a change in the stubborn @var{object}.
 
 @var{object} must be @strong{exactly} the value returned by
-@cfunction{GC_malloc_stubborn} or passed to
-@cfunction{GC_change_stubborn}.  In the second case it may be an
+@cfunc{GC_malloc_stubborn} or passed to
+@cfunc{GC_change_stubborn}.  In the second case it may be an
 interior pointer within 512 bytes from the beginning of the object.
 @end deftypefun
 
@@ -2897,7 +2896,7 @@ mine_realloc (mine_t * o, size_t newlen)
 
 
 @noindent
-@cfunction{GC_clear_roots} and @cfunction{GC_add_roots} calls may be
+@cfunc{GC_clear_roots} and @cfunc{GC_add_roots} calls may be
 required if the collector has to trace from nonstandard places,
 e.g. from dynamic library data areas on a machine on which the collector
 doesn't already understand them.
@@ -2976,24 +2975,24 @@ involving finalisable objects should be avoided, or broken by
 disappearing links.  All but the last finaliser registered for an object
 is ignored.
 
-A finalisation function may be removed by passing @null{} as
+A finalisation function may be removed by passing @cnull{} as
 @var{final}.
 
 Finalisers are implicitly unregistered just before they are invoked.  If
-@var{old_final} is not @null{}: the old finaliser is stored in
-@code{*@var{old_final}}.  If @var{old_client_data} is not @null{}: the
+@var{old_final} is not @cnull{}: the old finaliser is stored in
+@code{*@var{old_final}}.  If @var{old_client_data} is not @cnull{}: the
 old client data is stored in @code{*@var{old_client_data}}.
 
 @var{final} is never invoked on an accessible object, provided hidden
 pointers are converted to real pointers only if the allocation lock is
 held, and such conversions are not performed by finalisation routines.
 
-If @cfunction{GC_register_finalizer} is aborted as a result of a signal,
+If @cfunc{GC_register_finalizer} is aborted as a result of a signal,
 the object may be left with no finalisation, even if neither the old nor
-new finaliser were @null{}.
+new finaliser were @cnull{}.
 
-@var{object} should be the non--@null{} starting address of an object
-allocated by @cfunction{GC_malloc} or friends.
+@var{object} should be the non--@cnull{} starting address of an object
+allocated by @cfunc{GC_malloc} or friends.
 
 Note that any garbage collectable object referenced by @var{client_data}
 will be considered accessible until the finaliser is invoked.
@@ -3001,7 +3000,7 @@ will be considered accessible until the finaliser is invoked.
 
 
 @deftypefun void GC_register_finalizer_ignore_self (void * @var{object}, GC_finalization_proc @var{final}, void * @var{client_data}, GC_finalization_proc * @var{old_final}, void ** @var{old_client_data});
-Like @cfunction{GC_register_finalizer}.  It ignores self cycles,
+Like @cfunc{GC_register_finalizer}.  It ignores self cycles,
 i.e. pointers from a finalisable object to itself.
 
 There is a stylistic argument that this is wrong, but it's unavoidable
@@ -3013,7 +3012,7 @@ as accessible, even if it refers to the object itself.
 
 
 @deftypefun void GC_register_finalizer_no_order (void * @var{object}, GC_finalization_proc @var{final}, void * @var{client_data}, GC_finalization_proc * @var{old_client_final}, void ** @var{old_client_data})
-Like @cfunction{GC_register_finalizer}.  It ignores all cycles.  It
+Like @cfunc{GC_register_finalizer}.  It ignores all cycles.  It
 should probably only be used by Java implementations.  Note that
 @var{client_data} will still be viewed as accessible, even if it refers
 to the object itself.
@@ -3032,7 +3031,7 @@ possibly indirectly, from an unordered finalisable object to override
 the unordered finalisation request.
 
 This can be used in combination with
-@cfunction{GC_register_finalizer_no_order} so as to release resources
+@cfunc{GC_register_finalizer_no_order} so as to release resources
 that must not be released while an object can still be brought back to
 life by other finalisers.
 
@@ -3074,9 +3073,9 @@ did not handle the problem.
 Only exists for backward compatibility, see below.
 @end deftypefun
 
-	
+
 @deftypefun int GC_general_register_disappearing_link (void ** @var{link}, void * @var{object})
-A slight generalisation of @cfunction{GC_register_disappearing_link}.
+A slight generalisation of @cfunc{GC_register_disappearing_link}.
 @code{*@var{link}} is cleared when @var{object} first becomes
 inaccessible.
 
@@ -3096,7 +3095,7 @@ allocated.  It is unsafe to explicitly deallocate the object containing
 Explicitly deallocating @var{object} may or may not cause link to
 eventually be cleared.  This can be used to implement certain types of
 weak pointers.  Note however that this generally requires that the
-allocation lock is held (see @cfunction{GC_call_with_alloc_lock} below)
+allocation lock is held (see @cfunc{GC_call_with_alloc_lock} below)
 when the disguised pointer is accessed.  Otherwise a strong pointer
 could be recreated between the time the collector decides to reclaim the
 object and the @var{link} is cleared.
@@ -3110,7 +3109,7 @@ registration by either of the above two routines.
 
 
 @deftypefun int GC_should_invoke_finalizers (void)
-Return non--zero if @cfunction{GC_invoke_finalizers} has something to
+Return non--zero if @cfunc{GC_invoke_finalizers} has something to
 do.
 @end deftypefun
 
@@ -3163,14 +3162,14 @@ Acquire the lock, apply @var{fn} to @var{client_data}, release the lock.
 
 
 @deftypefun void GC_disable (void)
-Disable garbage collection.  Even @cfunction{GC_gcollect} calls will be
+Disable garbage collection.  Even @cfunc{GC_gcollect} calls will be
 ineffective.
 @end deftypefun
 
 
 @deftypefun void GC_enable (void)
-Re--enable garbage collection.  @cfunction{GC_disable} and
-@cfunction{GC_enable} calls nest.  Garbage collection is enabled if the
+Re--enable garbage collection.  @cfunc{GC_disable} and
+@cfunc{GC_enable} calls nest.  Garbage collection is enabled if the
 number of calls to both functions is equal.
 @end deftypefun
 
@@ -3233,15 +3232,15 @@ Explicitly increase the heap size, return @code{0} on failure and
 @code{1} on success.
 
 This is normally done automatically if a garbage collection failed to
-@cfunction{GC_reclaim} enough memory.  Explicit calls to
-@cfunction{GC_expand_hp} may prevent unnecessarily frequent collections
+@cfunc{GC_reclaim} enough memory.  Explicit calls to
+@cfunc{GC_expand_hp} may prevent unnecessarily frequent collections
 at program start--up.
 @end deftypefun
 
 
 @deftypefun void GC_set_max_heap_size (GC_word @var{number_of_bytes})
 Limit the heap size to @var{number_of_bytes}, it must be called before
-initialising the library with @cfunction{GC_INIT}.
+initialising the library with @cfunc{GC_INIT}.
 
 Useful when we are debugging, especially on systems that do not handle
 running out of memory well.  Using zero as @var{number_of_bytes} will
@@ -3280,7 +3279,7 @@ pointers enabled, which is now the default.
 
 Add a displacement to the set of those considered valid by the
 collector.  @code{GC_register_displacement(@var{n})} means that if
-@code{p} was returned by @cfunction{GC_malloc}, then @code{(char *)p +
+@code{p} was returned by @cfunc{GC_malloc}, then @code{(char *)p +
 @var{n}} will be considered to be a valid pointer to @code{p}.  @var{n}
 must be small and less than the size of @code{p}.
 
@@ -3295,7 +3294,7 @@ retention.
 
 
 @deftypefun void GC_debug_register_displacement (size_t @var{n})
-To be used in place of @cfunction{GC_register_displacement} when
+To be used in place of @cfunc{GC_register_displacement} when
 debugging allocation is being done.
 @end deftypefun
 
@@ -3329,18 +3328,18 @@ only the generational piece of this is functional if @code{GC_parallel}
 is true or if @code{GC_time_limit} is @code{GC_TIME_UNLIMITED};
 
 @item
-causes @cfunction{GC_local_gcj_malloc} to revert to locked allocation;
+causes @cfunc{GC_local_gcj_malloc} to revert to locked allocation;
 
 @item
-must be called before any @cfunction{GC_local_gcj_malloc} calls;
+must be called before any @cfunc{GC_local_gcj_malloc} calls;
 
 @item
 for best performance, should be called as early as possible; on some
 platforms, calling it later may have adverse effects;
 
 @item
-it is safe to call before @cfunction{GC_INIT}; it includes a
-@cfunction{GC_init} call.
+it is safe to call before @cfunc{GC_INIT}; it includes a
+@cfunc{GC_init} call.
 @end itemize
 @end deftypefun
 
@@ -3372,7 +3371,7 @@ probably impractical.
 
 @deftypefun {void *} GC_malloc_ignore_off_page (size_t @var{number_of_bytes})
 @deftypefunx {void *} GC_malloc_atomic_ignore_off_page (size_t @var{number_of_bytes})
-Like @cfunction{GC_malloc}, allocate an object of @var{number_of_bytes}.
+Like @cfunc{GC_malloc}, allocate an object of @var{number_of_bytes}.
 The client guarantees that as long as the object is alive, it will be
 referenced by a pointer that points to somewhere within the first 256
 bytes of the object.  This pointer should normally be declared
@@ -3413,7 +3412,7 @@ should be rare, and should not be ignored during code development.
 Return the old warning procedure.
 @end deftypefun
 
-      
+
 @deftypefun GC_word GC_set_free_space_divisor (GC_word @var{value})
 Set @code{GC_free_space_divisor} and return its old value.
 @end deftypefun
@@ -3472,7 +3471,7 @@ typedef void * (*GC_stack_base_func)(struct GC_stack_base *sb, void *arg);
 
 @deftypefun {void *} GC_call_with_stack_base (GC_stack_base_func @var{fn}, void * @var{arg})
 Call a function with a stack base structure corresponding to somewhere
-in the @cfunction{GC_call_with_stack_base} frame.  This often can be
+in the @cfunc{GC_call_with_stack_base} frame.  This often can be
 used to provide a sufficiently accurate stack base.  And we implement it
 everywhere.
 @end deftypefun
@@ -3486,7 +3485,7 @@ garbage collected memory, or assign pointers to the garbage collected
 heap.  Once registered, a thread will be stopped during garbage
 collections.
 
-Return codes:	
+Return codes:
 
 @table @code
 @item GC_SUCCESS
@@ -3495,7 +3494,7 @@ Return codes:
 was already registered;
 
 @item GC_NO_THREADS
-no thread support in @gc{};  	
+no thread support in @gc{};
 
 @item GC_UNIMPLEMENTED
 not yet implemented on this platform.
@@ -3509,7 +3508,7 @@ garbage collected memory or manipulate pointers to the garbage collected
 heap after making this call.  Specifically, if it wants to return or
 otherwise communicate a pointer to the garbage collected heap to another
 thread, it must do this before calling
-@cfunction{GC_unregister_my_thread}, most probably by saving it in a
+@cfunc{GC_unregister_my_thread}, most probably by saving it in a
 global data structure.
 @end deftypefun
 
@@ -3517,7 +3516,7 @@ global data structure.
 @deftypefun int GC_get_stack_base (struct GC_stack_base * @var{base})
 Attempt to fill in the @code{GC_stack_base} structure with the stack
 base for this thread.  This appears to be required to implement anything
-like the JNI @cfunction{AttachCurrentThread} in an environment in which
+like the JNI @cfunc{AttachCurrentThread} in an environment in which
 new threads are not automatically registered with the collector.  It is
 also unfortunately hard to implement well on many platforms.  Returns
 @code{GC_SUCCESS} or @code{GC_UNIMPLEMENTED}.
@@ -3554,17 +3553,17 @@ collected.
 
 @noindent
 The collector may be used to track down leaks in C programs that are
-intended to run with @malloc{}/@cfunction{free} (e.g. code with extreme
+intended to run with @malloc{}/@cfunc{free} (e.g. code with extreme
 real--time or portability constraints).
 
 To do so define @code{FIND_LEAK} in @file{Makefile}.  This will cause
-the collector to invoke the @cfunction{report_leak} routine defined near
+the collector to invoke the @cfunc{report_leak} routine defined near
 the top of @file{reclaim.c} whenever an inaccessible object is found
 that has not been explicitly freed.  Such objects will also be
 automatically reclaimed.
 
-If all objects are allocated with @cfunction{GC_DEBUG_MALLOC}, then the
-default version of @cfunction{report_leak} will report at least the
+If all objects are allocated with @cfunc{GC_DEBUG_MALLOC}, then the
+default version of @cfunc{report_leak} will report at least the
 source file and line number at which the leaked object was allocated.
 This may sometimes be sufficient.  On a few machines, it will also
 report a cryptic stack trace.  If this is not symbolic, it can
@@ -3575,7 +3574,7 @@ symbolic addresses.  It was largely supplied by Scott Schwartz.
 
 Note that the debugging facilities described in the next section can
 sometimes be slightly @strong{less} effective in leak finding mode,
-since in leak finding mode, @cfunction{GC_debug_free} actually results
+since in leak finding mode, @cfunc{GC_debug_free} actually results
 in reuse of the object.  (Otherwise the object is simply marked
 invalid.)  Also note that the test program is not designed to run
 meaningfully in @code{FIND_LEAK} mode.  Use @code{make gc.a} to build
@@ -3588,9 +3587,9 @@ the collector.
 
 
 @noindent
-The routines @cfunction{GC_debug_malloc},
-@cfunction{GC_debug_malloc_atomic}, @cfunction{GC_debug_realloc}, and
-@cfunction{GC_debug_free} provide an alternate interface to the
+The routines @cfunc{GC_debug_malloc},
+@cfunc{GC_debug_malloc_atomic}, @cfunc{GC_debug_realloc}, and
+@cfunc{GC_debug_free} provide an alternate interface to the
 collector, which provides some help with memory overwrite errors, and
 the like.  Objects allocated in this way are annotated with additional
 information.  Some of this information is checked during garbage
@@ -3600,35 +3599,35 @@ Simple cases of writing past the end of an allocated object should be
 caught if the object is explicitly deallocated, or if the collector is
 invoked while the object is live.  The first deallocation of an object
 will clear the debugging info associated with an object, so accidentally
-repeated calls to @cfunction{GC_debug_free} will report the deallocation
+repeated calls to @cfunc{GC_debug_free} will report the deallocation
 of an object without debugging information.  Out of memory errors will
-be reported to @code{stderr}, in addition to returning @null{}.
+be reported to @code{stderr}, in addition to returning @cnull{}.
 
-@cfunction{GC_debug_malloc} checking during garbage collection is
-enabled with the first call to @cfunction{GC_debug_malloc}.  This will
+@cfunc{GC_debug_malloc} checking during garbage collection is
+enabled with the first call to @cfunc{GC_debug_malloc}.  This will
 result in some slowdown during collections.  If frequent heap checks are
 desired, this can be achieved by explicitly invoking
-@cfunction{GC_gcollect}, e.g. from the debugger.
+@cfunc{GC_gcollect}, e.g. from the debugger.
 
-@cfunction{GC_debug_malloc} allocated objects should not be passed to
-@cfunction{GC_realloc} or @cfunction{GC_free}, and conversely.  It is
+@cfunc{GC_debug_malloc} allocated objects should not be passed to
+@cfunc{GC_realloc} or @cfunc{GC_free}, and conversely.  It is
 however acceptable to allocate only some objects with
-@cfunction{GC_debug_malloc}, and to use @cfunction{GC_malloc} for other
+@cfunc{GC_debug_malloc}, and to use @cfunc{GC_malloc} for other
 objects, provided the two pools are kept distinct.  In this case, there
-is a very low probability that @cfunction{GC_malloc} allocated objects
+is a very low probability that @cfunc{GC_malloc} allocated objects
 may be misidentified as having been overwritten.  This should happen
 with probability at most one in 2**32.  This probability is zero if
-@cfunction{GC_debug_malloc} is never called.
+@cfunc{GC_debug_malloc} is never called.
 
-@cfunction{GC_debug_malloc}, @cfunction{GC_malloc_atomic}, and
-@cfunction{GC_debug_realloc} take two additional trailing arguments, a
+@cfunc{GC_debug_malloc}, @cfunc{GC_malloc_atomic}, and
+@cfunc{GC_debug_realloc} take two additional trailing arguments, a
 string and an integer.  These are not interpreted by the allocator.
 They are stored in the object (the string is not copied).  If an error
 involving the object is detected, they are printed.
 
-The macros @cfunction{GC_MALLOC}, @cfunction{GC_MALLOC_ATOMIC},
-@cfunction{GC_REALLOC}, @cfunction{GC_FREE}, and
-@cfunction{GC_REGISTER_FINALIZER} are also provided.  These require the
+The macros @cfunc{GC_MALLOC}, @cfunc{GC_MALLOC_ATOMIC},
+@cfunc{GC_REALLOC}, @cfunc{GC_FREE}, and
+@cfunc{GC_REGISTER_FINALIZER} are also provided.  These require the
 same arguments as the corresponding (non debugging) routines.  If
 @file{gc.h} is included with @code{GC_DEBUG} defined, they call the
 debugging versions of these functions, passing the current file name and
@@ -3636,7 +3635,7 @@ line number as the two extra arguments, where appropriate.  If
 @file{gc.h} is included without @code{GC_DEBUG} defined, then all these
 macros will instead be defined to their non debugging equivalents.
 
-@cfunction{GC_REGISTER_FINALIZER} is necessary, since pointers to
+@cfunc{GC_REGISTER_FINALIZER} is necessary, since pointers to
 objects with debugging information are really pointers to a displacement
 of 16 bytes form the object beginning, and some translation is necessary
 when finalisation routines are invoked.
@@ -3659,9 +3658,9 @@ also run in a ``generational'' mode, in which it usually attempts to
 collect only objects allocated since the last garbage collection.
 Furthermore, in this mode, garbage collections run mostly incrementally,
 with a small amount of work performed in response to each of a large
-number of @cfunction{GC_malloc} requests.
+number of @cfunc{GC_malloc} requests.
 
-This mode is enabled by a call to @cfunction{GC_enable_incremental}.
+This mode is enabled by a call to @cfunc{GC_enable_incremental}.
 
 Incremental and generational collection is effective in reducing pause
 times only if the collector has some way to tell which objects or pages
@@ -3682,11 +3681,11 @@ details.
 @item
 Information supplied by the programmer.  We define ``stubborn'' objects
 to be objects that are rarely changed.  Such an object can be allocated
-(and enabled for writing) with @cfunction{GC_malloc_stubborn}.  Once it
+(and enabled for writing) with @cfunc{GC_malloc_stubborn}.  Once it
 has been initialised, the collector should be informed with a call to
-@cfunction{GC_end_stubborn_change}.  Subsequent writes that store
+@cfunc{GC_end_stubborn_change}.  Subsequent writes that store
 pointers into the object must be preceded by a call to
-@cfunction{GC_change_stubborn}.
+@cfunc{GC_change_stubborn}.
 @end enumerate
 
 This mechanism performs best for objects that are written only for
@@ -3744,7 +3743,7 @@ advantages.
 
 @defmac GC_I_HIDE_POINTERS
 If defined before the inclusion of @file{gc.h}: the macros
-@cfunction{HIDE_POINTER} and @cfunction{REVEAL_POINTER} are defined.
+@cfunc{HIDE_POINTER} and @cfunc{REVEAL_POINTER} are defined.
 @end defmac
 
 
@@ -3911,20 +3910,20 @@ We must include the header file:
 
 @noindent
 at the beginning of @strong{every} file that allocates memory through
-the garbage collector.  We call @cfunction{GC_MALLOC} wherever we would
-have called @cfunction{malloc}.  This initialises memory to zero like
-@cfunction{calloc}; there is no need to explicitly clear the result.
+the garbage collector.  We call @cfunc{GC_MALLOC} wherever we would
+have called @cfunc{malloc}.  This initialises memory to zero like
+@cfunc{calloc}; there is no need to explicitly clear the result.
 
 If we know that an allocated object will not contain pointers to the
 garbage--collected heap, and we don't need it to be initialised, we can
-use @cfunction{GC_MALLOC_ATOMIC} instead.
+use @cfunc{GC_MALLOC_ATOMIC} instead.
 
-A free function, @cfunction{GC_FREE}, is provided but needs not be
+A free function, @cfunc{GC_FREE}, is provided but needs not be
 called.  For very small objects, our program will probably perform
 better if we do not call it, and let the collector do its job.
 
-A @cfunction{GC_REALLOC} function behaves like the C library
-@cfunction{realloc}.  It allocates uninitialised pointer--free memory if
+A @cfunc{GC_REALLOC} function behaves like the C library
+@cfunc{realloc}.  It allocates uninitialised pointer--free memory if
 the original object was allocated that way.
 
 The following program @file{loop.c} is a trivial example:
@@ -3954,14 +3953,14 @@ int main ()
 
 @c ------------------------------------------------------------
 
-@appendixsubsec Interaction with the system @cfunction{malloc}
+@appendixsubsec Interaction with the system @cfunc{malloc}
 
 
 @noindent
 It is usually best not to mix garbage--collected allocation with the
 standard C allocation routines.  If we do, we need to be careful not to
 store pointers to the garbage--collected heap in memory allocated with
-the system @cfunction{malloc}.
+the system @cfunc{malloc}.
 
 @c ------------------------------------------------------------
 
@@ -3969,7 +3968,7 @@ the system @cfunction{malloc}.
 
 
 @noindent
-On some other platforms it is necessary to call @cfunction{GC_INIT} from
+On some other platforms it is necessary to call @cfunc{GC_INIT} from
 the main program, which is presumed to be part of the main executable,
 not a dynamic library.  This can never hurt, and is thus generally good
 practise.
@@ -4037,7 +4036,7 @@ allocations are performed with @code{GC_DEBUG} defined.
 We may be able to build the collector with
 @option{--enable-redirect-malloc} and set the @env{LD_PRELOAD}
 environment variable to point to the resulting library, thus replacing
-the standard @cfunction{malloc} with its garbage--collected counterpart.
+the standard @cfunc{malloc} with its garbage--collected counterpart.
 This is rather platform dependent.  See the leak detection documentation
 for some more details.
 
@@ -4175,8 +4174,8 @@ sections.
 
 This interface is designed for maximum compatibility with C strings.
 @ascii{} null characters may be embedded in cords using
-@cfunction{CORD_from_fn}.  This is handled correctly, but
-@cfunction{CORD_to_char_star} will produce a string with embedded nulls
+@cfunc{CORD_from_fn}.  This is handled correctly, but
+@cfunc{CORD_to_char_star} will produce a string with embedded nulls
 when given such a cord.
 
 This interface is fairly big, largely for performance reasons.
@@ -4199,7 +4198,7 @@ modified in place.
 
 The empty cord is represented by, and can be written as, @code{0}.  In
 the following documentation: when we refer to a cord as a ``C string'',
-we mean that the value of @code{CORD} type is non @null{}; this does not
+we mean that the value of @code{CORD} type is non @cnull{}; this does not
 mean that the string is empty because its first char can be zero.
 
 Never, ever, access directly a cord as a pointer to @code{char}; this is
@@ -4210,8 +4209,8 @@ funcs} for details.
 
 
 @defmac CORD_EMPTY
-An empty cord is always represented as @null{}.  This preprocessor
-symbol is an alias for @null{}.
+An empty cord is always represented as @cnull{}.  This preprocessor
+symbol is an alias for @cnull{}.
 @end defmac
 
 
@@ -4227,7 +4226,7 @@ symbol is an alias for @null{}.
 
 @defmac CORD_IS_STRING (@var{s})
 Evaluate to true if the cord @var{s} has non zero as first character.
-@var{s} must be different from @null{}.
+@var{s} must be different from @cnull{}.
 @end defmac
 
 
@@ -4255,7 +4254,7 @@ to generate the characters one by one.
 Prototype of functions used to generate the characters.  Whenever a
 generation function function is invoked: it must return the @var{i}-th
 character in the string.  @var{client_data} is the same value used as
-parameter for @cfunction{CORD_from_fn}.
+parameter for @cfunc{CORD_from_fn}.
 @end deftypefn
 
 
@@ -4263,7 +4262,7 @@ parameter for @cfunction{CORD_from_fn}.
 Turn a functional description into a cord.
 
 If the length of the cord, @var{len}, is ``short'': the characters are
-immediately generated by @cfunction{CORD_from_fn} itself; else both
+immediately generated by @cfunc{CORD_from_fn} itself; else both
 @var{fn} and @var{client_data} are stored in the returned cord.  The
 length of a ``short cord'' is @strong{not} part of the public @api{}.
 
@@ -4312,7 +4311,7 @@ subsequently altered.
 @deftypefun CORD CORD_cat_char_star (CORD @var{x}, const char * @var{y}, size_t @var{leny})
 Concatenate a cord and a C string with known length and return the
 result.  Except for the empty string case, this is a special case of
-@cfunction{CORD_cat}.  Since the length is known, it can be faster.  The
+@cfunc{CORD_cat}.  Since the length is known, it can be faster.  The
 string @var{y} is shared with the resulting @code{CORD}.  Hence it
 should not be altered by the caller.
 @end deftypefun
@@ -4338,9 +4337,9 @@ embedded functional descriptions take longer to evaluate.
 @end deftypefun
 
 
-@deftypevar CORD_oom_fn
+@deftypevar {Function Pointer} CORD_oom_fn
 An out of memory handler to call, it can be supplied by client and it
-must not return.  The default handler calls @cfunction{abort}.  The
+must not return.  The default handler calls @cfunc{abort}.  The
 variable definition is:
 
 @example
@@ -4384,13 +4383,13 @@ Find the first occurrence of @var{s} in @var{x} beginning at position
 
 @deftypefun CORD CORD_chars (char @var{c}, size_t @var{i})
 Return a cord consisting of @var{i} copies of (possibly zero) @var{c}.
-Dangerous in conjunction with @cfunction{CORD_to_char_star}.  The
+Dangerous in conjunction with @cfunc{CORD_to_char_star}.  The
 resulting representation takes constant space, independent of @var{i}.
 @end deftypefun
 
 
 @defmac CORD_nul (@var{i})
-A wrapper for @cfunction{CORD_chars} that creates a cord of null
+A wrapper for @cfunc{CORD_chars} that creates a cord of null
 characters.
 @end defmac
 
@@ -4402,7 +4401,7 @@ Turn a cord into a C string. The result shares no structure with
 
 
 @deftypefun {const char *} CORD_to_const_char_star (CORD @var{x})
-Like @cfunction{CORD_to_char_star}, but the result may share structure
+Like @cfunc{CORD_to_char_star}, but the result may share structure
 with the argument and is thus not modifiable.
 @end deftypefun
 
@@ -4414,7 +4413,7 @@ subsequently be modified.
 
 
 @deftypefun size_t CORD_chr (CORD @var{x}, size_t @var{i}, int @var{c})
-A vague analog of @cfunction{strchr}.  Return the position (an integer,
+A vague analog of @cfunc{strchr}.  Return the position (an integer,
 not a pointer) of the first occurrence of (@code{char}) @var{c} inside
 @var{x} at position @var{i} or subsequent.  The value @var{i} must be
 strictly less than the length of the cord.  If @var{c} is not found:
@@ -4423,7 +4422,7 @@ return @code{CORD_NOT_FOUND}.
 
 
 @deftypefun size_t CORD_rchr (CORD @var{x}, size_t @var{i}, int @var{c})
-A vague analog of @cfunction{strrchr}.  Return the index of the last
+A vague analog of @cfunc{strrchr}.  Return the index of the last
 occurrence of (@code{char}) @var{c} inside @var{x} at position @var{i}
 or previous.  The value @var{i} must be strictly less than the length of
 the cord.  If @var{c} is not found: return @code{CORD_NOT_FOUND}.
@@ -4460,7 +4459,7 @@ character string, not a general cord.
 
 
 @defmac CORD_NO_FN
-A @null{} pointer of type @code{CORD_batched_iter_fn}.
+A @cnull{} pointer of type @code{CORD_batched_iter_fn}.
 @end defmac
 
 
@@ -4473,7 +4472,7 @@ allow some optimization by the client.
 
 The iteration terminates when the right end of this string is reached,
 or when @var{f1} or @var{f2} return non--zero.  In the latter case
-@cfunction{CORD_iter5} returns non--zero; otherwise it returns zero.
+@cfunc{CORD_iter5} returns non--zero; otherwise it returns zero.
 
 The specified value of @var{i} must be less than the length of the cord.
 @end deftypefun
@@ -4490,13 +4489,13 @@ CORD_iter5(@var{x}, 0, @var{f1}, CORD_NO_FN, @var{client_data})
 
 
 @deftypefun int CORD_riter4 (CORD @var{x}, size_t @var{i}, CORD_iter_fn @var{f1}, void * @var{client_data})
-Similar to @cfunction{CORD_iter5}, but end--to--beginning. No provisions
+Similar to @cfunc{CORD_iter5}, but end--to--beginning. No provisions
 for @code{CORD_batched_iter_fn}.
 @end deftypefun
 
 
 @deftypefun int CORD_riter (CORD @var{x}, CORD_iter_fn @var{f1}, void * @var{client_data})
-A simpler version of @cfunction{CORD_riter4} that starts at the end.
+A simpler version of @cfunc{CORD_riter4} that starts at the end.
 @end deftypefun
 
 
@@ -4509,8 +4508,8 @@ character based on a position than on an index.  Unfortunately,
 positions are big (order of a few 100 bytes), so allocate them with
 caution.
 
-Note that @cfunction{CORD_pos_fetch}, @cfunction{CORD_next} and
-@cfunction{CORD_prev} have both macro and function definitions; the
+Note that @cfunc{CORD_pos_fetch}, @cfunc{CORD_next} and
+@cfunc{CORD_prev} have both macro and function definitions; the
 former may evaluate their argument more than once.
 
 
@@ -4525,48 +4524,48 @@ CORD_pos        pos;
 @noindent
 and then @code{pos} can be used as a pointer to the structure.
 @end deftp
-	
+
 
 @deftypefun CORD CORD_pos_to_cord (CORD_pos @var{p})
 Extract the cord from a position.
 @end deftypefun
-	
+
 
 @deftypefun size_t CORD_pos_to_index (CORD_pos @var{p})
 Extract the current index from a position.
 @end deftypefun
-	
+
 
 @deftypefun char CORD_pos_fetch (CORD_pos @var{p})
 Fetch the character located at the given position.
 @end deftypefun
 
-	
+
 @deftypefun void CORD_set_pos (CORD_pos @var{p}, CORD @var{x}, size_t @var{i})
 Initialize the position to refer to the given cord and index.  Note that
 this is the most expensive function on positions.
 @end deftypefun
 
-	
+
 @deftypefun void CORD_next (CORD_pos @var{p})
 Advance the position to the next character; @var{p} must be initialized
 and valid.  This function invalidates @var{p} if it goes past the end of
-the cord, so it must be used in conjuction with @cfunction{CORD_pos_valid}.
+the cord, so it must be used in conjuction with @cfunc{CORD_pos_valid}.
 @end deftypefun
 
-	
+
 @deftypefun void CORD_prev (CORD_pos @var{p})
 Move the position to the preceding character; @var{p} must be
 initialized and valid.  This function invalidates @var{p} if it goes
 before the beginning of the cord, so it must be used in conjuction with
-@cfunction{CORD_pos_valid}.
+@cfunc{CORD_pos_valid}.
 @end deftypefun
 
 
 @deftypefun int CORD_pos_valid (CORD_pos @var{p})
 Return true if the position is valid, i.e. inside the cord.
 @end deftypefun
-	
+
 
 @defmac CORD_FOR (@var{pos}, @var{cord})
 Expand to a @code{for} loop:
@@ -4578,7 +4577,7 @@ for (CORD_set_pos(@var{pos}, @var{cord}, 0);
 @end example
 @end defmac
 
-			
+
 @c ------------------------------------------------------------
 
 @c page
@@ -4600,18 +4599,18 @@ We must have exclusive access to the descriptor @var{f}, i.e. we may
 read it at any time, and expect the file pointer to be where we left it.
 Normally this should be invoked as @code{CORD_from_file(fopen(...))}.
 
-@cfunction{CORD_from_file} arranges to close the file descriptor when it
+@cfunc{CORD_from_file} arranges to close the file descriptor when it
 is no longer needed (e.g. when the result becomes inaccessible).
 
-The file @var{f} must be such that @cfunction{ftell} reflects the actual
+The file @var{f} must be such that @cfunc{ftell} reflects the actual
 character position in the file, i.e. the number of characters that can
-be or were read with @cfunction{fread}.  On Unix systems this is always
+be or were read with @cfunc{fread}.  On Unix systems this is always
 true; on MS Windows systems, @var{f} must be opened in binary mode.
 @end deftypefun
 
 
 @deftypefun CORD CORD_from_file_eager (FILE * @var{f})
-Equivalent to @cfunction{CORD_from_file}, except that the entire file
+Equivalent to @cfunc{CORD_from_file}, except that the entire file
 will be read and the file pointer will be closed immediately.  The
 binary mode restriction from above does not apply.
 @end deftypefun
@@ -4659,23 +4658,23 @@ field width, precision, etc. have the same semantics as for @code{%s}
 the format string is represented as a @code{CORD};
 
 @item
-@cfunction{CORD_sprintf} and @cfunction{CORD_vsprintf} assign the result
+@cfunc{CORD_sprintf} and @cfunc{CORD_vsprintf} assign the result
 through the 1st argument; unlike their @ansi{} C versions, there is no
 need to guess the correct buffer size;
 
 @item
 most of the conversions are implement through the native
-@cfunction{vsprintf}; hence they are usually no faster, and
-idiosyncracies of the native @cfunction{printf} are preserved; however,
-@code{CORD} arguments to @cfunction{CORD_sprintf} and
-@cfunction{CORD_vsprintf} are @strong{not} copied; the result shares the
+@cfunc{vsprintf}; hence they are usually no faster, and
+idiosyncracies of the native @cfunc{printf} are preserved; however,
+@code{CORD} arguments to @cfunc{CORD_sprintf} and
+@cfunc{CORD_vsprintf} are @strong{not} copied; the result shares the
 original structure; this may make them very efficient in some unusual
 applications; the format string is copied.
 @end enumerate
 
 All the functions return the number of characters generated or @code{-1}
 on error; this complies with the @ansi{} standard, but is inconsistent
-with some older implementations of @cfunction{sprintf}.
+with some older implementations of @cfunc{sprintf}.
 
 The implementation of these is probably less portable than the rest of
 this package.  These section of the @api{} can be excluded by defining
@@ -4720,8 +4719,8 @@ A client might look like:
 
 @noindent
 if a C string is desired as the final result, the call to
-@cfunction{CORD_balance} may be replaced by a call to
-@cfunction{CORD_to_char_star}.
+@cfunc{CORD_balance} may be replaced by a call to
+@cfunc{CORD_to_char_star}.
 
 
 @deftp {Struct Typedef} CORD_ec_struct
@@ -4750,9 +4749,9 @@ Append a cord to an extensible cord.  @var{s} remains shared with
 @defmac CORD_ec_to_cord (CORD_ec @var{x})
 Convert an extensible cord to a cord, then return a pointer to the
 @code{CORD} embedded into @var{x}.  This macro is a wrapper for
-@cfunction{CORD_ec_flush_buf}.
+@cfunc{CORD_ec_flush_buf}.
 @end defmac
-      
+
 
 @deftypefun void CORD_ec_flush_buf (CORD_ec @var{x})
 Flush the buffer part of the extended cord into the internal
@@ -4905,21 +4904,21 @@ Further collector documentation can be found at:
 @c page
 @node Concept Index
 @appendix An entry for each concept
-     
+
 @printindex cp
-     
+
 @node Function Index
-@appendix An entry for each function. 
+@appendix An entry for each function.
 
 @printindex fn
 
 @node Variable Index
-@appendix An entry for each variable. 
+@appendix An entry for each variable.
 
 @printindex vr
 
 @node Type Index
-@appendix An entry for each type. 
+@appendix An entry for each type.
 
 @printindex tp
 

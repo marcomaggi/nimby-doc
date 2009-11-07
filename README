@@ -8,8 +8,6 @@ Topics
 
   1. Introduction
   2. License
-  3. Install
-  4. Usage
   A. Credits
   B. Bugs
   C. Resources
@@ -31,18 +29,12 @@ Internet.
 All the files have a specific documentation license.
 
 
-4. Usage
---------
-
-Read the documentation.
-
-
 A. Credits
 ----------
 
 The    conversion   to   Texinfo    is   by    Marco   Maggi
-<marcomaggi@gna.org>.  Refer to the individual files for the
-original authors.
+<marc.maggi-ipsu@poste.it>.   Refer to the  individual files
+for the original authors.
 
 
 B. Bugs
