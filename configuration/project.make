@@ -15,6 +15,13 @@ info_MAKEINFO_FLAGS	= -I $(texi_SRCDIR) --no-split
 html_MAKEINFO_FLAGS	= -I $(texi_SRCDIR) --no-split --html
 pdf_TEXI2PDF_FLAGS	= -I $(texi_SRCDIR) --dvipdf --tidy --build-dir=$(pdf_BUILDDIR)
 
+## --------------------------------------------------------------------
+
+.PHONY: info html pdf
+
+info : info-all
+html : html-all
+pdf  : pdf-all
 
 #page
 ## ------------------------------------------------------------

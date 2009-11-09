@@ -1,52 +1,53 @@
-@c uuid.texiinc --
-@c
-@c Copyright (c) 2004-2006 Ralf S. Engelschall <rse@engelschall.com>
-@c Copyright (c) 2004-2006 The OSSP Project <http://www.ossp.org/>
-@c
-@c Texinfo translation by Marco Maggi <marcomaggi@gna.org>
-@c
-@c Permission to use, copy, modify, and distribute this software for any
-@c purpose  with or  without fee  is hereby  granted, provided  that the
-@c above  copyright notice  and  this permission  notice  appear in  all
-@c copies.
-@c
-@c THIS  SOFTWARE IS  PROVIDED ``AS  IS'' AND  ANY EXPRESSED  OR IMPLIED
-@c WARRANTIES, INCLUDING, BUT NOT  LIMITED TO, THE IMPLIED WARRANTIES OF
-@c MERCHANTABILITY AND FITNESS FOR  A PARTICULAR PURPOSE ARE DISCLAIMED.
-@c IN  NO  EVENT SHALL  THE  AUTHORS  AND  COPYRIGHT HOLDERS  AND  THEIR
-@c CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-@c EXEMPLARY, OR  CONSEQUENTIAL DAMAGES (INCLUDING, BUT  NOT LIMITED TO,
-@c PROCUREMENT OF  SUBSTITUTE GOODS OR  SERVICES; LOSS OF USE,  DATA, OR
-@c PROFITS; OR  BUSINESS INTERRUPTION) HOWEVER CAUSED AND  ON ANY THEORY
-@c OF  LIABILITY,  WHETHER  IN   CONTRACT,  STRICT  LIABILITY,  OR  TORT
-@c (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-@c OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+@c ------------------------------------------------------------
+@c Macros.
+@c ------------------------------------------------------------
 
+@c @macro uuid{}
+@c @acronym{UUID}
+@c @end macro
 
+@c @macro ossp{}
+@c @acronym{OSSP}
+@c @end macro
+
+@macro dce{}
+@acronym{DCE}
+@end macro
+
+@c @macro iso{}
+@c @acronym{ISO}
+@c @end macro
+
+@c @macro ietf{}
+@c @acronym{IETF}
+@c @end macro
+
+@macro iec{}
+@acronym{IEC}
+@end macro
+
+@macro oid{}
+@acronym{OID}
+@end macro
+
+@macro osi{}
+@acronym{OSI}
+@end macro
+
+@c @macro cfunc{NAME}
+@c @code{\NAME\()}
+@c @end macro
+
+@c @macro cnull{}
+@c @code{NULL}
+@c @end macro
+
+@c page
 @node uuid
-@appendix The original manual page of @uuid{} version 1.4.2
+@appendix The original manual page of @uuid{} version 1.6.2
 
 
-@unmacro ossp
-@macro ossp{}
-@acronym{OSSP}
-@end macro
-
-@unmacro uuid
-@macro uuid{}
-@acronym{UUID}
-@end macro
-
-@unmacro ascii
-@macro ascii{}
-@acronym{ASCII}
-@end macro
-
-@unmacro cfunction
-@macro cfunction{NAME}
-@code{\NAME\()}
-@end macro
-
+@ossp{} @uuid{} --- Universally Unique Identifier 1.6.2 (4-Jul-2008).
 
 @menu
 * uuid description::            Description.
@@ -55,29 +56,22 @@
 * uuid history::                History.
 @end menu
 
-
-@noindent
-@ossp{} @uuid{} --- Universally Unique Identifier 1.4.2 (13-Mar-2006).
-
-
-@c ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node uuid description
-@section Description
+@appendixsec Description
 
 
-@noindent
 @ossp{} @uuid{} is a ISO-C:1999 application programming interface
 (@api{}) and corresponding command line interface (@acronym{CLI}) for
-the generation of DCE 1.1, ISO/IEC 11578:1996 and RFC 4122 compliant
+the generation of @dce{} 1.1, ISO/IEC 11578:1996 and RFC 4122 compliant
 @emph{Universally Unique Identifier} (@uuid{}).
 
-It supports DCE 1.1 variant @uuid{}s of version 1 (time and node based),
-version 3 (name based, MD5), version 4 (random number based) and version
-5 (name based, SHA-1).  Additional @api{} bindings are provided for the
-languages ISO-C++:1998, Perl:5 and PHP:4/5.  Optional backward
-compatibility exists for the ISO-C DCE-1.1 and Perl Data::UUID @api{}s.
+It supports @dce{} 1.1 variant @uuid{}s of version 1 (time and node
+based), version 3 (name based, MD5), version 4 (random number based) and
+version 5 (name based, SHA-1).  Additional @api{} bindings are provided
+for the languages ISO-C++:1998, Perl:5 and PHP:4/5.  Optional backward
+compatibility exists for the ISO-C @dce{}-1.1 and Perl Data::UUID
+@api{}s.
 
 @uuid{}s are 128 bit numbers which are intended to have a high
 likelihood of uniqueness over space and time and are computationally
@@ -87,55 +81,79 @@ locally generated without contacting a global registration authority.
 objects with an extremely short lifetime and to reliably identifying
 very persistent objects across a network.
 
-This is the @acronym{ISO}--C application programming interface (@api{})
-of @ossp{} @uuid{}.
+This is the @iso{}--C application programming interface (@api{}) of
+@ossp{} @uuid{}.
 
+@c ------------------------------------------------------------
 
-@subsection @uuid{} binary representation
+@subsubheading @uuid{} binary representation
 
-
-@noindent
-According to the DCE 1.1, ISO/IEC 11578:1996 and RFC 4122 standards, a
-DCE 1.1 variant UUID is a 128 bit number defined out of 7 fields, each
-field a multiple of an octet in size and stored in network byte order:
+According to the @dce{} 1.1, @iso{}/@iec{} 11578:1996 and @ietf{} @rfc{}
+4122 standards, a @dce{} 1.1 variant @uuid{} is a 128 bit number defined
+out of 7 fields, each field a multiple of an octet in size and stored in
+network byte order:
 
 @example
- 0                   1                   2                   3
-  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
- +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-0|                          time_low                             |
- +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-1|       time_mid                |         time_hi_and_version   |
- +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-2|clk_seq_hi_res |  clk_seq_low  |         node (0-1)            |
- +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-3|                         node (2-5)                            |
- +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+                                                  [4]
+                                                 version
+                                               -->|  |<--
+                                                  |  |
+                                                  |  |  [16]
+              [32]                      [16]      |  |time_hi
+            time_low                  time_mid    | _and_version
+  |<---------------------------->||<------------>||<------------>|
+  | MSB                          ||              ||  |           |
+  | /                            ||              ||  |           |
+  |/                             ||              ||  |           |
+  +------++------++------++------++------++------++------++------+~~
+  |  15  ||  14  ||  13  ||  12  ||  11  ||  10  |####9  ||   8  |
+  | MSO  ||      ||      ||      ||      ||      |####   ||      |
+  +------++------++------++------++------++------++------++------+~~
+  7654321076543210765432107654321076543210765432107654321076543210
+
+~~+------++------++------++------++------++------++------++------+
+  ##* 7  ||   6  ||   5  ||   4  ||   3  ||   2  ||   1  ||   0  |
+  ##*    ||      ||      ||      ||      ||      ||      ||  LSO |
+~~+------++------++------++------++------++------++------++------+
+  7654321076543210765432107654321076543210765432107654321076543210
+
+  | |    ||      ||                                             /|
+  | |    ||      ||                                            / |
+  | |    ||      ||                                          LSB |
+  |<---->||<---->||<-------------------------------------------->|
+  |clk_seq clk_seq                      node
+  |_hi_res _low                         [48]
+  |[5-6]    [8]
+  | |
+->| |<--
+variant
+ [2-3]
 @end example
 
 An example of a @uuid{} binary representation is the octet stream
-@code{0xEC 0xB9 0xF3 0x5F 0x44 0x2A 0x11 0xD8 0x8A 0x24 0x00 0x90 0x27
-0x2F 0xF7 0x25}.  The binary representation format is exactly what the
-@ossp{} @uuid{} @api{} functions @cfunction{uuid_import} and
-@cfunction{uuid_export} deal with under @code{UUID_FMT_BIN}.
+@samp{0xF8 0x1D 0x4F 0xAE 0x7D 0xEC 0x11 0xD0 0xA7 0x65 0x00 0xA0 0xC9
+0x1E 0x6B 0xF6}.  The binary representation format is exactly what the
+@ossp{} @uuid{} @api{} functions @cfunc{uuid_import} and
+@cfunc{uuid_export} deal with under @code{UUID_FMT_BIN}.
 
+@c ------------------------------------------------------------
 
-@subsection @uuid{} @ascii{} string representation
+@subsubheading @uuid{} @ascii{} string representation
 
-
-@noindent
-According to the DCE 1.1, ISO/IEC 11578:1996 and RFC 4122 standards, a
-DCE 1.1 variant @uuid{} is represented as an @ascii{} string consisting
-of 8 hexadecimal digits followed by a hyphen, then three groups of 4
-hexadecimal digits each followed by a hyphen, then 12 hexadecimal
-digits.  Formally, the string representation is defined by the following
-grammar:
+According to the @dce{} 1.1, ISO/IEC 11578:1996 and @ietf{} @rfc{} 4122
+standards, a @dce{} 1.1 variant @uuid{} is represented as an @ascii{}
+string consisting of 8 hexadecimal digits followed by a hyphen, then
+three groups of 4 hexadecimal digits each followed by a hyphen, then 12
+hexadecimal digits.  Formally, the string representation is defined by
+the following grammar:
 
 @example
-uuid                   = <time_low> "-" <time_mid> "-"
+uuid                   = <time_low> "-"
+                         <time_mid> "-"
                          <time_high_and_version> "-"
                          <clock_seq_and_reserved>
-                         <clock_seq_low> "-" <node>
+                         <clock_seq_low> "-"
+                         <node>
 time_low               = 4*<hex_octet>
 time_mid               = 2*<hex_octet>
 time_high_and_version  = 2*<hex_octet>
@@ -149,21 +167,47 @@ hex_digit              = "0"|"1"|"2"|"3"|"4"|"5"|"6"|"7"|"8"|"9"
 @end example
 
 An example of a @uuid{} string representation is the @ascii{} string
-@code{54531d28-402b-11d8-af12-0002a5094c23}.  The string representation
+@samp{f81d4fae-7dec-11d0-a765-00a0c91e6bf6}.  The string representation
 format is exactly what the @ossp{} @uuid{} @api{} functions
-@cfunction{uuid_import} and @cfunction{uuid_export} deal with under
+@cfunc{uuid_import} and @cfunc{uuid_export} deal with under
 @code{UUID_FMT_STR}.
 
+@strong{NOTE} A corresponding @aurl{} can be generated out of a @ascii{}
+string representation of an @uuid{} by prefixing with @samp{urn:uuid:}
+as in @samp{urn:uuid:f81d4fae-7dec-11d0-a765-00a0c91e6bf6}.
 
-@subsection @uuid{} variants and versions
+@c ------------------------------------------------------------
 
+@subsubheading @uuid{} Single Integer Value Representation
 
-@noindent
+According to the @iso{}/@iec{} 11578:1996 and @acronym{ITU-T} Rec. X.667
+standards, a @dce{} 1.1 variant @uuid{} can be also represented as a
+single integer value consisting of a decimal number with up to 39
+digits.
+
+An example of a @uuid{} single integer value representation is the
+decimal number @samp{329800735698586629295641978511506172918}.  The
+string representation format is exactly what the @ossp{} @uuid{} @api{}
+functions @cfunc{uuid_import} and @cfunc{uuid_export} deal with under
+@code{UUID_FMT_SIV}.
+
+@strong{NOTE} A corresponding @iso{} @oid{} can be generated under the
+@samp{@{joint-iso-itu-t(2) uuid(25)@}} arc out of a single integer value
+representation of a @uuid{} by prefixing with @samp{2.25.}.  An example
+@oid{} is @samp{2.25.329800735698586629295641978511506172918}.
+Additionally, an @aurl{} can be generated by further prefixing with
+@samp{urn:oid:} as in
+@samp{urn:oid:2.25.329800735698586629295641978511506172918}.
+
+@c ------------------------------------------------------------
+
+@subsubheading @uuid{} variants and versions
+
 A @uuid{} has a variant and version.  The variant defines the layout of
 the @uuid{}.  The version defines the content of the @uuid{}.  The
-@uuid{} variant supported in @ossp{} @uuid{} is the DCE 1.1 variant
-only.  The DCE 1.1 @uuid{} variant versions supported in @ossp{}
-uuuuiidd are:
+@uuid{} variant supported in @ossp{} @uuid{} is the @dce{} 1.1
+variant only.  The @dce{} 1.1 @uuid{} variant versions supported
+in @ossp{} uuuuiidd are:
 
 @table @asis
 @item @emph{Version 1} (time and node based)
@@ -192,11 +236,10 @@ a name string of arbitrary length.  Version 5 @uuid{}s are usually used
 for non--unique but repeatable message digest identifiers.
 @end table
 
+@c ------------------------------------------------------------
 
-@subsection @uuid{} uniqueness
+@subsubheading @uuid{} uniqueness
 
-
-@noindent
 Version 1 @uuid{}s are guaranteed to be unique through combinations of
 hardware addresses, time stamps and random seeds.  There is a reference
 in the @uuid{} to the hardware (@acronym{MAC}) address of the first
@@ -221,47 +264,49 @@ they are generated out of locally gathered pseudo--random numbers only.
 Nevertheless there is still a high likelihood of uniqueness over space
 and time and that they are computationally difficult to guess.
 
+@c ------------------------------------------------------------
 
-@subsection Nil @uuid{}
+@subsubheading Nil @uuid{}
 
-
-@noindent
 There is a special @emph{Nil} @uuid{} consisting of all octets set to
 zero in the binary representation.  It can be used as a special @uuid{}
 value which does not conflict with real @uuid{}s.
 
-
-@c ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node uuid api
-@section Application programming interface
+@appendixsec Application programming interface
 
 
-@noindent
 The ISO-C Application Programming Interface (@api{}) of @ossp{} @uuid{}
 consists of the following components.
 
+@menu
+* uuid api constants::          Constants.
+* uuid api functions::          Functions.
+* uuid api example::            Usage example.
+@end menu
 
-@subsection Constants
+@c page
+@node uuid api constants
+@appendixsubsec Constants
 
 
-@noindent
 The following constants are provided:
 
 @table @code
 @item UUID_VERSION
 The hexadecimal encoded @ossp{} @uuid{} version.  This allows
 compile-time checking of the @ossp{} @uuid{} version.  For run--time
-checking use @cfunction{uuid_version} instead.
+checking use @cfunc{uuid_version} instead.
 
 The hexadecimal encoding for a version @code{$v.$r$t$l} is calculated
 with the @gnu{} @code{shtool version} command and is (in Perl--style for
 concise description):
 
 @example
-sprintf('0x%x%02x%d%02x', $_v, $_r, @{qw(s 9 . 2 b 1 a 0)@}->@{$_t@}, \
-($_t eq 's' ? 99 : $_l))
+sprintf('0x%x%02x%d%02x', $_v, $_r, \
+        @{qw(s 9 . 2 b 1 a 0)@}->@{$_t@}, \
+        ($_t eq 's' ? 99 : $_l))
 @end example
 
 @noindent
@@ -269,16 +314,19 @@ i.e., the version 0.9.6 is encoded as @code{0x009206}.
 
 @item UUID_LEN_BIN
 @itemx UUID_LEN_STR
+@itemx UUID_LEN_SIV
 The number of octets of the @uuid{} binary and string representations.
-Notice that the lengths of the string representation does @strong{not}
-include the necessary @code{NUL} termination character.
+Notice that the lengths of the string representation
+(@code{UUID_LEN_STR}) and the lengths of the single integer value
+representation (@code{UUID_LEN_SIV}) does @strong{not} include the
+necessary zero termination character.
 
 @item UUID_MAKE_V1
 @itemx UUID_MAKE_V3
 @itemx UUID_MAKE_V4
 @itemx UUID_MAKE_V5
 @itemx UUID_MAKE_MC
-The @code{mode} bits for use with @cfunction{uuid_make}.  The
+The @code{mode} bits for use with @cfunc{uuid_make}.  The
 @code{UUID_MAKE_Vn} specify which @uuid{} version to generate.  The
 @code{UUID_MAKE_MC} forces the use of a random multi--cast @acronym{MAC}
 address instead of the real physical @acronym{MAC} address in version 1
@@ -292,95 +340,131 @@ address instead of the real physical @acronym{MAC} address in version 1
 @itemx UUID_RC_IMP
 The possible numerical return--codes of @api{} functions.  The
 @code{UUID_RC_OK} indicates success, the others indicate errors.  Use
-@cfunction{uuid_error} to translate them into string versions.
+@cfunc{uuid_errr} to translate them into string versions.
 
 @item UUID_FMT_BIN
 @itemx UUID_FMT_STR
+@itemx UUID_FMT_SIV
 @itemx UUID_FMT_TXT
-The @code{fmt} formats for use with @cfunction{uuid_impor} and
-@cfunction{uuid_export}.  The @code{UUID_FMT_BIN} indicates the @uuid{}
-binary representation (of length @code{UUID_LEN_BIN}), the
-@code{UUID_FMT_STR} indicates the @uuid{} string representation (of
-length @code{UUID_LEN_STR}) and the @code{UUID_FMT_TXT} indicates the
-textual description (of arbitrary length) of a @uuid{}.
+The @code{fmt} formats for use with @cfunc{uuid_import} and
+@cfunc{uuid_export}.
+
+@table @code
+@item UUID_FMT_BIN
+Indicates the @uuid{} binary representation of length
+@code{UUID_LEN_BIN}.
+
+@item UUID_FMT_STR
+Indicates the @uuid{} string representation of length
+@code{UUID_LEN_STR}.
+
+@item UUID_FMT_SIV
+Indicates the @uuid{} single integer value representation of maximum
+length @code{UUID_LEN_SIV}.
+
+@item UUID_FMT_TXT
+Indicates the textual description (of arbitrary length) of a @uuid{}.
+@end table
 @end table
 
+@c page
+@node uuid api functions
+@appendixsubsec Functions
 
-@subsection Functions
 
-
-@deftypefun uuid_rc_t uuid_create (uuid_t * @var{uuid})
+@deftypefun uuid_rc_t uuid_create (uuid_t * @var{id})
 Create a new @uuid{} object and store a pointer to it in
-@code{*@var{uuid}}.  A @uuid{} object consists of an internal
+@code{*@var{id}}.  An @uuid{} object consists of an internal
 representation of a @uuid{}, the internal PRNG and MD5 generator
 contexts, and cached @acronym{MAC} address and timestamp information.
 The initial @uuid{} is the @emph{Nil} @uuid{}.
 @end deftypefun
 
 
-@deftypefun uuid_rc_t uuid_destroy (uuid_t * @var{uuid})
-Destroy @uuid{} object @var{uuid}.
+@deftypefun uuid_rc_t uuid_destroy (uuid_t * @var{id})
+Destroy @uuid{} object @var{id}.
 @end deftypefun
 
 
-@deftypefun uuid_rc_t uuid_clone (const uuid_t * @var{uuid}, uuid_t ** @var{uuid_clone})
-Clone @uuid{} object @var{uuid} and store new @uuid{} object in
-@var{uuid_clone}.
+@deftypefun uuid_rc_t uuid_clone (const uuid_t * @var{id}, uuid_t ** @var{id_clone})
+Clone @uuid{} object @var{id} and store new @uuid{} object in
+@var{id_clone}.
 @end deftypefun
 
 
-@deftypefun uuid_rc_t uuid_isnil (const uuid_t * @var{uuid}, int * @var{result})
-Checks whether the @uuid{} in @var{uuid} is the @emph{Nil} @uuid{}.  If
-this is the case, it returns true in @code{*@var{result}}.  Else it
-returns false in @code{*@var{result}}.
+@deftypefun uuid_rc_t uuid_isnil (const uuid_t * @var{id}, int * @var{result})
+Check whether the @uuid{} in @var{id} is the @emph{Nil} @uuid{}; if this
+is the case, store true in @code{*@var{result}}; else store false in
+@code{*@var{result}}.
 @end deftypefun
 
 
-@deftypefun uuid_rc_t uuid_compare (const uuid_t * @var{uuid}, const uuid_t * @var{uuid2}, int * @var{result})
-Compares the order of the two @uuid{}s in @var{uuid1} and @var{uuid2}
-and returns the result in @code{*@var{result}}: @code{-1} if @var{uuid1}
-is smaller than @var{uuid2}, @code{0} if @var{uuid1} is equal to
-@var{uuid2} and @code{+1} if @var{uuid1} is greater than @var{uuid2}.
+@deftypefun uuid_rc_t uuid_compare (const uuid_t * @vari{id}, const uuid_t * @varii{id}, int * @var{result})
+Compare the order of the two @uuid{}s in @vari{id} and @varii{id} and
+return the result in @code{*@var{result}}: @code{-1} if @vari{id} is
+smaller than @varii{id}, @code{0} if @vari{id} is equal to @varii{id}
+and @code{+1} if @vari{id} is greater than @varii{id}.
 @end deftypefun
 
 
-@deftypefun uuid_rc_t uuid_import (uuid_t * @var{uuid}, uuid_fmt_t @var{fmt}, const void * @var{data_ptr}, size_t @var{data_len})
-Imports a @uuid{} @var{uuid} from an external representation of format
+@deftypefun uuid_rc_t uuid_import (uuid_t * @var{id}, uuid_fmt_t @var{fmt}, const void * @var{data_ptr}, size_t @var{data_len})
+Import a @uuid{} @var{id} from an external representation of format
 @var{fmt}.  The data is read from the buffer at @var{data_ptr} which
 contains at least @var{data_len} bytes.
 
 The format of the external representation is specified by @var{fmt} and
 the minimum expected length in @var{data_len} depends on it.  Valid
-values for @var{fmt} are @code{UUID_FMT_BIN} and @code{UUID_FMT_STR}.
+values for @var{fmt} are @code{UUID_FMT_BIN}, @code{UUID_FMT_STR} and
+@code{UUID_FMT_SIV}.
 @end deftypefun
 
 
-@deftypefun uuid_rc_t uuid_export (const uuid_t * @var{uuid}, uuid_fmt_t @var{fmt}, void ** @var{data_ptr}, size_t * @var{data_len})
-Exports a @uuid{} @var{uuid} into an external representation of format
-@var{fmt}.  The data is written to the buffer at @code{*@var{data_ptr}}
-which has to be room for at least @code{*@var{data_len}} bytes.
+@deftypefun uuid_rc_t uuid_export (const uuid_t * @var{id}, uuid_fmt_t @var{fmt}, void ** @var{data_ptr}, size_t * @var{data_len})
+Export a @uuid{} @var{id} into an external representation of format
+@var{fmt}.  Valid values for @var{fmt} are @code{UUID_FMT_BIN},
+@code{UUID_FMT_STR}, @code{UUID_FMT_SIV} and @code{UUID_FMT_TXT}.
 
-If @code{*@var{data_ptr}} is @code{NULL}, @var{data_len} is ignored as
-input and a new buffer is allocated and returned in
-@code{*@var{data_ptr}} (the caller has to @cfunction{free} it later on).
-If @var{data_len} is not @code{NULL}, the number of available bytes at
-@code{*@var{data_ptr}} has to be provided in @code{*@var{data_len}} and
-the number of actually written bytes is returned in
-@code{*@var{data_len}} again.
+The data is written to the buffer whose location is obtained by
+dereferencing @var{data_ptr} after a ``cast'' to the appropriate
+pointer--to--pointer type.  Hence the generic pointer argument
+@var{data_ptr} is expected to be a pointer to a ``pointer of a
+particular type'', i.e., it has to be of type @code{unsigned char **}
+for @code{UUID_FMT_BIN} and @code{char **} for @code{UUID_FMT_STR},
+@code{UUID_FMT_SIV} and @code{UUID_FMT_TXT}.
 
-The format of the external representation is specified by @var{fmt} and
-the minimum required length in @code{*@var{data_len}} depends on it.
-Valid values for @var{fmt} are @code{UUID_FMT_BIN}, @code{UUID_FMT_STR}
-and @code{UUID_FMT_TXT}.
+The buffer has to have room for at least @code{*@var{data_len}} bytes.
+If the value of the pointer after ``casting'' and dereferencing
+@var{data_ptr} is @cnull{}, @var{data_len} is ignored as input and a new
+buffer is allocated and returned in the pointer after ``casting'' and
+dereferencing @var{data_ptr} (the caller has to @cfunc{free} it later
+on).
+
+If @var{data_len} is not @cnull{}, the number of available bytes in the
+buffer has to be provided in @code{*@var{data_len}} and the number of
+actually written bytes is returned in @code{*@var{data_len}} again.
+
+Notice that, when exporting in @code{UUID_FMT_STR} and
+@code{UUID_FMT_TXT} format, the value stored in @code{*@var{data_len}}
+includes the terminating zero for the @ascii{} coded string.
+
+The minimum required buffer length depends on the external
+representation as specified by @var{fmt} and is at least
+@code{UUID_LEN_BIN} for @code{UUID_FMT_BIN}, @code{UUID_LEN_STR} for
+@code{UUID_FMT_STR} and @code{UUID_LEN_SIV} for @code{UUID_FMT_SIV}.
+For @code{UUID_FMT_TXT} a buffer of unspecified length is required and
+hence it is recommended to allow @ossp{} @uuid{} to allocate the buffer
+as necessary.
 @end deftypefun
 
 
-@deftypefun uuid_rc_t uuid_load (uuid_t * @var{uuid}, const char * @var{name})
-Loads a predefined @uuid{} value into the @uuid{} object @var{uuid}.
-The following @var{name} arguments are currently known:
+@deftypefun uuid_rc_t uuid_load (uuid_t * @var{id}, const char * @var{name})
+Load a predefined @uuid{} value into the @uuid{} object @var{id}.  The
+following @var{name} arguments are currently known (notice that the
+@meta{time_low} field of the last four @uuid{} is different in the last
+digit):
 
 @multitable {ns:X500} {6ba7b814-9dad-11d1-80b4-00c04fd430c8}
-@item @emph{name} @tab @emph{@uuid{}}
+@item Name @tab @uuid{}
 @item nil       @tab 00000000-0000-0000-0000-000000000000
 @item ns:DNS    @tab 6ba7b810-9dad-11d1-80b4-00c04fd430c8
 @item ns:URL    @tab 6ba7b811-9dad-11d1-80b4-00c04fd430c8
@@ -389,61 +473,60 @@ The following @var{name} arguments are currently known:
 @end multitable
 
 The @code{ns:XXX} are names of predefined namespace @uuid{}s for use in
-the generation of DCE 1.1 version 3 and version 5 @uuid{}s.
+the generation of @dce{} 1.1 version 3 and version 5 @uuid{}s.
 @end deftypefun
 
 
-@deftypefun uuid_rc_t uuid_make (uuid_t * @var{uuid}, unsigned int @var{mode}, ...)
-Generates a new @uuid{} in @var{uuid} according to @var{mode} and
+@deftypefun uuid_rc_t uuid_make (uuid_t * @var{id}, unsigned int @var{mode}, ...)
+Generate a new @uuid{} in @var{id} according to @var{mode} and
 optional arguments (dependent on @var{mode}).
 
-If @var{mode} contains the @code{UUID_MAKE_V1} bit, a DCE 1.1 variant
-@uuid{} of version 1 is generated.  Then optionally the bit
+If @var{mode} contains the @code{UUID_MAKE_V1} bit, a @dce{} 1.1
+variant @uuid{} of version 1 is generated.  Then optionally the bit
 @code{UUID_MAKE_MC} forces the use of random multicast @acronym{MAC}
 address instead of the real physical @acronym{MAC} address (the
 default).  The @uuid{} is generated out of the 60--bit current system
 time, a 12--bit clock sequence and the 48--bit @acronym{MAC} address.
 
 If @var{mode} contains the @code{UUID_MAKE_V3} or @code{UUID_MAKE_V5}
-bit, a DCE 1.1 variant @uuid{} of version 3 or 5 is generated and two
-additional arguments are expected: first, a namespace @uuid{} object
-(@code{uuid_t *}).  Second, a name string of arbitrary length
-(@code{const char *}).  The @uuid{} is generated out of the 128--bit
-@acronym{MD5} or 160--bit @acronym{SHA}--1 from the concatenated octet
-stream of namespace @uuid{} and name string.
+bit, a @dce{} 1.1 variant @uuid{} of version 3 or 5 is generated and two
+additional arguments are expected: a namespace @uuid{} object
+(@code{uuid_t *}) and a name string of arbitrary length (@code{const
+char *}).  The @uuid{} is generated out of the 128--bit @acronym{MD5} or
+160--bit @acronym{SHA}--1 from the concatenated octet stream of
+namespace @uuid{} and name string.
 
-If @var{mode} contains the @code{UUID_MAKE_V4} bit, a DCE 1.1 variant
-@uuid{} of version 4 is generated.  The @uuid{} is generated out of
-128--bit random data.
+If @var{mode} contains the @code{UUID_MAKE_V4} bit, a @dce{} 1.1
+variant @uuid{} of version 4 is generated.  The @uuid{} is generated out
+of 128--bit random data.
 @end deftypefun
 
 
 @deftypefun {char *} uuid_error (uuid_rc_t @var{rc})
-Returns a constant string representation corresponding to the
+Return a constant string representation corresponding to the
 return--code @var{rc} for use in displaying @ossp{} @uuid{} errors.
 @end deftypefun
 
 
 @deftypefun {unsigned long} uuid_version (void)
-Returns the hexadecimal encoded @ossp{} @uuid{} version as compiled into
+Return the hexadecimal encoded @ossp{} @uuid{} version as compiled into
 the library object files.  This allows run--time checking of the @ossp{}
 @uuid{} version.  For compile--time checking use @code{UUID_VERSION}
 instead.
 @end deftypefun
 
+@c page
+@node uuid api example
+@appendixsubsec Usage example
 
-@subsection Example
 
-
-@noindent
 The following shows an example usage of the @api{}.  Error handling is
 omitted for code simplification and has to be re--added for production
 code.
 
 @example
 /* generate a DCE 1.1 v1 UUID from system environment */
-char *
-uuid_v1 (void)
+char *uuid_v1(void)
 @{
   uuid_t *uuid;
   char *str;
@@ -451,14 +534,13 @@ uuid_v1 (void)
   uuid_create(&uuid);
   uuid_make(uuid, UUID_MAKE_V1);
   str = NULL;
-  uuid_export(uuid, UUID_FMT_STR, (void **)&str, NULL);
+  uuid_export(uuid, UUID_FMT_STR, &str, NULL);
   uuid_destroy(uuid);
   return str;
 @}
 
 /* generate a DCE 1.1 v3 UUID from an URL */
-char *
-uuid_v3 (const char *url)
+char *uuid_v3(const char *url)
 @{
   uuid_t *uuid;
   uuid_t *uuid_ns;
@@ -469,35 +551,40 @@ uuid_v3 (const char *url)
   uuid_load(uuid_ns, "ns:URL");
   uuid_make(uuid, UUID_MAKE_V3, uuid_ns, url);
   str = NULL;
-  uuid_export(uuid, UUID_FMT_STR, (void **)&str, NULL);
+  uuid_export(uuid, UUID_FMT_STR, &str, NULL);
   uuid_destroy(uuid_ns);
   uuid_destroy(uuid);
   return str;
 @}
 @end example
 
-
-@c ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node uuid also
-@section See also
+@appendixsec See also
 
 
-@noindent
 The following are references to @uuid{} documentation and
 specifications:
 
 @noindent
-@emph{A Universally Unique IDentifier (UUID) URN Namespace}, P. Leach,
-M. Mealling, R. Salz, IETF Request for Comments: RFC 4122, July 2005, 32
-pages, @url{http://www.ietf.org/rfc/rfc4122.txt}.
+@emph{A Universally Unique IDentifier (@uuid{}) @acronym{URN}
+Namespace}, P. Leach, M. Mealling, R. Salz, @ietf{} @rfc{} 4122, July
+2005, 32 pages, @url{http://www.ietf.org/rfc/rfc4122.txt}.
 
 @noindent
-@emph{DCE1.1: Remote Procedure Call}, appendix @emph{Universally Unique
-Identifier}, Open Group Technical Standard Document Number C706, August
-1997, 737 pages, (supersedes C309 DCE: Remote Procedure Call 8/1994,
-which was basis for ISO/IEC 11578:1996 specification),
+Information Technology --- Open Systems Interconnection (@osi{}),
+Procedures for the operation of @osi{} Registration Authorities:
+Generation and Registration of Universally Unique Identifiers (@uuid{}s)
+and their Use as ASN.1 Object Identifier Components, @iso{}/@iec{}
+9834-8:2004 / @acronym{ITU-T} Rec. X.667, 2004, December 2004, 25 pages,
+@url{http://www.itu.int/ITU-T/studygroups/com17/oid/X.667-E.pdf}
+
+@noindent
+@emph{@dce{} 1.1: Remote Procedure Call}, appendix
+@emph{Universally Unique Identifier}, Open Group Technical Standard
+Document Number C706, August 1997, 737 pages, (supersedes C309
+@dce{}: Remote Procedure Call 8/1994, which was basis for ISO/IEC
+11578:1996 specification),
 @url{http://www.opengroup.org/publications/catalog/c706.htm}.
 
 @noindent
@@ -519,30 +606,18 @@ Request for Comments: RFC 2518, February 1999, 94 pages,
 @url{http://www.ietf.org/rfc/rfc2518.txt}.
 
 @noindent
-@emph{DCE 1.1 compliant @uuid{} functions}, FreeBSD manual pages
+@emph{@dce{} 1.1 compliant @uuid{} functions}, FreeBSD manual pages
 @code{uuid(3)} and @code{uuidgen(2)},
 @url{http://www.freebsd.org/cgi/man.cgi?query=uuid&manpath=FreeBSD+6.0-RELEASE}
 
-
-@c ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c ------------------------------------------------------------
+@c page
 @node uuid history
-@section History
+@appendixsec History
 
 
-@noindent
 @ossp{} @uuid{} was implemented in January 2004 by Ralf S.  Engelschall
 @email{rse@@engelschall.com}.  It was prompted by the use of @uuid{}s in
 the @ossp{} @acronym{AS} and @emph{OpenPKG} projects.  It is a clean
 room implementation intended to be strictly standards compliant and
 maximum portable.
 
-
-@c ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-@c end of file
-@c Local Variables:
-@c mode: texinfo
-@c page-separator: \"^@c -+$\"
-@c End:

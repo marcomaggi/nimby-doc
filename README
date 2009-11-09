@@ -8,6 +8,7 @@ Topics
 
   1. Introduction
   2. License
+  3. Install
   A. Credits
   B. Bugs
   C. Resources
@@ -27,6 +28,26 @@ Internet.
 ----------
 
 All the files have a specific documentation license.
+
+
+3. Install
+----------
+
+Read   the   "README.build"   file   for  details   on   the
+infrastructure requirements.  Then do this:
+
+  $ mkdir "=build"
+  $ cd "=build"
+  $ ./configure
+  $ make
+  $ make install
+
+by default  Info, HTML  and PDF files  are build.   To build
+only selected targets:
+
+  $ make info
+  $ make html
+  $ make pdf
 
 
 A. Credits
