@@ -1,0 +1,1931 @@
+@c bzlib.texiinc --
+@c
+
+@ignore
+@c Macros used in the document.
+
+@macro gnu{}
+@acronym{GNU}
+@end macro
+
+@macro cfunc{NAME}
+@code{\NAME\()}
+@end macro
+
+@macro cnull{}
+@code{NULL}
+@end macro
+
+@end ignore
+
+@macro bziptwo{}
+@command{bzip2}
+@end macro
+
+@macro bunziptwo{}
+@command{bunzip2}
+@end macro
+
+@c page
+@node bzlib
+@appendix A program and library for data compression
+
+
+@bziptwo{} compresses files using the Burrows--Wheeler block--sorting text
+compression algorithm, and Huffman coding.  Compression is generally
+considerably better than that achieved by more conventional
+LZ77/LZ78--based compressors, and approaches the performance of the PPM
+family of statistical compressors.
+
+@bziptwo{} is built on top of Libbzip2, a flexible library for
+handling compressed data in the @bziptwo{} format.  This manual describes
+both how to use the program and how to work with the library interface.
+Most of the manual is devoted to this library, not the program, which is
+good news if our interest is only in the program.
+
+@quotation
+@strong{NOTE} This appendix is an unofficial Texinfo conversion of the
+original Bzip2 documentation in @acronym{XML} format; it documents
+version 1.0.5 of Bzip2.  The text is slightly reorganised to comply with
+good formatting standards for a documentation appendix; some sections
+from the original document are not included, refer to the web site.
+@end quotation
+
+@menu
+* bzlib license::               License notice.
+
+Using the program
+
+* bzlib invoking::              Invoking the program.
+* bzlib usage::                 How to use the @bziptwo{} program.
+* bzlib resources::             Memory management.
+* bzlib recovering::            Recovering data from damaged files.
+* bzlib performance::           Performance notes.
+* bzlib caveats::               Caveats.
+
+Using the library
+
+* bzlib library::               Introduction to programming the library.
+* bzlib errors::                Error handling.
+* bzlib memory::                Memory--to--memory operations.
+* bzlib file::                  File stream operations.
+* bzlib no-stdio::              Using the library in a @file{stdio.h}
+                                free environment.
+* bzlib criterr::               Critical error handling.
+@end menu
+
+@c page
+@node bzlib license
+@appendixsec License notice
+
+
+The program @bziptwo{}, the associated library Libbzip2 and all the
+documentation are copyright @copyright{} 1996--2007 Julian Seward
+@email{jseward@@bzip.org}.  All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+@itemize
+@item
+Redistributions of source code must retain the above copyright notice,
+this list of conditions and the following disclaimer.
+
+@item
+The origin of this software must not be misrepresented; we must not
+claim that we wrote the original software.  If we use this software in
+a product, an acknowledgment in the product documentation would be
+appreciated but is not required.
+
+@item
+Altered source versions must be plainly marked as such, and must not be
+misrepresented as being the original software.
+
+@item
+The name of the author may not be used to endorse or promote products
+derived from this software without specific prior written permission.
+@end itemize
+
+THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT,
+INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+
+PATENTS: To the best of my knowledge, @bziptwo{} and
+Libbzip2 do not use any patented algorithms.  However, I do not
+have the resources to carry out a patent search.  Therefore I cannot
+give any guarantee of the above statement.
+
+@c page
+@node bzlib invoking
+@appendixsec Invoking the program
+
+
+The package installs the following programs:
+
+@table @command
+@item bzip2
+@itemx bunzip2
+A block--sorting file compressor.
+
+@item bzcat
+Decompresses files to stdout.
+
+@item bzip2recover
+Recovers data from damaged @bziptwo{} files.
+@end table
+
+@noindent
+synopsis:
+
+@example
+bzip2 [-cdfkqstvzVL123456789] [filenames ...]
+bunzip2 [-fkvsVL] [filenames ...]
+bzcat [-s] [filenames ...]
+bzip2recover filename
+@end example
+
+@table @option
+@item -c
+@itemx --stdout
+Compress or decompress to standard output.
+
+@item -d
+@itemx --decompress
+Force decompression.  @bziptwo{}, @bunziptwo{} and @command{bzcat}
+are really the same program, and the decision about what actions to take
+is done on the basis of which name is used.  This flag overrides that
+mechanism, and forces @bziptwo{} to decompress.
+
+@item -z
+@itemx --compress
+The complement to @option{-d}: forces compression, regardless of the
+invokation name.
+
+@item -t
+@itemx --test
+Check integrity of the specified file(s), but don't decompress them.
+This really performs a trial decompression and throws away the result.
+
+@item -f
+@itemx --force
+Force overwrite of output files.  Normally, @bziptwo{} will not overwrite
+existing output files.  Also forces @bziptwo{} to break hard links to
+files, which it otherwise wouldn't do.  @bziptwo{} normally declines to
+decompress files which don't have the correct magic header bytes.  If
+forced (@option{-f}), however, it will pass such files through
+unmodified.  This is how @gnu{} @command{gzip} behaves.
+
+@item -k
+@itemx --keep
+Keep (don't delete) input files during compression or decompression.
+
+@item -s
+@itemx --small
+Reduce memory usage, for compression, decompression and testing.  Files
+are decompressed and tested using a modified algorithm which only
+requires 2.5 bytes per block byte.  This means any file can be
+decompressed in 2300k of memory, albeit at about half the normal speed.
+During compression, @option{-s} selects a block size of 200k, which
+limits memory use to around the same figure, at the expense of our
+compression ratio.  In short, if our machine is low on memory (8
+megabytes or less), use @option{-s} for everything.
+
+@item -q
+@itemx --quiet
+Suppress non--essential warning messages.  Messages pertaining to I/O
+errors and other critical events will not be suppressed.
+
+@item -v
+@item --verbose
+Verbose mode, show the compression ratio for each file processed.
+Further @option{-v} increase the verbosity level, spewing out lots of
+information which is primarily of interest for diagnostic purposes.
+
+@item -L
+@itemx --license
+@itemx -V
+@itemx --version
+Display the software version, license terms and conditions.
+
+@item -1
+@itemx --fast
+@itemx @dots{}
+@itemx -9
+@itemx --best
+Set the block size to 100 k, 200 k ...  900 k when compressing.  Has no
+effect when decompressing.  The @option{--fast} and @option{--best}
+aliases are primarily for @gnu{} @command{gzip} compatibility.  In
+particular, @option{--fast} doesn't make things significantly faster and
+@option{--best} merely selects the default behaviour.
+
+@item --
+Treats all subsequent arguments as file names, even if they start with a
+dash.  This is so we can handle files with names beginning with a dash,
+for example: @code{bzip2 -- -myfilename}.
+
+@item --repetitive-fast
+@itemx --repetitive-best
+These flags are redundant in versions 0.9.5 and above.  They provided
+some coarse control over the behaviour of the sorting algorithm in
+earlier versions, which was sometimes useful.  0.9.5 and above have an
+improved algorithm which renders these flags irrelevant.
+@end table
+
+@c page
+@node bzlib usage
+@appendixsec How to use the @bziptwo{} program
+
+
+The command--line options are deliberately very similar to those of
+@gnu{} @command{gzip}, but they are not identical.
+
+@bziptwo{} expects a list of file names to accompany the command--line
+flags.  Each file is replaced by a compressed version of itself, with
+the name @file{original-name.bz2}.  Each compressed file has the same
+modification date, permissions, and, when possible, ownership as the
+corresponding original, so that these properties can be correctly
+restored at decompression time.  File name handling is naive in the
+sense that there is no mechanism for preserving original file names,
+permissions, ownerships or dates in filesystems which lack these
+concepts, or have serious file name length restrictions, such as MS-DOS.
+
+@bziptwo{} and @bunziptwo{} will by default not overwrite existing
+files.  If we want this to happen, specify the @option{-f} flag.
+
+If no file names are specified, @bziptwo{} compresses from standard input
+to standard output.  In this case, @bziptwo{} will decline to write
+compressed output to a terminal, as this would be entirely
+incomprehensible and therefore pointless.
+
+@bunziptwo{} (or @code{bzip2 -d}) decompresses all specified files.
+Files which were not created by @bziptwo{} will be detected and ignored,
+and a warning issued.  @bziptwo{} attempts to guess the filename for the
+decompressed file from that of the compressed file as follows:
+
+@itemize
+@item
+@file{filename.bz2} becomes @file{filename}.
+
+@item
+@file{filename.bz} becomes @file{filename}.
+
+@item
+@file{filename.tbz2} becomes @file{filename.tar}.
+
+@item
+@file{filename.tbz} becomes @file{filename.tar}.
+
+@item
+@file{anyothername} becomes @file{anyothername.out}.
+@end itemize
+
+If the file does not end in one of the recognised endings, @code{.bz2},
+@code{.bz}, @code{.tbz2} or @code{.tbz}, @bziptwo{} complains that it
+cannot guess the name of the original file, and uses the original name
+with @code{.out} appended.
+
+As with compression, supplying no filenames causes decompression from
+standard input to standard output.
+
+@bunziptwo{} will correctly decompress a file which is the
+concatenation of two or more compressed files.  The result is the
+concatenation of the corresponding uncompressed files.  Integrity
+testing (@option{-t}) of concatenated compressed files is also
+supported.
+
+We can also compress or decompress files to the standard output by
+giving the @option{-c} flag.  Multiple files may be compressed and
+decompressed like this.  The resulting outputs are fed sequentially to
+@code{stdout}.  Compression of multiple files in this manner generates a
+stream containing multiple compressed file representations.  Such a
+stream can be decompressed correctly only by @bziptwo{} version 0.9.0 or
+later.  Earlier versions of @bziptwo{} will stop after decompressing the
+first file in the stream.
+
+@command{bzcat} (or @code{bzip2 -dc}) decompresses all specified files
+to the standard output.
+
+@bziptwo{} will read arguments from the environment variables @env{BZIP2}
+and @env{BZIP}, in that order, and will process them before any
+arguments read from the command line.  This gives a convenient way to
+supply default arguments.
+
+Compression is always performed, even if the compressed file is slightly
+larger than the original.  Files of less than about one hundred bytes
+tend to get larger, since the compression mechanism has a constant
+overhead in the region of 50 bytes.  Random data (including the output
+of most file compressors) is coded at about 8.05 bits per byte, giving
+an expansion of around 0.5%.
+
+As a self-check for our protection, @bziptwo{} uses 32-bit @acronym{CRC}s
+to make sure that the decompressed version of a file is identical to the
+original.  This guards against corruption of the compressed data, and
+against undetected bugs in @bziptwo{} (hopefully very unlikely).  The
+chances of data corruption going undetected is microscopic, about one
+chance in four billion for each file processed.  Be aware, though, that
+the check occurs upon decompression, so it can only tell we that
+something is wrong.  It can't help we recover the original uncompressed
+data.  We can use @command{bzip2recover} to try to recover data from
+damaged files.
+
+Return values: @code{0} for a normal exit, @code{1} for environmental
+problems (file not found, invalid flags, I/O errors, etc.), @code{2} to
+indicate a corrupt compressed file, @code{3} for an internal consistency
+error (eg, bug) which caused @bziptwo{} to panic.
+
+@c page
+@node bzlib resources
+@appendixsec Memory management
+
+
+@bziptwo{} compresses large files in blocks.  The block size affects both
+the compression ratio achieved, and the amount of memory needed for
+compression and decompression.  The flags @option{-1} through
+@option{-9} specify the block size to be 100,000 bytes through 900,000
+bytes (the default) respectively.  At decompression time, the block size
+used for compression is read from the header of the compressed file, and
+@bunziptwo{} then allocates itself just enough memory to decompress
+the file.  Since block sizes are stored in compressed files, it follows
+that the flags @option{-1} to @option{-9} are irrelevant to and so
+ignored during decompression.
+
+Compression and decompression requirements, in bytes, can be estimated
+as:
+
+@example
+Compression:   400k + ( 8 x block size )
+
+Decompression: 100k + ( 4 x block size ), or
+               100k + ( 2.5 x block size )
+@end example
+
+Larger block sizes give rapidly diminishing marginal returns.  Most of
+the compression comes from the first two or three hundred kilobytes of
+block size, a fact worth bearing in mind when using @bziptwo{} on small
+machines.  It is also important to appreciate that the decompression
+memory requirement is set at compression time by the choice of block
+size.
+
+For files compressed with the default 900k block size, @bunziptwo{} will
+require about 3700 kbytes to decompress.  To support decompression of
+any file on a 4 megabyte machine, @bunziptwo{} has an option to
+decompress using approximately half this amount of memory, about 2300
+kbytes.  Decompression speed is also halved, so we should use this
+option only where necessary.  The relevant flag is @option{-s}.
+
+In general, try and use the largest block size memory constraints allow,
+since that maximises the compression achieved.  Compression and
+decompression speed are virtually unaffected by block size.
+
+Another significant point applies to files which fit in a single block;
+that means most files we'd encounter using a large block size.  The
+amount of real memory touched is proportional to the size of the file,
+since the file is smaller than a block.  For example, compressing a file
+20,000 bytes long with the flag @option{-9} will cause the compressor to
+allocate around 7600k of memory, but only touch 400k + 20000 * 8 = 560
+kbytes of it.  Similarly, the decompressor will allocate 3700k but only
+touch 100k + 20000 * 4 = 180 kbytes.
+
+Here is a table which summarises the maximum memory usage for different
+block sizes.  Also recorded is the total compressed size for 14 files of
+the Calgary Text Compression Corpus totalling 3,141,622 bytes.  This
+column gives some feel for how compression varies with block size.
+These figures tend to understate the advantage of larger block sizes for
+larger files, since the Corpus is dominated by smaller files.
+
+@example
+        Compress   Decompress   Decompress   Corpus
+Flag     usage      usage       -s usage     Size
+
+ -1      1200k       500k         350k      914704
+ -2      2000k       900k         600k      877703
+ -3      2800k      1300k         850k      860338
+ -4      3600k      1700k        1100k      846899
+ -5      4400k      2100k        1350k      845160
+ -6      5200k      2500k        1600k      838626
+ -7      6100k      2900k        1850k      834096
+ -8      6800k      3300k        2100k      828642
+ -9      7600k      3700k        2350k      828642
+@end example
+
+@c page
+@node bzlib recovering
+@appendixsec Recovering data from damaged files
+
+
+@bziptwo{} compresses files in blocks, usually 900k long.  Each block is
+handled independently.  If a media or transmission error causes a
+multi--block @samp{.bz2} file to become damaged, it may be possible to
+recover data from the undamaged blocks in the file.
+
+The compressed representation of each block is delimited by a 48-bit
+pattern, which makes it possible to find the block boundaries with
+reasonable certainty.  Each block also carries its own 32-bit
+@acronym{CRC}, so damaged blocks can be distinguished from undamaged
+ones.
+
+@command{bzip2recover} is a simple program whose purpose is to search
+for blocks in @samp{.bz2} files, and write each block out into its own
+@samp{.bz2} file.  We can then use @code{bzip2 -t} to test the
+integrity of the resulting files, and decompress those which are
+undamaged.
+
+@command{bzip2recover} takes a single argument, the name of the damaged
+file, and writes a number of files @code{rec0001file.bz2},
+@code{rec0002file.bz2}, etc, containing the extracted blocks.  The
+output filenames are designed so that the use of wildcards in subsequent
+processing---for example, @code{bzip2 -dc rec*file.bz2 &#62;
+recovered_data}---lists the files in the correct order.
+
+@command{bzip2recover} should be of most use dealing with large
+@samp{.bz2} files, as these will contain many blocks.  It is clearly
+futile to use it on damaged single--block files, since a damaged block
+cannot be recovered.  If we wish to minimise any potential data loss
+through media or transmission errors, we might consider compressing
+with a smaller block size.
+
+@c page
+@node bzlib performance
+@appendixsec Performance notes
+
+
+The sorting phase of compression gathers together similar strings in the
+file.  Because of this, files containing very long runs of repeated
+symbols, like @samp{aabaabaabaab...}  (repeated several hundred times)
+may compress more slowly than normal.  Versions 0.9.5 and above fare
+much better than previous versions in this respect.  The ratio between
+worst-case and average-case compression time is in the region of 10:1.
+For previous versions, this figure was more like 100:1.  We can use the
+@option{-vvvv} option to monitor progress in great detail, if we want.
+
+Decompression speed is unaffected by these phenomena.
+
+@bziptwo{} usually allocates several megabytes of memory to operate in,
+and then charges all over it in a fairly random fashion.  This means
+that performance, both for compressing and decompressing, is largely
+determined by the speed at which our machine can service cache misses.
+Because of this, small changes to the code to reduce the miss rate have
+been observed to give disproportionately large performance improvements.
+I imagine @bziptwo{} will perform best on machines with very large caches.
+
+@c page
+@node bzlib caveats
+@appendixsec Caveats
+
+
+I/O error messages are not as helpful as they could be.  @bziptwo{} tries
+hard to detect I/O errors and exit cleanly, but the details of what the
+problem is sometimes seem rather misleading.
+
+This manual page pertains to version 1.0.5 of @bziptwo{}.  Compressed data
+created by this version is entirely forwards and backwards compatible
+with the previous public releases, versions 0.1pl2, 0.9.0 and 0.9.5,
+1.0.0, 1.0.1, 1.0.2 and 1.0.3, but with the following exception: 0.9.0
+and above can correctly decompress multiple concatenated compressed
+files.  0.1pl2 cannot do this; it will stop after decompressing just the
+first file in the stream.
+
+@command{bzip2recover} versions prior to 1.0.2 used 32-bit integers to
+represent bit positions in compressed files, so it could not handle
+compressed files more than 512 megabytes long.  Versions 1.0.2 and above
+use 64-bit ints on some platforms which support them (GNU supported
+targets, and Windows). To establish whether or not
+@command{bzip2recover} was built with such a limitation, run it without
+arguments. In any event we can build ourself an unlimited version if
+we can recompile it with @code{MaybeUInt64} set to be an unsigned
+64-bit integer.
+
+@c page
+@node bzlib library
+@appendixsec Programming the library
+
+
+Libbzip2 is a flexible library for compressing and decompressing data in
+the @bziptwo{} data format.  Although packaged as a single entity, it
+helps to regard the library as three separate parts: the low level
+interface, the high level interface and some utility functions.
+
+The structure of Libbzip2's interfaces is similar to that of Jean--Loup
+Gailly's and Mark Adler's excellent Zlib library.
+
+All externally visible symbols have names beginning with @samp{BZ2_};
+this is new in version 1.0.  The intention is to minimise pollution of
+the namespaces of library clients.
+
+To use any part of the library, we need to:
+
+@example
+#include <bzlib.h>
+@end example
+
+@noindent
+into our sources.
+
+@c ------------------------------------------------------------
+
+@subsubheading Memory--to--memory @api{}
+
+This interface provides services for compressing and decompressing data
+in memory.  There's no provision for dealing with files, streams or any
+other I/O mechanisms, just straight memory--to--memory work.  In fact,
+this part of the library can be compiled without inclusion of
+@file{stdio.h}, which may be helpful for embedded applications.
+
+The low--level part of the library has no global variables and is
+therefore thread--safe.
+
+Six routines make up the low level interface:
+
+@example
+BZ2_bzCompressInit      BZ2_bzDecompressInit
+BZ2_bzCompress          BZ2_bzDecompress
+BZ2_bzCompressEnd       BZ2_bzDecompressEnd
+@end example
+
+@noindent
+the @code{*Init} functions allocate memory for compression/decompression
+and do other initialisations, whilst the @code{*End} functions close
+down operations and release memory.
+
+The real work is done by @cfunc{BZ2_bzCompress} and
+@cfunc{BZ2_bzDecompress}; these compress and decompress data from a
+user--supplied input buffer to a user-supplied output buffer; these
+buffers can be of any size; arbitrary quantities of data are handled by
+making repeated calls to these functions.  This is a flexible mechanism
+allowing a consumer--pull style of activity, or producer--push, or a
+mixture of both.
+
+@c ------------------------------------------------------------
+
+@subsubheading File stream @api{}
+
+
+This interface provides some handy wrappers around the low--level
+interface to facilitate reading and writing @bziptwo{} format files
+(@samp{.bz2} files).  The routines provide hooks to facilitate reading
+files in which the @bziptwo{} data stream is embedded within some
+larger--scale file structure, or where there are multiple @bziptwo{} data
+streams concatenated end--to--end.
+
+For reading files, @cfunc{BZ2_bzReadOpen}, @cfunc{BZ2_bzRead},
+@cfunc{BZ2_bzReadClose} and @cfunc{BZ2_bzReadGetUnused} are supplied.
+For writing files, @cfunc{BZ2_bzWriteOpen}, @cfunc{BZ2_bzWrite} and
+@cfunc{BZ2_bzWriteFinish} are available.
+
+As with the low--level library, no global variables are used so the
+library is per se thread--safe.  However, if I/O errors occur whilst
+reading or writing the underlying compressed files, we may have to
+consult @code{errno} to determine the cause of the error.  In that case,
+we'd need a C library which correctly supports @code{errno} in a
+multithreaded environment.
+
+To make the library a little simpler and more portable,
+@cfunc{BZ2_bzReadOpen} and @cfunc{BZ2_bzWriteOpen} require we to pass
+them file handles (@code{FILE *}) which have previously been opened for
+reading or writing respectively.  This avoids portability problems
+associated with file operations and file attributes, whilst not being
+much of an imposition on the programmer.
+
+@c ------------------------------------------------------------
+
+@subsubheading Utility functions
+
+
+For very simple needs, @cfunc{BZ2_bzBuffToBuffCompress} and
+@cfunc{BZ2_bzBuffToBuffDecompress} are provided.  These compress data in
+memory from one buffer to another buffer in a single function call.  We
+should assess whether these functions fulfill our memory--to--memory
+compression/decompression requirements before investing effort in
+understanding the more general but more complex low-level interface.
+
+Yoshioka Tsuneo (@email{tsuneo@@rr.iij4u.or.jp}) has contributed some
+functions to give better Zlib compatibility:
+
+@example
+BZ2_bzopen              BZ2_bzclose
+BZ2_bzread              BZ2_bzwrite
+BZ2_bzflush             BZ2_bzerror
+BZ2_bzlibVersion
+@end example
+
+@noindent
+we may find these functions more convenient for simple file reading and
+writing, than those in the high-level interface.  These functions are
+not (yet) officially part of the library, and are minimally documented
+here.  If they break, we get to keep all the pieces.  I hope to
+document them properly when time permits.
+
+Yoshioka also contributed modifications to allow the library to be built
+as a Windows DLL.
+
+@c page
+@node bzlib errors
+@appendixsec Error handling
+
+
+The library is designed to recover cleanly in all situations, including
+the worst--case situation of decompressing random data.  I'm not 100%
+sure that it can always do this, so we might want to add a signal
+handler to catch segmentation violations during decompression if we are
+feeling especially paranoid.  I would be interested in hearing more
+about the robustness of the library to corrupted compressed data.
+
+Version 1.0.3 is more robust in this respect than any previous version.
+Investigations with Valgrind (a tool for detecting problems with memory
+management) indicate that, at least for the few files I tested, all
+single-bit errors in the decompressed data are caught properly, with no
+segmentation faults, no uses of uninitialised data, no out of range
+reads or writes, and no infinite looping in the decompressor.  So it's
+certainly pretty robust, although I wouldn't claim it to be totally
+bomb--proof.
+
+The file @file{bzlib.h} contains all definitions needed to use the
+library.  In particular, we should definitely not include
+@file{bzlib_private.h}.
+
+In @file{bzlib.h}, the various return values are defined.  The following
+list is not intended as an exhaustive description of the circumstances
+in which a given value may be returned; those descriptions are given
+later.  Rather, it is intended to convey the rough meaning of each
+return value.  The first five actions are normal and not intended to
+denote an error situation.
+
+
+@defvr Constant BZ_OK
+The requested action was completed successfully.
+@end defvr
+
+
+@defvr Constant BZ_RUN_OK
+@defvrx Constant BZ_FLUSH_OK
+@defvrx Constant BZ_FINISH_OK
+In @cfunc{BZ2_bzCompress} the requested flush/finish/nothing--special
+action was completed successfully.
+@end defvr
+
+
+@defvr Constant BZ_STREAM_END
+Compression of data was completed or the logical stream end was
+detected during decompression.
+@end defvr
+
+
+The following return values indicate an error of some kind.
+
+
+@defvr Constant BZ_CONFIG_ERROR
+Indicates that the library has been improperly compiled on our
+platform; a major configuration error.  Specifically, it means that
+@code{sizeof(char)}, @code{sizeof(short)} and @code{sizeof(int)} are not
+1, 2 and 4 respectively, as they should be.
+
+Note that the library should still work properly on 64-bit platforms
+which follow the LP64 programming model; that is, where
+@code{sizeof(long)} and @code{sizeof(void*)} are 8.  Under LP64,
+@code{sizeof(int)} is still 4, so Libbzip2, which doesn't use the
+@code{long} type, is OK.
+@end defvr
+
+
+@defvr Constant BZ_SEQUENCE_ERROR
+When using the library, it is important to call the functions in the
+correct sequence and with data structures (buffers, etc.) in the correct
+states.  Libbzip2 checks as much as it can to ensure this is happening,
+and returns @code{BZ_SEQUENCE_ERROR} if not.  Code which complies
+precisely with the function semantics, as detailed below, should never
+receive this value; such an event denotes buggy code which we should
+investigate.
+@end defvr
+
+
+@defvr Constant BZ_PARAM_ERROR
+Returned when a parameter to a function call is out of range or
+otherwise manifestly incorrect; as with @code{BZ_SEQUENCE_ERROR}, this
+denotes a bug in the client code.  The distinction between
+@code{BZ_PARAM_ERROR} and @code{BZ_SEQUENCE_ERROR} is a bit hazy, but
+still worth making.
+@end defvr
+
+
+@defvr Constant BZ_MEM_ERROR
+Returned when a request to allocate memory failed.  Note that the
+quantity of memory needed to decompress a stream cannot be determined
+until the stream's header has been read.  So @cfunc{BZ2_bzDecompress}
+and @cfunc{BZ2_bzRead} may return @code{BZ_MEM_ERROR} even though some
+of the compressed data has been read.  The same is not true for
+compression; once @cfunc{BZ2_bzCompressInit} or @cfunc{BZ2_bzWriteOpen}
+have successfully completed, @code{BZ_MEM_ERROR} cannot occur.
+@end defvr
+
+
+@defvr Constant BZ_DATA_ERROR
+Returned when a data integrity error is detected during decompression.
+Most importantly, this means when stored and computed @acronym{CRC}s for
+the data do not match.  This value is also returned upon detection of
+any other anomaly in the compressed data.
+@end defvr
+
+
+@defvr Constant BZ_DATA_ERROR_MAGIC
+As a special case of @code{BZ_DATA_ERROR}, it is sometimes useful to
+know when the compressed stream does not start with the correct magic
+bytes (@samp{B}, @samp{Z}, @samp{h}).
+@end defvr
+
+
+@defvr Constant BZ_IO_ERROR
+Returned by @cfunc{BZ2_bzRead} and @cfunc{BZ2_bzWrite} when there is an
+error reading or writing in the compressed file, and by
+@cfunc{BZ2_bzReadOpen} and @cfunc{BZ2_bzWriteOpen} for attempts to use a
+file for which the error indicator (@code{ferror(stream)}) is set.  On
+receipt of @code{BZ_IO_ERROR}, the caller should consult @code{errno}
+and/or @cfunc{perror} to acquire operating-system specific information
+about the problem.
+@end defvr
+
+
+@defvr Constant BZ_UNEXPECTED_EOF
+Returned by @cfunc{BZ2_bzRead} when the compressed file finishes before
+the logical end of stream is detected.
+@end defvr
+
+
+@defvr Constant BZ_OUTBUFF_FULL
+Returned by @cfunc{BZ2_bzBuffToBuffCompress} and
+@cfunc{BZ2_bzBuffToBuffDecompress} to indicate that the output data will
+not fit into the output buffer provided.
+@end defvr
+
+@c page
+@node bzlib memory
+@appendixsec Memory--to--memory operations
+
+
+@menu
+* bzlib memory typedef::        Data types definitions.
+* bzlib memory compress::       Compression functions.
+* bzlib memory decompress::     Decompression functions.
+* bzlib memory utils::          Utility functions.
+@end menu
+
+@c page
+@node bzlib memory typedef
+@appendixsubsec Data types definitions
+
+
+@deftp {Struct Typedef} bz_stream
+Holds data for stream compression and decompression.  The fields of
+@code{bz_stream} comprise the entirety of the user--visible data.
+
+It is defined as:
+
+@example
+typedef struct @{
+  char *                next_in;
+  unsigned int          avail_in;
+  unsigned int          total_in_lo32;
+  unsigned int          total_in_hi32;
+
+  char *                next_out;
+  unsigned int          avail_out;
+  unsigned int          total_out_lo32;
+  unsigned int          total_out_hi32;
+
+  void *                state;
+
+  void *(*bzalloc)(void *,int,int);
+  void (*bzfree)(void *,void *);
+  void *opaque;
+@} bz_stream;
+@end example
+
+The @code{state} field is a pointer to the private data structures
+required for compression.
+
+Custom memory allocators are supported, via the fields @code{bzalloc},
+@code{bzfree}, and @code{opaque}; the value @code{opaque} is used as
+first argument to all calls to @code{bzalloc} and @code{bzfree}, but is
+otherwise ignored by the library.  The call:
+
+@example
+bzalloc(opaque, n, m);
+@end example
+
+@noindent
+is expected to return a pointer @code{p} to @code{n * m} bytes of
+memory, and:
+
+@example
+bzfree(opaque, p);
+@end example
+
+@noindent
+should free that memory.  If we don't want to use a custom memory
+allocator, set @code{bzalloc}, @code{bzfree} and @code{opaque} to
+@cnull{}, and the library will then use the standard @cfunc{malloc} and
+@cfunc{free} routines.
+@end deftp
+
+@c page
+@node bzlib memory compress
+@appendixsubsec Compression functions
+
+
+@deftypefun int BZ2_bzCompressInit (bz_stream * @var{strm}, int @var{block_size_100k}, int @var{verbosity}, int @var{work_factor})
+Prepare for compression.  The @code{bz_stream} structure holds all data
+pertaining to the compression activity; it must be allocated and
+initialised prior to the call; before calling this function the fields
+@code{bzalloc}, @code{bzfree} and @code{opaque} must be filled
+appropriately.
+
+Upon return, the internal state will have been allocated and
+initialised, and @code{total_in_lo32}, @code{total_in_hi32},
+@code{total_out_lo32} and @code{total_out_hi32} will have been set to
+zero.  These four fields are used by the library to inform the caller of
+the total amount of data passed into and out of the library,
+respectively; we should not try to change them.
+
+@quotation
+As of version 1.0 of the library, 64-bit counts are maintained, even on
+32-bit platforms, using the @code{_hi32} fields to store the upper 32
+bits of the count.  So, for example, the total amount of data in is:
+
+@example
+(total_in_hi32 << 32) + total_in_lo32
+@end example
+@end quotation
+
+The meaning of the arguments is:
+
+@table @var
+@item blockSize100k
+Specifies the block size to be used for compression.  It should be a
+value between 1 and 9 inclusive, and the actual block size used is
+100000 times this figure; 9 gives the best compression but takes most
+memory.
+
+@item verbosity
+Should be set to a number between 0 and 4 inclusive.  0 is silent and
+greater numbers give increasingly verbose monitoring/debugging output.
+If the library has been compiled with @option{-DBZ_NO_STDIO}, no such
+output will appear for any verbosity setting.
+
+@item workFactor
+Controls how the compression phase behaves when presented with worst
+case, highly repetitive, input data.  If compression runs into
+difficulties caused by repetitive data, the library switches from the
+standard sorting algorithm to a fallback algorithm.  The fallback is
+slower than the standard algorithm by perhaps a factor of three, but
+always behaves reasonably, no matter how bad the input.
+
+Lower values of @var{work_factor} reduce the amount of effort the
+standard algorithm will expend before resorting to the fallback.  We
+should set this parameter carefully; too low, and many inputs will be
+handled by the fallback algorithm and so compress rather slowly, too
+high, and our average--to--worst case compression times can become very
+large.  The default value of 30 gives reasonable behaviour over a wide
+range of circumstances.
+
+Allowed values range from 0 to 250 inclusive; 0 is a special case,
+equivalent to using the default value of 30.
+
+@quotation
+@strong{NOTE} The compressed output generated is the same regardless of
+whether or not the fallback algorithm is used.
+@end quotation
+@end table
+
+Possible return values:
+
+@table @code
+@item BZ_OK
+Success.
+
+@item BZ_CONFIG_ERROR
+If the library has been mis--compiled.
+
+@item BZ_PARAM_ERROR
+If @var{strm} is @cnull{} or one of the following expressions is true:
+
+@example
+blockSize  < 1          blockSize  > 9
+verbosity  < 0          verbosity  > 4
+workFactor < 0          workFactor > 250
+@end example
+
+@item BZ_MEM_ERROR
+If not enough memory is available.
+@end table
+
+Allowed next actions: @cfunc{BZ2_bzCompress} if @code{BZ_OK} is
+returned; no specific action needed in case of error.
+@end deftypefun
+
+
+@deftypefun int BZ2_bzCompress (bz_stream * @var{strm}, int @var{action})
+Provide more input data or output buffer space for compression; the
+caller maintains input and output buffers and calls this function to
+transfer data between them.  Before each call to this function:
+
+@itemize
+@item
+The field @code{next_in} must point at the data to be compressed, and
+the field @code{avail_in} must indicate how many bytes the library can
+read; this function updates the fields @code{next_in}, @code{avail_in}
+and @code{total_in} to reflect the number of bytes it has read.
+
+@item
+The field @code{next_out} must point to a buffer in which the compressed
+data is to be placed, with the field @code{avail_out} indicating how
+much output space is available; this function updates the fields
+@code{next_out}, @code{avail_out} and @code{total_out} to reflect the
+number of output bytes.
+@end itemize
+
+We may provide and remove as little or as much data as we like on each
+call to this function; in the limit, it is acceptable to supply and
+remove data one byte at a time, although this would be terribly
+inefficient.  We should always ensure that at least one byte of output
+space is available at each call.
+
+A second purpose of this function is to request a change of mode of the
+compressed stream.
+
+Conceptually, a compressed stream can be in one of four states: IDLE,
+RUNNING, FLUSHING and FINISHING.  Before initialisation and after
+termination, a stream is regarded as IDLE.
+
+Upon initialisation (@cfunc{BZ2_bzCompressInit}), the stream is placed
+in the RUNNING state.  Subsequent calls to @cfunc{BZ2_bzCompress} should
+pass @code{BZ_RUN} as the requested action; other actions are illegal
+and will result in @code{BZ_SEQUENCE_ERROR}.
+
+At some point, the calling program will have provided all the input data
+it wants to.  It will then want to finish up; in effect, asking the
+library to process any data it might have buffered internally.  In this
+state, @cfunc{BZ2_bzCompress} will no longer attempt to read data from
+@code{next_in}, but it will want to write data to @code{next_out}.
+Because the output buffer supplied by the user can be arbitrarily small,
+the finishing--up operation cannot necessarily be done with a single
+call of @cfunc{BZ2_bzCompress}.
+
+Instead, the calling program passes @code{BZ_FINISH} as an action to
+@cfunc{BZ2_bzCompress}.  This changes the stream's state to FINISHING.
+Any remaining input (ie, @code{next_in[0 .. avail_in-1]}) is compressed
+and transferred to the output buffer.  To do this,
+@cfunc{BZ2_bzCompress} must be called repeatedly until all the output
+has been consumed.  At that point, @cfunc{BZ2_bzCompress} returns
+@code{BZ_STREAM_END}, and the stream's state is set back to IDLE.
+@cfunc{BZ2_bzCompressEnd} should then be called.
+
+Just to make sure the calling program does not cheat, the library makes
+a note of @code{avail_in} at the time of the first call to
+@cfunc{BZ2_bzCompress} which has @code{BZ_FINISH} as an action (ie, at
+the time the program has announced its intention to not supply any more
+input).  By comparing this value with that of @code{avail_in} over
+subsequent calls to @cfunc{BZ2_bzCompress}, the library can detect any
+attempts to slip in more data to compress.  Any calls for which this is
+detected will return @code{BZ_SEQUENCE_ERROR}.  This indicates a
+programming mistake which should be corrected.
+
+Instead of asking to finish, the calling program may ask
+@cfunc{BZ2_bzCompress} to take all the remaining input, compress it and
+terminate the current (Burrows-Wheeler) compression block.  This could
+be useful for error control purposes.  The mechanism is analogous to
+that for finishing: call @cfunc{BZ2_bzCompress} with an action of
+@code{BZ_FLUSH}, remove output data, and persist with the
+@code{BZ_FLUSH} action until the value @code{BZ_RUN} is returned.  As
+with finishing, @cfunc{BZ2_bzCompress} detects any attempt to provide
+more input data once the flush has begun.
+
+Once the flush is complete, the stream returns to the normal RUNNING
+state.
+
+This all sounds pretty complex, but isn't really.  Here's a table which
+shows which actions are allowable in each state, what action will be
+taken, what the next state is, and what the non--error return values
+are.  Note that we cannot explicitly ask what state the stream is in,
+but neither we need to; it can be inferred from the values returned by
+@cfunc{BZ2_bzCompress}.
+
+@table @code
+@item IDLE/any
+Illegal.  IDLE state only exists after @cfunc{BZ2_bzCompressEnd} or
+before @cfunc{BZ2_bzCompressInit}.  Return value is
+@code{BZ_SEQUENCE_ERROR}
+
+@item RUNNING/BZ_RUN
+Compress from @code{next_in} to @code{next_out} as much as possible.
+Next state is RUNNING.  Return value is @code{BZ_RUN_OK}.
+
+@item RUNNING/BZ_FLUSH
+Remember current value of @code{next_in}.  Compress from @code{next_in}
+to @code{next_out} as much as possible, but do not accept any more
+input.  Next state is FLUSHING.  Return value is @code{BZ_FLUSH_OK}.
+
+@item RUNNING/BZ_FINISH
+Remember current value of @code{next_in}.  Compress from @code{next_in}
+to @code{next_out} as much as possible, but do not accept any more
+input.  Next state is FINISHING.  Return value is @code{BZ_FINISH_OK}.
+
+@item FLUSHING/BZ_FLUSH
+Compress from @code{next_in} to @code{next_out} as much as possible, but
+do not accept any more input.  If all the existing input has been used
+up and all compressed output has been removed: next state is RUNNING,
+return value is @code{BZ_RUN_OK}; else next state is FLUSHING and return
+value is @code{BZ_FLUSH_OK}.
+
+@item FLUSHING/other
+Illegal.  Return value is @code{BZ_SEQUENCE_ERROR}.
+
+@item FINISHING/BZ_FINISH
+Compress from @code{next_in} to @code{next_out} as much as possible, but
+to not accept any more input.  If all the existing input has been used
+up and all compressed output has been removed: next state is IDLE and
+return value is @code{BZ_STREAM_END}; else next state is FINISHING and
+return value is @code{BZ_FINISH_OK}.
+
+@item FINISHING/other
+Illegal.  Return value is @code{BZ_SEQUENCE_ERROR}.
+@end table
+
+The usual sequence of calls for compressing a load of data is:
+
+@enumerate
+@item
+Get started with @cfunc{BZ2_bzCompressInit}.
+
+@item
+Shovel data in and shlurp out its compressed form using zero or more
+calls of @cfunc{BZ2_bzCompress} with action @code{BZ_RUN}.
+
+@item
+Finish up.  Repeatedly call @cfunc{BZ2_bzCompress} with action
+@code{BZ_FINISH}, copying out the compressed output, until
+@code{BZ_STREAM_END} is returned.
+
+@item
+Close up and go home.  Call @cfunc{BZ2_bzCompressEnd}.
+@end enumerate
+
+If the data we want to compress fits into our input buffer all at
+once, we can skip the calls of @code{BZ2_bzCompress(..., BZ_RUN)} and
+just do the @code{BZ2_bzCompress(..., BZ_FINISH)} calls.
+
+All required memory is allocated by @cfunc{BZ2_bzCompressInit}.  The
+compression library can accept any data at all (obviously).  So we
+shouldn't get any error return values from the @cfunc{BZ2_bzCompress}
+calls.  If we do, they will be @code{BZ_SEQUENCE_ERROR} and indicate a
+bug in our programming.
+
+Trivial other possible return values:
+
+@table @code
+@item BZ_PARAM_ERROR
+If @var{strm} is @cnull{}, or @code{strm->state} is @cnull{}.
+@end table
+@end deftypefun
+
+
+@deftypefun int BZ2_bzCompressEnd (bz_stream * @var{strm})
+Releases all memory associated with a compression stream; notice that
+this call does @strong{not} reset the fields referencing input and
+output buffers.  Possible return values:
+
+@table @code
+@item BZ_PARAM_ERROR
+If @var{strm} is @cnull{} or @code{strm->state} is @cnull{}.
+
+@item BZ_OK
+Otherwise.
+@end table
+@end deftypefun
+
+@c page
+@node bzlib memory decompress
+@appendixsubsec Decompression functions
+
+
+@deftypefun int BZ2_bzDecompressInit (bz_stream * @var{strm}, int @var{verbosity}, int @var{small})
+Prepare for decompression.  @var{strm} must reference an already
+allocated and initialised stream structure; the fields @code{bzalloc},
+@code{bzfree} and @code{opaque} must be set, if a custom memory
+allocator is required, or made @cnull{} for the normal @cfunc{malloc}
+and @cfunc{free} routines.  Upon return, the internal state will have
+been initialised, and the fields @code{total_in} and @code{total_out}
+will be zero.
+
+For the meaning of parameter @var{verbosity}, see
+@cfunc{BZ2_bzCompressInit}.
+
+If @var{small} is non--zero, the library will use an alternative
+decompression algorithm which uses less memory but at the cost of
+decompressing more slowly (roughly speaking, half the speed, but the
+maximum memory requirement drops to around 2300k).
+
+Note that the amount of memory needed to decompress a stream cannot be
+determined until the stream's header has been read, so even if this
+function succeeds, a subsequent @cfunc{BZ2_bzDecompress} could fail with
+@code{BZ_MEM_ERROR}.
+
+Possible return values:
+
+@table @code
+@item BZ_OK
+Success.
+
+@item BZ_CONFIG_ERROR
+If the library has been mis--compiled.
+
+@item BZ_PARAM_ERROR
+If one of the following expressions is true:
+
+@example
+(small != 0 && small != 1)
+(verbosity < 0 || verbosity > 4)
+@end example
+
+@item BZ_MEM_ERROR
+If insufficient memory is available.
+@end table
+
+Allowed next actions: @cfunc{BZ2_bzDecompress} if @code{BZ_OK} was
+returned; no specific action required in case of error
+@end deftypefun
+
+
+@deftypefun int BZ2_bzDecompress (bz_stream * @var{strm})
+Provide more input data or output buffer space for decompression; the
+caller maintains input and output buffers and uses this function to
+transfer data between them.  Before each call to this function:
+
+@itemize
+@item
+The field @code{next_in} must point at the compressed data and the field
+@code{avail_in} must indicate how many bytes the library can read; this
+function updates the fields @code{next_in}, @code{avail_in} and
+@code{total_in} to reflect the number of bytes it has read.
+
+@item
+The field @code{next_out} must point to a buffer in which the
+uncompressed output is to be placed, with the field @code{avail_out}
+indicating how much output space is available; this function updates the
+fields @code{next_out}, @code{avail_out} and @code{total_out} to reflect
+the number of bytes output.
+@end itemize
+
+We may provide and remove as little or as much data as we like on each
+call of this function; in the limit, it is acceptable to supply and
+remove data one byte at a time, although this would be terribly
+inefficient; we must always ensure that at least one byte of output
+space is available at each call.
+
+We should provide input and remove output as described above and
+repeatedly call this function until @code{BZ_STREAM_END} is returned:
+appearance of @code{BZ_STREAM_END} denotes that this funcion has
+detected the logical end of the compressed stream.  This function will
+not produce @code{BZ_STREAM_END} until all output data has been placed
+into the output buffer, so once @code{BZ_STREAM_END} appears, we are
+guaranteed to have available all the decompressed output, and
+@cfunc{BZ2_bzDecompressEnd} can safely be called.
+
+In case of an error return value, we should call
+@cfunc{BZ2_bzDecompressEnd} to clean up and release memory.
+
+Possible return values:
+
+@table @code
+@item BZ_OK
+Success.
+
+@item BZ_STREAM_END
+If the logical end of the data stream was detected and all output in has
+been consumed, e.g. @code{strm->avail_out > 0}.
+
+@item BZ_PARAM_ERROR
+If @var{strm} is @cnull{} or @code{strm->state} is @cnull{} or
+@code{strm->avail_out < 1}.
+
+@item BZ_DATA_ERROR
+If a data integrity error is detected in the compressed stream.
+
+@item BZ_DATA_ERROR_MAGIC
+If the compressed stream doesn't begin with the right magic bytes.
+
+@item BZ_MEM_ERROR
+If there wasn't enough memory available.
+@end table
+
+Allowed next actions: @cfunc{BZ2_bzDecompress} if @code{BZ_OK} was
+returned; @cfunc{BZ2_bzDecompressEnd} otherwise.
+@end deftypefun
+
+
+@deftypefun int BZ2_bzDecompressEnd (bz_stream* @var{strm})
+Releases all memory associated with a decompression stream; notice that
+this call does @strong{not} reset the fields of @var{strm} referencing
+input and output buffers.  Possible return values:
+
+@table @code
+@item BZ_OK
+Success.
+
+@item BZ_PARAM_ERROR
+If @var{strm} is @cnull{} or @code{strm->state} is @cnull{}.
+@end table
+@end deftypefun
+
+@c page
+@node bzlib memory utils
+@appendixsubsec Utility functions
+
+
+@deftypefun int BZ2_bzBuffToBuffCompress (char * @var{dest}, unsigned int * @var{dest_len}, char * @var{source}, unsigned int @var{source_len}, int @var{block_size_100k}, int @var{verbosity}, int @var{work_factor})
+Attempt to compress @var{source_len} bytes from the block referenced by
+@var{source} into the buffer referenced by @var{dest}.  @var{dest_len}
+must reference a variable holding the number of bytes available in the
+output buffer; if the destination buffer is big enough, this variable is
+set to the size of the compressed data and @code{BZ_OK} is returned; if
+the compressed data does not fit, the variable is unchanged and
+@code{BZ_OUTBUFF_FULL} is returned.
+
+Compression in this manner is a one--shot event, done with a single call
+to this function; the resulting compressed data is a complete @bziptwo{}
+format data stream; there is no mechanism for making additional calls to
+provide extra input data.
+
+For the meaning of the parameters @var{block_size_100k}, @var{verbosity}
+and @var{work_factor}, see @cfunc{BZ2_bzCompressInit}.
+
+To guarantee that the compressed data will fit in its buffer, we must
+allocate an output buffer of size 1% larger than the uncompressed data,
+plus six hundred extra bytes.
+
+Possible return values:
+
+@table @code
+@item BZ_OK
+Success.
+
+@item BZ_OUTBUFF_FULL
+If the size of the compressed data exceeds the size of the output
+buffer.
+
+@item BZ_CONFIG_ERROR
+If the library has been mis--compiled.
+
+@item BZ_PARAM_ERROR
+If @var{dest} is @cnull{} or @var{dest_len} is @cnull{NULL} or one of
+the following expressions is true:
+
+@example
+(blockSize100k < 1 ||   9 < blockSize100k)
+(verbosity     < 0 ||   4 < verbosity)
+(workFactor    < 0 || 250 < workFactor)
+@end example
+
+@item BZ_MEM_ERROR
+If insufficient memory is available.
+@end table
+@end deftypefun
+
+
+@deftypefun int BZ2_bzBuffToBuffDecompress (char * @var{dest}, unsigned int * @var{dest_len}, char * @var{source}, unsigned int  @var{source_len}, int @var{small}, int @var{verbosity})
+Attempt to decompress @var{source_len} bytes from the block referenced
+by @var{source} into the buffer referenced by @var{dest}.
+@var{dest_len} must reference a variable holding the number of bytes
+available in the output buffer; if the destination buffer is big enough,
+this variable is set to the size of the compressed data and @code{BZ_OK}
+is returned; if the compressed data does not fit, the variable is
+unchanged and @code{BZ_OUTBUFF_FULL} is returned.
+
+@var{source} is assumed to hold a complete @bziptwo{} format data
+stream; this function tries to decompress the entirety of the stream
+into the output buffer.
+
+For the meaning of parameters @var{small} and @var{verbosity}, see
+@cfunc{BZ2_bzDecompressInit}.
+
+Because the compression ratio of the compressed data cannot be known in
+advance, there is no easy way to guarantee that the output buffer will
+be big enough; we may of course make arrangements in our code to record
+the size of the uncompressed data, but such a mechanism is beyond the
+scope of this library.
+
+Possible return values:
+
+@table @code
+@item BZ_OK
+Success.
+
+@item BZ_OUTBUFF_FULL
+If the size of the compressed data exceeds the size of the output buffer.
+
+@item BZ_CONFIG_ERROR
+If the library has been mis--compiled.
+
+@item BZ_PARAM_ERROR
+If @var{dest} is @cnull{} or @var{dest_len} is @cnull{} or @code{small !=
+0 && small != 1} or @code{verbosity < 0} or @code{verbosity > 4}.
+
+@item BZ_MEM_ERROR
+If insufficient memory is available.
+
+@item BZ_DATA_ERROR
+If a data integrity error was detected in the compressed data.
+
+@item BZ_DATA_ERROR_MAGIC
+If the compressed data doesn't begin with the right magic bytes.
+
+@item BZ_UNEXPECTED_EOF
+If the compressed data ends unexpectedly.
+@end table
+@end deftypefun
+
+@c page
+@node bzlib file
+@appendixsec File stream operations
+
+
+This interface provides functions for reading and writing @bziptwo{}
+format files.
+
+@menu
+* bzlib file intro::            Introduction.
+* bzlib file types::            Type definitions.
+* bzlib file write::            Writing compressed files.
+* bzlib file read::             Reading compressed files.
+* bzlib file examples::         Standard file reading/writing code.
+* bzlib file compat::           Zlib compatibility functions.
+@end menu
+
+@c page
+@node bzlib file intro
+@appendixsubsec Introduction
+
+
+All of the functions take an @code{int} pointer as first argument,
+@var{bzerror}; after each call, @var{bzerror} must be consulted first to
+determine the outcome of the call:
+
+@itemize -
+@item
+If it is @code{BZ_OK}: the call completed successfully and only then
+should the return value of the function (if any) be consulted.
+
+@item
+If it is @code{BZ_IO_ERROR}: there was an error reading/writing the
+underlying compressed file; we should then consult @code{errno} and
+@cfunc{perror} to determine the cause of the difficulty.
+@end itemize
+
+@var{bzerror} can also be set to various other values; precise details
+are documented on a per--function basis.  If @var{bzerror} indicates an
+error (ie, anything except @code{BZ_OK} and @code{BZ_STREAM_END}), we
+must immediately call the appropriate close function to release all the
+resources associated with the stream: once an error has been indicated,
+the behaviour of all calls except the close functions is undefined.
+
+The @code{FILE *} arguments passed to the open functions must be set to
+binary mode; most Unix systems will do this by default, but other
+platforms, including Windows and Mac, will not.  If we omit this, we may
+encounter problems when moving code to new platforms.
+
+Memory allocation requests are handled by @cfunc{malloc} and
+@cfunc{free}; at present there is no facility for user--defined memory
+allocators in the file I/O functions.
+
+@c page
+@node bzlib file types
+@appendixsubsec Type definitions
+
+
+@deftp {Opaque Pointer} {BZFILE *}
+References a data structure representing a @samp{.bz2} file.
+@end deftp
+
+@c page
+@node bzlib file write
+@appendixsubsec Writing compressed files
+
+
+@deftypefun {BZFILE *} BZ2_bzWriteOpen (int * @var{bzerror}, FILE * @var{stream}, int @var{block_size_100k}, int @var{verbosity}, int @var{work_factor})
+Prepare to write compressed data to file handle @var{stream}, which must
+refer to a file opened for writing and for which the error indicator
+(@code{ferror(stream)}) is not set.
+
+For the meaning of parameters @var{block_size_100k}, @var{verbosity} and
+@var{work_factor}, see @cfunc{BZ2_bzCompressInit}.
+
+All required memory is allocated at this stage, so if the call completes
+successfully, @code{BZ_MEM_ERROR} cannot be signalled by a subsequent
+call to @cfunc{BZ2_bzWrite}.
+
+Possible assignments to @var{bzerror}:
+
+@table @code
+@item BZ_OK
+Success.
+
+@item BZ_CONFIG_ERROR
+If the library has been mis--compiled.
+
+@item BZ_PARAM_ERROR
+If @var{stream} is @cnull{} or one of the following expressions is true:
+
+@example
+(blockSize100k < 1 || 9 < blockSize100k)
+@end example
+
+@item BZ_IO_ERROR
+If @code{ferror(stream)} is non--zero.
+
+@item BZ_MEM_ERROR
+If insufficient memory is available.
+@end table
+
+Possible return values: pointer to an abstract @code{BZFILE} if
+@var{bzerror} is @code{BZ_OK}; @cnull{} otherwise.
+
+Allowed next actions: @cfunc{BZ2_bzWrite} if @var{bzerror} is
+@code{BZ_OK} (we could go directly to @cfunc{BZ2_bzWriteClose}, but
+this would be pretty pointless); @cfunc{BZ2_bzWriteClose} otherwise.
+@end deftypefun
+
+
+@deftypefun void BZ2_bzWrite (int * @var{bzerror}, BZFILE * @var{b}, void * @var{buf}, int @var{len})
+Absorb @var{len} bytes from the buffer @var{buf}, eventually to be
+compressed and written to the file.  Possible assignments to
+@var{bzerror}:
+
+@table @code
+@item BZ_OK
+Success.
+
+@item BZ_PARAM_ERROR
+If @var{b} is @cnull{} or @var{buf} is @cnull{} or @code{len < 0}.
+
+@item BZ_SEQUENCE_ERROR
+If @var{b} was opened with @cfunc{BZ2_bzReadOpen}.
+
+@item BZ_IO_ERROR
+If there is an error writing the compressed file.
+@end table
+@end deftypefun
+
+
+@deftypefun void BZ2_bzWriteClose (int * @var{bzerror}, BZFILE * @var{b}, int @var{abandon}, unsigned int * @var{nbytes_in}, unsigned int * @var{nbytes_out})
+@deftypefunx void BZ2_bzWriteClose64 (int * @var{bzerror}, BZFILE * @var{b}, int @var{abandon}, unsigned int * @var{nbytes_in_lo32}, unsigned int * @var{nbytes_in_hi32}, unsigned int * @var{nbytes_out_lo32}, unsigned int * @var{nbytes_out_hi32})
+Compresse and flushes to the compressed file all data so far supplied by
+@cfunc{BZ2_bzWrite}.  The logical @acronym{EOF} markers are also
+written, so subsequent calls to @cfunc{BZ2_bzWrite} are illegal.  All
+memory associated with the compressed file @var{b} is released.
+@cfunc{fflush} is called on the compressed file, but it is not
+@cfunc{fclose}'d.
+
+If @cfunc{BZ2_bzWriteClose} is called to clean up after an error, the
+only action is to release the memory.  The library records the error
+codes issued by previous calls, so this situation will be detected
+automatically.  There is no attempt to complete the compression
+operation, nor to @cfunc{fflush} the compressed file.  We can force
+this behaviour to happen even in the case of no error, by passing a
+non--zero value to @var{abandon}.
+
+If @var{nbytes_in} is non--@cnull{}, it must reference a variable which
+will be set to be the total volume of uncompressed data handled; if
+@var{nbytes_out} is non--@cnull{}, it must reference a variable which
+will be set to the total volume of compressed data written.
+
+For compatibility with older versions of the library:
+@cfunc{BZ2_bzWriteClose} only yields the lower 32 bits of these counts;
+we must use @cfunc{BZ2_bzWriteClose64} if we want the full 64 bit
+counts; these two functions are otherwise absolutely identical.
+
+Possible assignments to @var{bzerror}:
+
+@table @code
+@item BZ_OK
+Success.
+
+@item BZ_SEQUENCE_ERROR
+If @var{b} was opened with @cfunc{BZ2_bzReadOpen}.
+
+@item BZ_IO_ERROR
+If there is an error writing the compressed file.
+@end table
+@end deftypefun
+
+
+
+@c page
+@node bzlib file read
+@appendixsubsec Reading compressed files
+
+
+@deftypefun {BZFILE *} BZ2_bzReadOpen (int * @var{bzerror}, FILE * @var{stream}, int @var{verbosity}, int @var{small}, void * @var{unused}, int @var{unused_number})
+Prepare to read compressed data from the file handle @var{stream}, which
+should refer to a file which has been opened for reading, and for which
+the error indicator (@code{ferror(stream)}) is not set.
+
+@var{verbosity} should be set to a number between 0 and 4 inclusive; 0
+is silent and greater numbers give increasingly verbose
+monitoring/debugging output.  If the library has been compiled with
+@option{-DBZ_NO_STDIO}, no such output will appear for any verbosity
+setting.
+
+If @var{small} is 1, the library will use an alternative decompression
+algorithm which uses less memory but at the cost of decompressing more
+slowly (roughly speaking, half the speed, but the maximum memory
+requirement drops to around 2300k); if @var{small} is 0, the library
+will use the default algorithm.
+
+For reasons explained below, @cfunc{BZ2_bzRead} will decompress
+@var{unused_number} bytes starting at @var{unused}, before starting to
+read from the file @var{stream}; at most @code{BZ_MAX_UNUSED} bytes may
+be supplied like this.  If this facility is not required, we should
+pass @cnull{} and @samp{0} for @var{unused} and @var{unused_number}
+respectively.
+
+The amount of memory needed to decompress a file cannot be determined
+until the file's header has been read.  So it is possible that this
+function returns @code{BZ_OK} but a subsequent call of
+@cfunc{BZ2_bzRead} will return @code{BZ_MEM_ERROR}.
+
+Possible assignments to @var{bzerror}:
+
+@table @code
+@item BZ_OK
+Success.
+
+@item BZ_CONFIG_ERROR
+If the library has been mis--compiled.
+
+@item BZ_PARAM_ERROR
+If @var{stream} is @cnull{} or one of the following expressions is true:
+
+@example
+(1 != small && 0 != small)
+(unused == NULL && unused_number != 0)
+(unused != NULL && !(0 <= unused_number <= BZ_MAX_UNUSED))
+@end example
+
+@item BZ_IO_ERROR
+If @code{ferror(stream)} is non--zero.
+
+@item BZ_MEM_ERROR
+If insufficient memory is available.
+@end table
+
+Possible return values: pointer to an abstract @code{BZFILE} if
+@var{bzerror} is @code{BZ_OK}, @cnull{} otherwise.
+
+Allowed next actions: @cfunc{BZ2_bzRead} if @var{bzerror} is
+@code{BZ_OK}; @cfunc{BZ2_bzClose} otherwise.
+@end deftypefun
+
+
+@deftypefun int BZ2_bzRead (int * @var{bzerror}, BZFILE * @var{b}, void * @var{buf}, int @var{len})
+Read up to @var{len} (uncompressed) bytes from the compressed file
+@var{b} into the buffer @var{buf}.  If reading was successful,
+@var{bzerror} is set to @code{BZ_OK} and the number of bytes read is
+returned; if the logical end--of--stream (@acronym{EOF}) was detected,
+@var{bzerror} will be set to @code{BZ_STREAM_END}, and the number of
+bytes read is returned; all other @var{bzerror} values denote an error.
+
+This function will supply @var{len} bytes, unless the logical
+@acronym{EOF} is detected or an error occurs; because of this, it is
+possible to detect the @acronym{EOF} by observing when the number of
+bytes returned is less than the number requested; nevertheless, this is
+not advisable; we should instead check @var{bzerror} after every call
+and to detect @code{BZ_STREAM_END}.
+
+Internally, this function copies data from the compressed file in chunks
+of size @code{BZ_MAX_UNUSED} bytes before decompressing it; if the file
+contains more bytes than strictly needed to reach the logical
+@acronym{EOF}, this function will almost certainly read some of the
+trailing data before signalling @code{BZ_SEQUENCE_END}.  To collect the
+read but unused data once @code{BZ_SEQUENCE_END} has appeared, call
+@cfunc{BZ2_bzReadGetUnused} immediately before @cfunc{BZ2_bzReadClose}.
+
+Possible assignments to @var{bzerror}:
+
+@table @code
+@item BZ_OK
+Success.
+
+@item BZ_STREAM_END
+If the logical @acronym{eof} was detected.
+
+@item BZ_PARAM_ERROR
+If @var{b} is @cnull{} or @var{buf} is @cnull{} or @code{len < 0}.
+
+@item BZ_SEQUENCE_ERROR
+If @var{b} was opened with @cfunc{BZ2_bzWriteOpen}.
+
+@item BZ_IO_ERROR
+If there is an error reading from the compressed file.
+
+@item BZ_UNEXPECTED_EOF
+If the compressed file ended before the logical @acronym{EOF} was
+detected.
+
+@item BZ_DATA_ERROR
+If a data integrity error was detected in the compressed stream.
+
+@item BZ_DATA_ERROR_MAGIC
+If the stream does not begin with the requisite header bytes (i.e., it
+is not a @bziptwo{} data file); this is really a special case of
+@code{BZ_DATA_ERROR}.
+
+@item BZ_MEM_ERROR
+If insufficient memory was available.
+@end table
+
+Return values: number of bytes read, if @var{bzerror} is @code{BZ_OK} or
+@code{BZ_STREAM_END}; undefined otherwise.
+
+Allowed next actions:
+
+@itemize
+@item
+If @var{bzerror} is @code{BZ_OK}: collect data from @var{buf}, then
+@cfunc{BZ2_bzRead} or @cfunc{BZ2_bzReadClose}.
+
+@item
+If @var{bzerror} is @code{BZ_SEQUENCE_END}: collect data from @var{buf},
+then @cfunc{BZ2_bzReadClose} or @cfunc{BZ2_bzReadGetUnused}.
+
+@item
+Otherwise @cfunc{BZ2_bzReadClose}.
+@end itemize
+@end deftypefun
+
+
+@deftypefun void BZ2_bzReadGetUnused (int * @var{bzerror}, BZFILE * @var{b}, void ** @var{unused}, int * @var{unused_number})
+Return data which was read from the compressed file but was not needed
+to get to the logical @acronym{EOF}; @code{*unused} is set to the
+address of the data, and @code{*unused_number} to the number of bytes;
+@code{*unused_number} will be set to a value between @code{0} and
+@code{BZ_MAX_UNUSED} inclusive.
+
+This function may only be called once @cfunc{BZ2_bzRead} has signalled
+@code{BZ_STREAM_END} but before @cfunc{BZ2_bzReadClose}.
+
+Possible assignments to @var{bzerror}:
+
+@table @code
+@item BZ_OK
+Success.
+
+@item BZ_PARAM_ERROR
+If @var{b} is @cnull{} or unused is @cnull{} or @var{unused_number} is
+@cnull{}.
+
+@item BZ_SEQUENCE_ERROR
+If @code{BZ_STREAM_END} has not been signalled or if @var{b} was opened
+with @cfunc{BZ2_bzWriteOpen}.
+@end table
+
+Allowed next actions: @cfunc{BZ2_bzReadClose}.
+@end deftypefun
+
+
+@deftypefun void BZ2_bzReadClose (int * @var{bzerror}, BZFILE * @var{b})
+Release all memory pertaining to the compressed file @var{b}.
+@cfunc{BZ2_bzReadClose} does not call @cfunc{fclose} on the underlying
+file handle, so we must do that ourself if appropriate.  This function
+must be called to clean up after all error situations.
+
+Possible assignments to @var{bzerror}:
+
+@table @code
+@item BZ_OK
+Success.
+
+@item BZ_SEQUENCE_ERROR
+If @var{b} was opened with @cfunc{BZ2_bzOpenWrite}.
+@end table
+@end deftypefun
+
+@c page
+@node bzlib file examples
+@appendixsubsec Standard file reading/writing code
+
+
+Here's how we'd write data to a compressed file:
+
+@example
+FILE *          stream;
+BZFILE *        b;
+int             nBuf;
+char            buf[ /* whatever size we like */ ];
+int             bzerror;
+int             nWritten;
+
+stream = fopen ("myfile.bz2", "w");
+if (NULL == stream)
+  @{
+    /* handle error */
+  @}
+
+b = BZ2_bzWriteOpen (&bzerror, stream, 9);
+if (BZ_OK != bzerror)
+  @{
+    BZ2_bzWriteClose (b);
+    /* handle error */
+  @}
+
+while ( /* condition */ )
+  @{
+    /* get data to write into buf, and set nBuf appropriately */
+    nWritten = BZ2_bzWrite (&bzerror, b, buf, nBuf);
+    if (BZ_IO_ERROR == bzerror)
+      @{
+        BZ2_bzWriteClose (&bzerror, b);
+        /* handle error */
+      @}
+  @}
+
+BZ2_bzWriteClose(&bzerror, b);
+if (BZ_IO_ERROR == bzerror)
+  @{
+    /* handle error */
+  @}
+@end example
+
+And to read from a compressed file:
+
+@example
+FILE *          stream;
+BZFILE *        b;
+int             nBuf;
+char            buf[ /* whatever size we like */ ];
+int             bzerror;
+int             nWritten;
+
+stream = fopen ("myfile.bz2", "r");
+if (NULL == stream)
+  @{
+    /* handle error */
+  @}
+
+b = BZ2_bzReadOpen (&bzerror, stream, 0, NULL, 0);
+if (BZ_OK != bzerror)
+  @{
+    BZ2_bzReadClose (&bzerror, b);
+    /* handle error */
+  @}
+
+bzerror = BZ_OK;
+while (BZ_OK == bzerror &&
+       /* arbitrary other conditions */)
+  @{
+    nBuf = BZ2_bzRead (&bzerror, b, buf, /* size of buf */ );
+    if ( bzerror == BZ_OK )
+      @{
+        /* do something with buf[0 .. nBuf-1] */
+      @}
+    @}
+
+if (BZ_STREAM_END != bzerror)
+  @{
+    BZ2_bzReadClose (&bzerror, b);
+    /* handle error */
+  @}
+else
+  @{
+    BZ2_bzReadClose (&bzerror, b);
+  @}
+@end example
+
+@c page
+@node bzlib file compat
+@appendixsubsec Zlib compatibility functions
+
+
+Yoshioka Tsuneo has contributed some functions to give better Zlib
+compatibility.
+
+
+@deftypefun {BZFILE *} BZ2_bzopen (const char * @var{path}, const char * @var{mode})
+@deftypefunx {BZFILE *} BZ2_bzdopen (int @var{fd}, const char * @var{mode})
+Open a @code{.bz2} file for reading or writing, using either its name or
+a pre--existing file descriptor; analogous to @cfunc{fopen} and
+@cfunc{fdopen}.
+@end deftypefun
+
+
+@deftypefun int BZ2_bzread (BZFILE * @var{b}, void * @var{buf}, int @var{len})
+@deftypefunx int BZ2_bzwrite (BZFILE * @var{b}, void * @var{buf}, int @var{len})
+Read or write data from/to a previously opened @code{BZFILE}; analogous
+to @cfunc{fread} and @cfunc{fwrite}.
+@end deftypefun
+
+
+@deftypefun int BZ2_bzflush (BZFILE * @var{b})
+@deftypefunx void BZ2_bzclose (BZFILE * @var{b})
+Flush or close a @code{BZFILE}; analogous to @cfunc{fflush} and
+@cfunc{fclose}.  @cfunc{BZ2_bzflush} actually does nothing.
+@end deftypefun
+
+
+@deftypefun {const char *} BZ2_bzerror (BZFILE * @var{b}, int * @var{errnum})
+Return a string describing the most recent error status of @var{b} and
+also sets the variable referenced by @var{errnum} to its numerical
+value.
+@end deftypefun
+
+
+@deftypefun {const char *} BZ2_bzlibVersion (void)
+Return a pointer to a statically--allocated, @acronym{ASCII}--coded,
+zero--terminated representing the library version.  Example:
+
+@example
+1.0.5, 10-Dec-1007
+@end example
+@end deftypefun
+
+@c page
+@node bzlib no-stdio
+@appendixsec Using the library in a @file{stdio.h} free environment
+
+
+In a deeply embedded application, we might want to use just the
+memory--to--memory functions; we can do this conveniently by compiling
+the library with the preprocessor symbol @code{BZ_NO_STDIO} defined.
+Doing this gives we a library containing only the following eight
+functions:
+
+@example
+BZ2_bzCompressInit   BZ2_bzCompress   BZ2_bzCompressEnd
+BZ2_bzDecompressInit BZ2_bzDecompress BZ2_bzDecompressEnd
+BZ2_bzBuffToBuffCompress BZ2_bzBuffToBuffDecompress
+@end example
+
+@noindent
+when compiled like this, all functions will ignore @var{verbosity}
+settings.
+
+@c page
+@node bzlib criterr
+@appendixsec Critical error handling
+
+
+Libbzip2 contains a number of internal assertion checks which should,
+needless to say, never be activated.  Nevertheless, if an assertion
+should fail, behaviour depends on whether or not the library was
+compiled with @code{BZ_NO_STDIO} set.
+
+For a normal compilation, an assertion failure yields the message:
+
+@quotation
+bzip2/libbzip2: internal error number N.
+
+This is a bug in bzip2/libbzip2, 1.0.5 of 10 December 2007. Please
+report it to me at: @email{jseward@@bzip.org}. If this happened when we
+were using some program which uses libbzip2 as a component, we should
+also report this bug to the author(s) of that program.  Please make an
+effort to report this bug; timely and accurate bug reports eventually
+lead to higher quality software.
+
+Thanks.  Julian Seward, 10 December 2007.
+@end quotation
+
+@noindent
+where @code{N} is some error code number.  If @code{N == 1007}, it also
+prints some extra text advising the reader that unreliable memory is
+often associated with internal error 1007.  (This is a frequently
+observed phenomenon with versions 1.0.0/1.0.1).
+
+@code{exit(3)} is then called.
+
+For a @file{stdio.h}--free library, assertion failures result in a call
+to a function declared as:
+
+@example
+extern void bz_internal_error (int errcode);
+@end example
+
+@noindent
+the relevant code is passed as a parameter; we should supply such a
+function.
+
+In either cases, once an assertion failure has occurred, any
+@code{bz_stream} records involved can be regarded as invalid; we should
+not attempt to resume normal operation with them.
+
+We may, of course, change critical error handling to suit our needs;
+critical errors indicate bugs in the library and should not occur; all
+``normal'' error situations are indicated via error return codes from
+functions and can be recovered from.
+
+@c end of file
