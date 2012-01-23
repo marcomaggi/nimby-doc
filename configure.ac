@@ -1,8 +1,8 @@
 dnl @configure_input@
 dnl
 
-AC_INIT([nimby-doc],[1.0],[marco.maggi-ipsu@poste.it])
-DS_BEGIN([./src/gc.texi])
+AC_INIT([nimby-doc],[1.0.1],[marco.maggi-ipsu@poste.it])
+DS_BEGIN([./src/boehm-gc.texi])
 DS_EXCLUDE_SECTION([DOC_RULES])
 DS_EXCLUDE_SECTION([DEV_RULES])
 DS_EXCLUDE_SECTION([METASCRIPTS])

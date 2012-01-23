@@ -1741,7 +1741,7 @@ True if the internal buffer holds the final chunk of the document.
 
 
 @deftypefun void XML_GetParsingStatus (XML_Parser @var{p}, XML_ParsingStatus * @var{status})
-Fill the structure reference by @var{status} with the status of the
+Fill the structure referenced by @var{status} with the status of the
 parser with respect to being initialized, parsing, finished, or
 suspended, and whether the final buffer is being processed.
 
@@ -2510,8 +2510,8 @@ position reported is the byte position (in the original document or
 entity encoding) of the first of the sequence of characters that
 generated the current event (or the error that caused the parse
 functions to return @code{XML_STATUS_ERROR}).  The exceptions are
-callbacks trigged by declarations in the document prologue, in which
-case they exact position reported is somewhere in the relevant markup,
+callbacks triggered by declarations in the document prologue, in which
+case the exact position reported is somewhere in the relevant markup,
 but not necessarily as meaningful as for other events.
 
 The position reporting functions are accurate only outside of the
@@ -2559,9 +2559,10 @@ tags from empty elements using separate start and end tags).
 
 
 @deftypefun {const char *} XML_GetInputContext (XML_Parser @var{p}, int * @var{offset}, int * @var{size})
-Return the parser's input buffer, sets the integer pointed at by offset
-to the offset within this buffer of the current parse position, and set
-the integer pointed at by size to the size of the returned buffer.
+Return the parser's input buffer, sets the integer pointed at by
+@var{offset} to the offset within this buffer of the current parse
+position, and set the integer pointed at by @var{size} to the size of
+the returned buffer.
 
 This should only be called from within a handler during an active parse
 and the returned buffer should only be referred to from within the
