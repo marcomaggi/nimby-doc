@@ -1529,13 +1529,13 @@ with user data.
 To state the obvious: the three parsing functions @cfunc{XML_Parse},
 @cfunc{XML_ParseBuffer} and @cfunc{XML_GetBuffer} must not be called
 from within a handler unless they operate on a separate parser instance,
-that is, one that did not call the handler.  For example, it is fine to
+that is: one that did not call the handler.  For example, it is fine to
 call the parsing functions from within an
 @cfunc{XML_ExternalEntityRefHandler}, if they apply to the parser
 created by @cfunc{XML_ExternalEntityParserCreate}.
 
 @quotation
-@emph{Note:} the @var{len} argument passed to these functions should be
+@strong{NOTE} The @var{len} argument passed to these functions should be
 considerably less than the maximum value for an integer, as it could
 create an integer overflow situation if the added lengths of a buffer
 and the unprocessed portion of the previous buffer exceed the maximum
@@ -1593,30 +1593,33 @@ This function has to be called prior to every call to
 A typical use would look like this:
 
 @example
-for (;;)
-  @{
-    int    bytes_read;
-    void * buff = XML_GetBuffer(p, BUFF_SIZE);
+#undef BUFF_SIZE
+#define BUFF_SIZE       4096
+XML_Parser       parser = the_parser;
+int              docfd  = the_file_descriptor;
+int              nbytes;
+void *           buff;
+enum XML_Status  status;
 
-    if (buff == NULL)
-      @{
-        /* handle error */
-      @}
-
-    bytes_read = read(docfd, buff, BUFF_SIZE);
-    if (bytes_read < 0)
-      @{
-        /* handle error */
-      @}
-
-    if (! XML_ParseBuffer(p, bytes_read, bytes_read == 0))
-      @{
-        /* handle parse error */
-      @}
-
-    if (bytes_read == 0)
-      break;
+for (;;) @{
+  buff = XML_GetBuffer(parser, BUFF_SIZE);
+  if (buff == NULL) @{
+    /* handle error */
   @}
+
+  nbytes = read(docfd, buff, BUFF_SIZE);
+  if (nbytes < 0) @{
+    /* handle error */
+  @}
+
+  status = XML_ParseBuffer(parser, nbytes, (0 == nbytes));
+  if (XML_STATUS_OK != status) @{
+    /* handle parse error */
+  @}
+
+  if (0 == nbytes)
+    break;
+@}
 @end example
 @end deftypefun
 
@@ -1674,7 +1677,7 @@ is, @cfunc{XML_Parse} and @cfunc{XML_ParseBuffer} return
 @code{XML_STATUS_ERROR} with error code @code{XML_ERROR_ABORTED}.
 
 @quotation
-@emph{Note:} This will be applied to the current parser instance only,
+@strong{NOTE} This will be applied to the current parser instance only,
 that is, if there is a parent parser then it will continue parsing when
 the external entity reference handler returns.  It is up to the
 implementation of that handler to call @cfunc{XML_StopParser} on the
@@ -1685,7 +1688,7 @@ When suspended, parsing can be resumed by calling
 @cfunc{XML_ResumeParser}.
 
 @quotation
-@emph{Note:} New in Expat 1.95.8.
+@strong{NOTE} New in Expat 1.95.8.
 @end quotation
 @end deftypefun
 
@@ -1701,7 +1704,7 @@ An additional error code, @code{XML_ERROR_NOT_SUSPENDED}, will be
 returned if the parser was not currently suspended.
 
 @quotation
-@emph{Note:} This must be called on the most deeply nested child parser
+@strong{NOTE} This must be called on the most deeply nested child parser
 instance first, and on its parent parser only after the child parser has
 finished, to be applied recursively until the document entity's parser
 is restarted.  That is, the parent parser will not resume by itself and
@@ -1710,7 +1713,7 @@ the appropriate moment.
 @end quotation
 
 @quotation
-@emph{Note:} New in Expat 1.95.8.
+@strong{NOTE} New in Expat 1.95.8.
 @end quotation
 @end deftypefun
 
@@ -1748,7 +1751,7 @@ suspended, and whether the final buffer is being processed.
 @var{status} must not be @cnull{}.
 
 @quotation
-@emph{Note:} New in Expat 1.95.8.
+@strong{NOTE} New in Expat 1.95.8.
 @end quotation
 @end deftypefun
 
@@ -2041,7 +2044,7 @@ the argument passed to the handler function will be the parser object
 itself.
 
 @quotation
-@emph{Note:} The type of @var{arg} and the type of the first argument to
+@strong{NOTE} The type of @var{arg} and the type of the first argument to
 the @code{XML_ExternalEntityRefHandler} do not match.  This function
 takes a @code{void *} to be passed to the handler, while the handler
 accepts an @code{XML_Parser}.
@@ -2084,7 +2087,7 @@ The @var{is_parameter_entity} argument will be non--zero for a parameter
 entity and zero for a general entity.
 
 @quotation
-@emph{Note:} skipped parameter entities in declarations and skipped
+@strong{NOTE} Skipped parameter entities in declarations and skipped
 general entities in attribute values cannot be reported, because the
 event would be out of sync with the reporting of the declarations or
 attribute values.
@@ -2877,7 +2880,7 @@ Otherwise.
 @end table
 
 @quotation
-@emph{Note:} For the purpose of checking WFC: Entity Declared, passing
+@strong{NOTE} For the purpose of checking WFC: Entity Declared, passing
 @var{use_dtd} == @code{XML_TRUE} will make the parser behave as if the
 document had a @dtd{} with an external subset.  This holds true even if
 the external entity reference handler returns without action.
@@ -2913,7 +2916,7 @@ It does nothing if there is not a default handler.
 @deftypefun void XML_FreeContentModel (XML_Parser @var{p}, XML_Content * @var{model})
 Deallocate the model argument passed to the
 @cfunc{XML_ElementDeclHandler} callback set using
-@cfunc{XML_ElementDeclHandler}.  This function should not be used for
+@cfunc{XML_SetElementDeclHandler}.  This function should not be used for
 any other purpose.
 @end deftypefun
 
