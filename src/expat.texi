@@ -1493,7 +1493,7 @@ typedef struct @{
 @deftypefun XML_Parser XML_ExternalEntityParserCreate (XML_Parser @var{p}, const XML_Char * @var{context}, const XML_Char * @var{encoding})
 Construct a new @code{XML_Parser} object for parsing an external general
 entity.  @var{context} is the context argument passed in a call to a
-@var{ExternalEntityRefHandler}.  Other state information such as
+@code{XML_ExternalEntityRefHandler}.  Other state information such as
 handlers, user data, namespace processing is inherited from the parser
 passed as the first argument.  So we shouldn't need to call any of the
 behavior changing functions on this parser (unless we want it to act
