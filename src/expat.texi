@@ -1447,7 +1447,7 @@ UTF-16
 ISO-8859-1
 @end example
 
-Any other value will invoke a call to the @var{UnknownEncodingHandler}.
+Any other value will invoke @code{XML_UnknownEncodingHandler}.
 @end deftypefun
 
 
