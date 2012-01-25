@@ -864,7 +864,7 @@ platforms.
 
 
 @menu
-* using compile::               Compiling and linking against expat.
+* using compile::               Compiling and linking against Expat.
 * using basics::                Basics.
 * using comm::                  Communicating between handlers.
 * using version::               @pxml{} version.
@@ -878,7 +878,7 @@ platforms.
 
 @c page
 @node using compile
-@section Compiling and linking against expat
+@section Compiling and linking against Expat
 
 
 Unless Expat is installed in a location not expected by the compiler and
@@ -1040,8 +1040,8 @@ When the parser is passed, the user data may be retrieved using
 @cfunc{XML_GetUserData}.
 
 One common case where multiple calls to a single handler may need to
-communicate using an application data structure is the case when content
-passed to the character data handler (set by
+communicate using an application data structure, is the case when
+content passed to the character data handler (set by
 @cfunc{XML_SetCharacterDataHandler}) needs to be accumulated.
 
 A common first--time mistake with any of the event--oriented interfaces
@@ -1128,9 +1128,9 @@ separator, prefix.
 We can set handlers for the start of a namespace declaration and for the
 end of a scope of a declaration with the
 @cfunc{XML_SetNamespaceDeclHandler} function.  The
-@var{StartNamespaceDeclHandler} is called prior to the start tag handler
-and the @var{EndNamespaceDeclHandler} is called after the corresponding
-end tag that ends the namespace's scope.
+@code{XML_StartNamespaceDeclHandler} is called prior to the start tag
+handler and the @code{XML_EndNamespaceDeclHandler} is called after the
+corresponding end tag that ends the namespace's scope.
 
 The namespace start handler gets passed the prefix and @uri{} for the
 namespace.  For a default namespace declaration (@code{xmlns='...'}),
@@ -1140,8 +1140,8 @@ the prefix for the closing scope.
 
 These handlers are called for each declaration.  So if, for instance, a
 start tag had three namespace declarations, then the
-@var{StartNamespaceDeclHandler} would be called three times before the
-start tag handler is called, once for each declaration.
+@code{XML_StartNamespaceDeclHandler} would be called three times before
+the start tag handler is called, once for each declaration.
 
 @c page
 @node using encodings
@@ -1169,21 +1169,15 @@ With Expat, we may also specify an encoding at the time of creating a
 parser.  This is useful when the encoding information may come from a
 source outside the document itself (like a higher level protocol).
 
-There are four built--in encodings in Expat:
-
-@example
-UTF-8
-UTF-16
-ISO-8859-1
-US-ASCII
-@end example
+There are four built--in encodings in Expat: UTF-8, UTF-16, ISO-8859-1,
+US-ASCII.
 
 Anything else discovered in an encoding declaration or in the protocol
 encoding specified in the parser constructor, triggers a call to the
-@var{UnknownEncodingHandler}.  This handler gets passed the encoding
-name and a pointer to an @code{XML_Encoding} data structure.  Our
-handler must fill in this structure and return @code{XML_STATUS_OK} if
-it knows how to deal with the encoding.  Otherwise the handler should
+@code{XML_UnknownEncodingHandler}.  This handler gets passed the
+encoding name and a pointer to an @code{XML_Encoding} data structure.
+Our handler must fill in this structure and return @code{XML_STATUS_OK}
+if it knows how to deal with the encoding.  Otherwise the handler should
 return @code{XML_STATUS_ERROR}.  The handler also gets passed a pointer
 to an optional application data structure that we may indicate when we
 set the handler.
@@ -1234,9 +1228,9 @@ for any translation of these strings into other encodings.
 
 Expat does not read or parse external entities directly.  Note that any
 external @dtd{} is a special case of an external entity.  If we've set
-no @var{ExternalEntityRefHandler}, then external entity references are
-silently ignored.  Otherwise, it calls our handler with the information
-needed to read and parse the external entity.
+no @code{XML_ExternalEntityRefHandler}, then external entity references
+are silently ignored.  Otherwise, it calls our handler with the
+information needed to read and parse the external entity.
 
 Our handler isn't actually responsible for parsing the entity, but it is
 responsible for creating a subsidiary parser with
@@ -1244,8 +1238,8 @@ responsible for creating a subsidiary parser with
 returns an instance of @code{XML_Parser} that has handlers and other
 data structures initialized from the parent parser.  We may then use
 @cfunc{XML_Parse} or @cfunc{XML_ParseBuffer} calls against this parser.
-Since external entities my refer to other external entities, our handler
-should be prepared to be called recursively.
+Since external entities may refer to other external entities, our
+handler should be prepared to be called recursively.
 
 @c page
 @node using dtd
@@ -1269,7 +1263,7 @@ Always parse parameter entities and the external subset.
 @end table
 
 In order to read an external @dtd{}, we also have to set an external
-entity reference handler as described above.
+entity reference handler as described in @ref{using entity}.
 
 @c page
 @node using stop
@@ -1915,7 +1909,8 @@ Set a handler that gets called at the end of a @code{CDATA} section.
 
 
 @deftypefun void XML_SetCdataSectionHandler (XML_Parser @var{p}, XML_StartCdataSectionHandler @var{start}, XML_EndCdataSectionHandler @var{end})
-Sets both @code{CDATA} and section handlers with one call.
+Set both @code{CDATA} handlers: the one called at the start and the one
+called at the end.
 @end deftypefun
 
 
@@ -2957,6 +2952,10 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 @appendix Bibliography and references
 
 
+``Extensible Markup Language (XML) 1.0 (Fifth Edition)''.  W3C
+Recommendation 26 November 2008.
+
+@center @url{http://www.w3.org/TR/REC-xml/}
 
 @c page
 @node concept index
