@@ -1974,7 +1974,7 @@ typedef int
 @deftypefun void XML_SetExternalEntityRefHandler (XML_Parser @var{p}, XML_ExternalEntityRefHandler @var{h})
 Set an external entity reference handler.  This handler is also called
 for processing an external @dtd{} subset if parameter entity parsing is
-in effect. (See @cfunc{XML_SetParamEntityParsing}.)
+in effect.  See @cfunc{XML_SetParamEntityParsing}.
 
 The context parameter specifies the parsing context in the format
 expected by the context argument to
