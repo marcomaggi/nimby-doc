@@ -2138,8 +2138,6 @@ unparsed entity declarations.
 Set a handler that will be called for all entity declarations.
 @end deftypefun
 
-
-
 @c page
 @node api handlers misc
 @subsection Other handlers
