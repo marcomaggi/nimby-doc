@@ -159,6 +159,10 @@ Revised^6 Report on the algorithmic language Scheme
 @acronym{XML}
 @end macro
 
+@macro axml{}
+@acronym{XML}
+@end macro
+
 @c ------------------------------------------------------------
 @c Software acronyms.
 @c ------------------------------------------------------------
@@ -1753,23 +1757,393 @@ suspended, and whether the final buffer is being processed.
 @section Setting the handlers
 
 
+@menu
+* api handlers intro::          Introductive notes on handlers.
+* api handlers dtd element::    Element @dtd{} declaration handlers.
+* api handlers dtd attlist::    Attribute list @dtd{} declaration
+                                handlers.
+* api handlers dtd entity::     Entity @dtd{} declaration handlers.
+* api handlers misc::           Other handlers.
+@end menu
+
+@c page
+@node api handlers intro
+@subsection Introductive notes on handlers
+
+
 Although handlers are typically set prior to parsing and left alone, an
 application may choose to set or change the handler for a parsing event
 while the parse is in progress.  For instance, our application may
 choose to ignore all text not descended from a @code{para} element.  One
-way it could do this is to set the character handler when a @code{para}
-start tag is seen, and unset it for the corresponding end tag.
+way it could do this is to set the character handler when a
+@code{<para>} start tag is seen, and unset it for the corresponding end
+tag.
 
-A handler may be unset by providing a @cnull{} pointer to the appropriate
-handler setter.  None of the handler setting functions have a return
-value.
+A handler may be unset by providing a @cnull{} pointer to the
+appropriate handler setter.  Most of the handler setting functions have
+no return value, an exception is @func{XML_ExternalEntityRefHandler}.
 
-Our handlers will be receiving strings in arrays of type
-@code{XML_Char}.  This type is conditionally defined in @file{expat.h}
-as either @code{char}, @code{wchar_t} or @code{unsigned short}.  The
-former implies @utf{}-8 encoding, the latter two imply @utf{}-16
-encoding.  Note that we'll receive them in this form independent of the
-original encoding of the document.
+Handlers receive strings in arrays of type @code{XML_Char}; this type is
+conditionally defined in @file{expat.h} as either @code{char},
+@code{wchar_t} or @code{unsigned short}.  The former implies @utf{}-8
+encoding, the latter two imply @utf{}-16 encoding.  Note that the
+handler will receive them in this form independently from the original
+encoding of the document.
+
+@c page
+@node api handlers dtd element
+@subsection Element @dtd{} declaration handlers
+
+
+To declare the following @axml{} fragment in a @dtd{}:
+
+@example
+<numbers><one/><two/><three/></numbers>
+@end example
+
+@noindent
+we do:
+
+@example
+<!ELEMENT one     EMPTY>
+<!ELEMENT two     EMPTY>
+<!ELEMENT three   EMPTY>
+<!ELEMENT numbers (one,two,three)>
+@end example
+
+@noindent
+when Expat parses the last declaration of this @dtd{} fragment:
+@code{numbers} is the ``root element'' and the others are its
+``children''.
+
+
+@deftp {Function Pointer Typedef} XML_ElementDeclHandler
+Handler for element declarations in the @dtd{}; invoked whenever, while
+processing a @dtd{}, the parser finds an @code{<!ELEMENT} token.
+Defined as:
+
+@example
+typedef void (* XML_ElementDeclHandler)
+  (void *               user_data,
+   const XML_Char *     name,
+   XML_Content *        model);
+@end example
+
+@var{user_data} references the custom value registered with
+@cfunc{XML_SetUserData} or @cfunc{XML_UseParserAsHandlerArg}.
+
+@var{name} references a zero--terminated string holding the name of the
+element being declared; this pointer is never @cnull{}.
+
+@var{model} references a structure describing the element declaration,
+this pointer is never @cnull{}; it is the application's responsibility
+to free this data structure using @cfunc{XML_FreeContentModel}.
+@end deftp
+
+
+@deftypefun void XML_SetElementDeclHandler (XML_Parser @var{p}, XML_ElementDeclHandler @var{H})
+Set or unset a handler for element @dtd{} declarations.
+@end deftypefun
+
+
+@deftypefun void XML_FreeContentModel (XML_Parser @var{p}, XML_Content * @var{model})
+Deallocate the @var{model} argument passed to the
+@code{XML_ElementDeclHandler} handler.  This function should not be used
+for any other purpose.
+@end deftypefun
+
+
+@deftp Enumeration XML_Content_Type
+Used to identify the content type in an element's @dtd{} declaration.
+@end deftp
+
+
+@defvr {Enumeration Constant} XML_CTYPE_EMPTY
+@defvrx {Enumeration Constant} XML_CTYPE_ANY
+@defvrx {Enumeration Constant} XML_CTYPE_MIXED
+@defvrx {Enumeration Constant} XML_CTYPE_NAME
+@defvrx {Enumeration Constant} XML_CTYPE_CHOICE
+@defvrx {Enumeration Constant} XML_CTYPE_SEQ
+Values of the @code{XML_Content_Type} enumeration.  See the description
+of the field @code{type} in the structure @code{XML_Content} for
+details.
+@end defvr
+
+
+@deftp Enumeration XML_Content_Quant
+Specify the quantifier used in an element's @dtd{} declaration.
+@end deftp
+
+
+@defvr {Enumeration Constant} XML_CQUANT_NONE
+@defvrx {Enumeration Constant} XML_CQUANT_OPT
+@defvrx {Enumeration Constant} XML_CQUANT_REP
+@defvrx {Enumeration Constant} XML_CQUANT_PLUS
+Values of the @code{XML_Content_Quant} enumeration.  An element
+declaration is described by the values as follows:
+
+@table @code
+@item XML_CQUANT_NONE
+When there is no quantifier.
+
+@item XML_CQUANT_OPT
+When the quantifier @code{?} is used.
+
+@item XML_CQUANT_REP
+When the quantifier @code{*} is used.  We can imagine @code{REP} to
+stand for ``replicated''.
+
+@item XML_CQUANT_PLUS
+When the quantifier @code{+} is used.
+@end table
+@end defvr
+
+
+@deftp {Struct Typedef} XML_Content
+Instances of this structure type can be: ``root elements'' when this
+structure represents an @code{<!ELEMENT} declaration; ``children
+elements'' when this structure is an element of an array referenced by
+the @code{children} field (see below).  Description of public fields
+follows.
+
+@table @code
+@item enum XML_Content_Type type
+The type of the element described by this instance.  When this instance
+represents a root element, the value is as follows:
+
+@example
+<!ELEMENT THIS EMPTY>
+  @result{} type == XML_CTYPE_EMPTY
+
+<!ELEMENT THIS ANY>
+  @result{} type == XML_CTYPE_ANY
+
+<!ELEMENT THIS (#PCDATA)>
+  @result{} type == XML_CTYPE_MIXED
+
+<!ELEMENT THIS (#PCDATA|THAT)*>
+  @result{} type == XML_CTYPE_MIXED
+
+<!ELEMENT THIS (THAT|THOSE)>
+  @result{} type == XML_CTYPE_CHOICE
+
+<!ELEMENT THIS (THAT, THOSE)>
+  @result{} type == XML_CTYPE_SEQ
+@end example
+
+@noindent
+when this instance represents a child element, the value of this field
+is always @code{XML_CTYPE_NAME}.
+
+If the type is @code{EMPTY} or @code{ANY}: @code{quant} is
+@code{XML_CQUANT_NONE} and the other fields are zero or @cnull{}.
+
+If the type is @code{MIXED}: @code{quant} is @code{XML_CQUANT_NONE} or
+@code{XML_CQUANT_REP}.
+
+@item enum XML_Content_Quant quant
+The quantifier for the element's content.  If this structure represents
+a root element, the value is as follows:
+
+@example
+<!ELEMENT this (that)>
+  @result{} quant == XML_CQUANT_NONE
+
+<!ELEMENT this (that)?>
+  @result{} quant == XML_CQUANT_OPT
+
+<!ELEMENT this (that)*>
+  @result{} quant == XML_CQUANT_REP
+
+<!ELEMENT this (that)+>
+  @result{} quant == XML_CQUANT_PLUS
+@end example
+
+@noindent
+if this structure represents a child element the value is always
+@code{XML_CQUANT_NONE}.
+
+@item const XML_Char * name
+@cnull{} for root elements; for children elements: references a
+zero--terminated string representing the child's element name.
+
+@item XML_Content * children
+@itemx unsigned int numchildren
+@code{children} is @cnull{} or a pointer to an array of structures
+describing the children elements; the number of elements in the array is
+@code{numchildren}.
+
+One of the following cases is possible:
+
+@itemize
+@item
+When @code{type} is @code{XML_CTYPE_EMPTY} or @code{XML_CTYPE_ANY}: the
+array is empty.
+
+@item
+When @code{type} is @code{XML_CTYPE_CHOICE} or @code{XML_CTYPE_SEQ}: the
+array has a number of entries equal to the number of children elements.
+
+@item
+When @code{type} is @code{XML_CTYPE_MIXED} and the element's content
+specification is @code{(#PCDATA)}: the array is empty.
+
+@item
+When @code{type} is @code{XML_CTYPE_MIXED} and the element's content
+specification lists children elements: the array has a number of entries
+equal to the number of children elements.
+@end itemize
+@end table
+@end deftp
+
+@c page
+@node api handlers dtd attlist
+@subsection Attribute list @dtd{} declaration handlers
+
+
+@deftp {Function Pointer Typedef} XML_AttlistDeclHandler
+Handler for attribute list declarations in the @dtd{}; invoked whenever,
+while processing a @dtd{}, the parser finds an @code{<!ATTLIST} token.
+Defined as:
+
+@example
+typedef void (* XML_AttlistDeclHandler)
+  (void *               user_data,
+   const XML_Char *     element_name,
+   const XML_Char *     attribute_name,
+   const XML_Char *     attribute_type,
+   const XML_Char *     default_value,
+   int                  is_required);
+@end example
+
+This handler is called for each attribute; so a single @code{<!ATTLIST}
+declaration with multiple attributes declared will generate multiple
+calls to this handler.
+
+@var{user_data} references the custom value registered with
+@cfunc{XML_SetUserData} or @cfunc{XML_UseParserAsHandlerArg}.
+
+@var{element_name} references a zero--terminated string representing the
+name of the element for which the attribute is being declared.
+
+@var{attribute_name} references a zero--terminated string representing
+the attribute name.
+
+@var{attribute_type} references a zero--terminated string representing
+the attribute type; it is the string representing the type in the
+declaration with whitespace removed.
+
+@var{default_value} either is @cnull{} or references a zero--terminated
+string representing the default value; @var{is_required} is true if the
+attribute is required.  These two arguments are interpreted together:
+
+@itemize
+@item
+For @code{#IMPLIED} attributes: @code{default_value} is @cnull{} and
+@var{is_required} is true.
+
+@item
+For @code{#REQUIRED} attributes: @code{default_value} is @cnull{} and
+@var{is_required} is false.
+
+@item
+For @code{#FIXED} attributes: @var{default_value} references a string
+and @var{is_required} is true.
+@end itemize
+@end deftp
+
+
+@deftypefun void XML_SetAttlistDeclHandler (XML_Parser @var{P}, XML_AttlistDeclHandler @var{H})
+Set a handler for attribute list declarations in the @dtd{}.
+@end deftypefun
+
+@c page
+@node api handlers dtd entity
+@subsection Entity @dtd{} declaration handlers
+
+
+Entity declarations in a @dtd{} look like the following:
+
+@example
+<!-- internal entity -->
+<!ENTITY stuff 'a'>
+
+<!-- external entities -->
+<!ENTITY stuff SYSTEM 'http://localhost/stuff'>
+
+<!ENTITY stuff PUBLIC 'The Stuff' 'http://localhost/stuff'>
+
+<!NOTATION stuffer SYSTEM 'http://localhost/stuffer'>
+<!ENTITY stuff SYSTEM 'http://localhost/stuff' NDATA stuffer>
+
+<!NOTATION stuffer SYSTEM 'http://localhost/stuffer'>
+<!ENTITY stuff PUBLIC 'The Stuff'
+  'http://localhost/stuff' NDATA stuffer>
+@end example
+
+
+@deftp {Function Pointer Typedef} XML_EntityDeclHandler
+Handler for entity declarations in the @dtd{}; invoked whenever, while
+processing a @dtd{}, the parser finds an @code{<!ENTITY} token.  Defined
+as:
+
+@example
+typedef void (* XML_EntityDeclHandler)
+  (void           * user_data,
+   const XML_Char * entity_name,
+   int              is_parameter_entity,
+   const XML_Char * value,
+   int              value_length,
+   const XML_Char * base,
+   const XML_Char * system_id,
+   const XML_Char * public_id,
+   const XML_Char * notation_name);
+@end example
+
+@var{user_data} references the custom value registered with
+@cfunc{XML_SetUserData} or @cfunc{XML_UseParserAsHandlerArg}.
+
+@var{entity_name} references a zero--terminated string representing the
+entity name.
+
+The @var{is_parameter_entity} argument will be non--zero in the case of
+parameter entities and zero otherwise.
+
+The @var{value} string is not zero--terminated, the length is provided
+in the @var{value_length} parameter; do not use @var{value_length} to
+test for internal entities, since it is legal to have zero--length
+values, instead check for whether or not @var{value} is @cnull{}.
+
+@var{base} either is @cnull{} or references a zero--terminated string
+representing the base set with @cfunc{XML_SetBase}.
+
+@var{system_id} either is @cnull{} or references a zero--terminated
+string representing the system literal in a @code{SYSTEM} or
+@code{PUBLIC} external identifier.
+
+@var{public_id} either is @cnull{} or references a zero--terminated
+string representing the public literal identifier in a @code{PUBLIC}
+external identifier.
+
+For internal entities: @var{value} will be non--@cnull{} and
+@var{system_id}, @var{public_id}, and @var{notation_name} will all be
+@cnull{}.
+
+The @var{notation_name} argument will have a non--@cnull{} value only for
+unparsed entity declarations.
+@end deftp
+
+
+@deftypefun void XML_SetEntityDeclHandler (XML_Parser @var{P}, XML_EntityDeclHandler @var{H})
+Set a handler that will be called for all entity declarations.
+@end deftypefun
+
+
+
+@c page
+@node api handlers misc
+@subsection Other handlers
+
 
 
 @deftp {Function Pointer Typedef} XML_StartElementHandler
@@ -2252,170 +2626,6 @@ Set both doctype handlers with one call.
 @end deftypefun
 
 
-@deftp {Function Pointer Typedef} XML_ElementDeclHandler
-Defined as:
-
-@example
-typedef void (* XML_ElementDeclHandler) (void *userData,
-                                         const XML_Char *name,
-                                         XML_Content *model);
-@end example
-@end deftp
-
-
-@deftp Enumeration XML_Content_Type
-Used to identify the content type.
-@end deftp
-
-
-@defmac XML_CTYPE_EMPTY
-@defmacx XML_CTYPE_ANY
-@defmacx XML_CTYPE_MIXED
-@defmacx XML_CTYPE_NAME
-@defmacx XML_CTYPE_CHOICE
-@defmacx XML_CTYPE_SEQ
-Values of the @code{XML_Content_Type} enumeration.
-@end defmac
-
-
-@deftp Enumeration XML_Content_Quant
-Used to identifiy ???
-@end deftp
-
-
-@defmac XML_CQUANT_NONE
-@defmacx XML_CQUANT_OPT
-@defmacx XML_CQUANT_REP
-@defmacx XML_CQUANT_PLUS
-Values of the @code{XML_Content_Quant} enumeration.
-@end defmac
-
-
-@deftp Struct XML_cp
-@deftpx {Struct Typedef} XML_Content
-Description of public fields follows.
-
-@table @code
-@item enum XML_Content_Type type
-@item enum XML_Content_Quant quant
-@item const XML_Char * name
-@item unsigned int numchildren
-@item XML_Content * children
-@end table
-@end deftp
-
-
-@deftypefun void XML_SetElementDeclHandler (XML_Parser @var{p}, XML_ElementDeclHandler @var{eldecl})
-Set a handler for element declarations in a @dtd{}.  The handler gets
-called with the name of the element in the declaration and a pointer to
-a structure that contains the element model.
-
-It is the application's responsibility to free this data structure using
-@cfunc{XML_FreeContentModel}.
-
-The @var{model} argument is the root of a tree of @code{XML_Content}
-nodes.
-
-If @code{type} equals @code{XML_CTYPE_EMPTY} or @code{XML_CTYPE_ANY},
-then @code{quant} will be @code{XML_CQUANT_NONE}, and the other fields
-will be zero or @cnull{}.
-
-If @code{type} is @code{XML_CTYPE_MIXED}, then @code{quant} will be
-@code{XML_CQUANT_NONE} or @code{XML_CQUANT_REP} and @code{numchildren}
-will contain the number of elements that are allowed to be mixed in and
-children points to an array of @code{XML_Content} structures that will
-all have type @code{XML_CTYPE_NAME} with no quantification.  Only the
-root node can be type @code{XML_CTYPE_EMPTY}, @code{XML_CTYPE_ANY}, or
-@code{XML_CTYPE_MIXED}.
-
-For type @code{XML_CTYPE_NAME}, the name field points to the name and
-the @code{numchildren} and @code{children} fields will be zero and
-@cnull{}.  The @code{quant} field will indicate any quantifiers placed on
-the name.
-
-Types @code{XML_CTYPE_CHOICE} and @code{XML_CTYPE_SEQ} indicate a choice
-or sequence respectively.  The @code{numchildren} field indicates how
-many nodes in the choice or sequence and children points to the nodes.
-@end deftypefun
-
-
-@deftp {Function Pointer Typedef} XML_AttlistDeclHandler
-Defined as:
-
-@example
-typedef void
-(* XML_AttlistDeclHandler) (void           * user_data,
-                            const XML_Char * elname,
-                            const XML_Char * attname,
-                            const XML_Char * att_type,
-                            const XML_Char * dflt,
-                            int            isrequired);
-@end example
-@end deftp
-
-
-@deftypefun void XML_SetAttlistDeclHandler (XML_Parser @var{p}, XML_AttlistDeclHandler @var{attdecl})
-Set a handler for @code{attlist} declarations in the @dtd{}.  This
-handler is called for each attribute.  So a single @code{attlist}
-declaration with multiple attributes declared will generate multiple
-calls to this handler.
-
-The @var{elname} parameter returns the name of the element for which the
-attribute is being declared.
-
-The attribute @code{name} is in the @var{attname} parameter.
-
-The attribute @code{type} is in the @var{att_type} parameter. It is the
-string representing the type in the declaration with whitespace removed.
-
-The @var{dflt} parameter holds the default value.  It will be @cnull{} in
-the case of @code{#IMPLIED} or @code{#REQUIRED} attributes.  We can
-distinguish these two cases by checking the @var{isrequired} parameter,
-which will be true in the case of @code{#REQUIRED} attributes.
-
-Attributes which are @code{#FIXED} will have also have a true
-@var{isrequired}, but they will have the non--@cnull{} fixed value in the
-@var{dflt} parameter.
-@end deftypefun
-
-
-@deftp {Function Pointer Typedef} XML_EntityDeclHandler
-Defined as:
-
-@example
-typedef void
-(* XML_EntityDeclHandler) (void           * user_data,
-                           const XML_Char * entity_name,
-                           int              is_parameter_entity,
-                           const XML_Char * value,
-                           int              value_length,
-                           const XML_Char * base,
-                           const XML_Char * system_id,
-                           const XML_Char * public_id,
-                           const XML_Char * notation_name);
-@end example
-@end deftp
-
-
-@deftypefun void XML_SetEntityDeclHandler (XML_Parser @var{p}, XML_EntityDeclHandler @var{h})
-Set a handler that will be called for all entity declarations.  The
-@var{is_parameter_entity} argument will be non--zero in the case of
-parameter entities and zero otherwise.
-
-For internal entities (@code{<!ENTITY foo "bar">}), @var{value} will be
-non--@cnull{} and @var{system_id}, @var{public_id}, and
-@var{notation_name} will all be @cnull{}.
-
-The @var{value} string is not zero--terminated; the length is provided
-in the @var{value_length} parameter.  Do not use @var{value_length} to
-test for internal entities, since it is legal to have zero--length
-values.  Instead check for whether or not @var{value} is @cnull{}.
-
-The @var{notation_name} argument will have a non--@cnull{} value only for
-unparsed entity declarations.
-@end deftypefun
-
-
 @deftp {Function Pointer Typedef} XML_UnparsedEntityDeclHandler
 Defined as:
 
@@ -2893,15 +3103,6 @@ corresponding markup to be passed to the default handler set by
 @cfunc{XML_SetDefaultHandler} or @cfunc{XML_SetDefaultHandlerExpand}.
 It does nothing if there is not a default handler.
 @end deftypefun
-
-
-@deftypefun void XML_FreeContentModel (XML_Parser @var{p}, XML_Content * @var{model})
-Deallocate the model argument passed to the
-@cfunc{XML_ElementDeclHandler} callback set using
-@cfunc{XML_SetElementDeclHandler}.  This function should not be used for
-any other purpose.
-@end deftypefun
-
 
 @c page
 @node document license
