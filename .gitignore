@@ -34,6 +34,10 @@ doc/mdate-sh
 doc/stamp-vti
 doc/texinfo.tex
 doc/version.texi
+src/mdate-sh
+src/stamp-vti
+src/texinfo.tex
+src/version.texi
 install-sh
 missing
 mkinstalldirs
