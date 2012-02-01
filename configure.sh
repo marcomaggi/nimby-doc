@@ -1,8 +1,8 @@
-# prepare.sh --
+# configure.sh --
+#
+# Run this to configure.
 
-set -x
-
-(cd .. && sh ./autogen.sh)
+set -xe
 
 prefix=/usr/local
 
