@@ -1425,6 +1425,7 @@ and a flag indicating whether the parse can be resumed in the future.
 @menu
 * api create::                  Parser creation.
 * api parse::                   Parsing.
+* api external::                External entities parsers.
 * api handlers::                Setting the handlers.
 * api report::                  Parse position and error
                                 reporting functions.
@@ -1488,17 +1489,6 @@ typedef struct @{
 @end deftypefun
 
 
-@deftypefun XML_Parser XML_ExternalEntityParserCreate (XML_Parser @var{p}, const XML_Char * @var{context}, const XML_Char * @var{encoding})
-Construct a new @code{XML_Parser} object for parsing an external general
-entity.  @var{context} is the context argument passed in a call to a
-@code{XML_ExternalEntityRefHandler}.  Other state information such as
-handlers, user data, namespace processing is inherited from the parser
-passed as the first argument.  So we shouldn't need to call any of the
-behavior changing functions on this parser (unless we want it to act
-differently than the parent parser).
-@end deftypefun
-
-
 @deftypefun void XML_ParserFree (XML_Parser @var{p})
 Free memory used by the parser.  Our application is responsible for
 freeing any memory associated with user data.
@@ -1517,7 +1507,6 @@ using @cfunc{XML_ExternalEntityParserCreate}; it will return
 Our application is responsible for dealing with any memory associated
 with user data.
 @end deftypefun
-
 
 @c page
 @node api parse
@@ -1751,6 +1740,105 @@ suspended, and whether the final buffer is being processed.
 @end quotation
 @end deftypefun
 
+@c page
+@node api external
+@section External entities parsers
+
+
+@deftypefun XML_Parser XML_ExternalEntityParserCreate (XML_Parser @var{p}, const XML_Char * @var{context}, const XML_Char * @var{encoding})
+Construct a new @code{XML_Parser} object for parsing an external general
+entity.  @var{context} is the context argument passed in a call to a
+@code{XML_ExternalEntityRefHandler}.  Other state information such as
+handlers, user data, namespace processing is inherited from the parser
+passed as the first argument.  So we shouldn't need to call any of the
+behavior changing functions on this parser (unless we want it to act
+differently than the parent parser).
+@end deftypefun
+
+
+@deftp {Function Pointer Typedef} XML_ExternalEntityRefHandler
+External entity reference handler.  Defined as:
+
+@example
+typedef int (* XML_ExternalEntityRefHandler)
+   (XML_Parser          parser,
+    const XML_Char *    context,
+    const XML_Char *    base,
+    const XML_Char *    system_id,
+    const XML_Char *    public_id);
+@end example
+
+This handler is also called for processing an external @dtd{} subset if
+parameter entity parsing is in effect.  See
+@cfunc{XML_SetParamEntityParsing}.
+
+The @var{context} parameter specifies the parsing context in the format
+expected by the context argument to
+@cfunc{XML_ExternalEntityParserCreate}.  @code{context} is valid only
+until the handler returns, so if the referenced entity is to be parsed
+later, it must be copied.
+
+@var{context} is @cnull{} only when the entity is a parameter entity,
+which is how one can differentiate between general and parameter
+entities.
+
+@var{base} is the base to use for relative system identifiers; it is set
+by @cfunc{XML_SetBase} and may be @cnull{}.
+
+@var{public_id} is the public id given in the entity declaration and may
+be @cnull{}.
+
+@var{system_id} is the system identifier specified in the entity
+declaration and is never @cnull{}.
+
+There are a couple of ways in which this handler differs from others.
+
+@enumerate
+@item
+This handler returns a status indicator (an integer).
+@code{XML_STATUS_OK} should be returned for successful handling of the
+external entity reference.  Returning @code{XML_STATUS_ERROR} indicates
+failure, and causes the calling parser to return an
+@code{XML_ERROR_EXTERNAL_ENTITY_HANDLING} error.
+
+@item
+Instead of having the user data as its first argument, it receives the
+parser that encountered the entity reference.  This, along with the
+@var{context} parameter, may be used as arguments to a call to
+@cfunc{XML_ExternalEntityParserCreate}.  Using the returned parser, the
+body of the external entity can be recursively parsed.
+@end enumerate
+
+Since this handler may be called recursively, it should not be saving
+information into global or static variables.
+@end deftp
+
+
+@deftypefun void XML_SetExternalEntityRefHandler (XML_Parser @var{p}, XML_ExternalEntityRefHandler @var{h})
+Set an external entity reference handler.
+@end deftypefun
+
+
+@deftypefun void XML_SetExternalEntityRefHandlerArg (XML_Parser @var{P}, void * @var{arg})
+Set the argument passed to the @code{XML_ExternalEntityRefHandler}.  If
+@var{arg} is not @cnull{}, it is the new value passed to the handler set
+using @cfunc{XML_SetExternalEntityRefHandler}; if @var{arg} is @cnull{},
+the argument passed to the handler function will be the parser object
+itself.
+
+@quotation
+@strong{NOTE} The type of @var{arg} and the type of the first argument to
+the @code{XML_ExternalEntityRefHandler} do not match.  This function
+takes a @code{void *} to be passed to the handler, while the handler
+accepts an @code{XML_Parser}.
+
+This is a historical accident, but will not be corrected before Expat
+2.0 (at the earliest) to avoid causing compiler warnings for code that's
+known to work with this @api{}.  It is the responsibility of the
+application code to know the actual type of the argument passed to the
+handler and to manage it properly.
+@end quotation
+@end deftypefun
 
 @c page
 @node api handlers
@@ -1759,11 +1847,23 @@ suspended, and whether the final buffer is being processed.
 
 @menu
 * api handlers intro::          Introductive notes on handlers.
+* api handlers xml decl::       @axml{} declaration handler.
+* api handlers standalone::     Non--standalone handler.
+* api handlers dtd doctype::    @dtd{} document type declaration.
 * api handlers dtd element::    Element @dtd{} declaration handlers.
 * api handlers dtd attlist::    Attribute list @dtd{} declaration
                                 handlers.
+* api handlers dtd notation::   @dtd{} notation declaration.
 * api handlers dtd entity::     Entity @dtd{} declaration handlers.
-* api handlers misc::           Other handlers.
+* api handlers element::        Element handlers.
+* api handlers char data::      Character data handlers.
+* api handlers comment::        Comment handlers.
+* api handlers cdata::          Cdata handler.
+* api handlers namespace::      Namespace handlers.
+* api handlers default::        Default handler.
+* api handlers entity::         Special entity handlers.
+* api handlers procinst::       Processing instruction handlers.
+* api handlers encoding::       Character encoding handlers.
 @end menu
 
 @c page
@@ -1789,6 +1889,181 @@ conditionally defined in @file{expat.h} as either @code{char},
 encoding, the latter two imply @utf{}-16 encoding.  Note that the
 handler will receive them in this form independently from the original
 encoding of the document.
+
+@c page
+@node api handlers xml decl
+@subsection @axml{} declaration handler
+
+
+@axml{} declarations look like this:
+
+@example
+<?xml version='1.0'?>
+<?xml version='1.0'? encoding='utf-8'>
+<?xml version='1.0'? standalone='yes'>
+<?xml version='1.0'? standalone='no'>
+@end example
+
+
+@deftp {Function Pointer Typedef} XML_XmlDeclHandler
+Handler for @pxml{} declarations and also for text declarations
+discovered in external entities.  Defined as:
+
+@example
+typedef void (* XML_XmlDeclHandler)
+  (void           *     user_data,
+   const XML_Char *     version,
+   const XML_Char *     encoding,
+   int                  standalone);
+@end example
+
+@var{user_data} references the custom value registered with
+@cfunc{XML_SetUserData} or @cfunc{XML_UseParserAsHandlerArg}.
+
+@var{version} is either @cnull{} or references a zero--terminated string
+representing the @axml{} specification version; such string is always
+@code{1.0}.  The way to distinguish the kind of input is that
+@var{version} will be @cnull{} for text declarations.
+
+@var{encoding} is either @cnull{} or references a zero--terminated
+string representing the character encoding of the document being parsed.
+
+@var{standalone} will be:
+
+@table @code
+@item -1
+Indicating that there was no @code{standalone} parameter in the
+declaration.
+
+@item 0
+Indicating that @code{standalone} was given as @code{no}.
+
+@item +1
+Indicating that @code{standalone} was given as @code{yes}.
+@end table
+@end deftp
+
+
+@deftypefun void XML_SetXmlDeclHandler (XML_Parser @var{p}, XML_XmlDeclHandler @var{xmldecl})
+Set a handler that is called for @pxml{} declarations and also for text
+declarations discovered in external entities.
+@end deftypefun
+
+@c page
+@node api handlers standalone
+@subsection Non--standalone handler
+
+
+@deftp {Function Pointer Typedef} XML_NotStandaloneHandler
+Handler called if the document is not ``standalone''.  Defined as:
+
+@example
+typedef int (* XML_NotStandaloneHandler) (void * user_data);
+@end example
+
+@var{user_data} references the custom value registered with
+@cfunc{XML_SetUserData} or @cfunc{XML_UseParserAsHandlerArg}.
+
+This handler is called when there is an external subset or a reference
+to a parameter entity, but it does not have @code{standalone} set to
+@code{yes} in an @pxml{} declaration.
+
+If this handler returns @code{XML_STATUS_ERROR}: the parser will throw
+an @code{XML_ERROR_NOT_STANDALONE} error.
+@end deftp
+
+
+@deftypefun void XML_SetNotStandaloneHandler (XML_Parser @var{p}, XML_NotStandaloneHandler @var{h})
+Set a handler that is called if the document is not ``standalone''.
+@end deftypefun
+
+@c page
+@node api handlers dtd doctype
+@subsection @dtd{} document type declaration
+
+
+An internal document type declaration looks like this:
+
+@example
+<!DOCTYPE ball [
+  <!ELEMENT ball EMPTY>
+  <!ATTLIST ball colour CDATA #REQUIRED>
+]>
+@end example
+
+@noindent
+external document type declarations look like this:
+
+@example
+<!DOCTYPE toys SYSTEM 'http://localhost/toys'>
+<!DOCTYPE toys PUBLIC 'The Toys' 'http://localhost/toys'>
+@end example
+
+@noindent
+with the @uri{} @code{http://localhost/toys} being the system identifier
+and @code{The Toys} being the public identifier.  @code{SYSTEM} document
+types are meant for use by a single author or group of authors;
+@code{PUBLIC} document types are meant for public use.
+
+
+@deftp {Function Pointer Typedef} XML_StartDoctypeDeclHandler
+Handler called at the start of a @code{<!DOCTYPE} declaration, before
+any external or internal subset is parsed.  Defined as:
+
+@example
+typedef void (* XML_StartDoctypeDeclHandler)
+   (void           *    user_data,
+    const XML_Char *    doctype_name,
+    const XML_Char *    system_id,
+    const XML_Char *    public_id,
+    int                 has_internal_subset);
+@end example
+
+@var{user_data} references the custom value registered with
+@cfunc{XML_SetUserData} or @cfunc{XML_UseParserAsHandlerArg}.
+
+@var{doctype_name} references a zero--terminated string representing the
+document type name.
+
+@var{system_id} either is @cnull{} or references a zero--terminated
+string representing the system identifier.
+
+@var{public_id} either is @cnull{} or references a zero--terminated
+string representing the public identifier.
+
+@var{has_internal_subset} will be non--zero if the @code{<!DOCTYPE}
+declaration has an internal subset.
+@end deftp
+
+
+@deftypefun void XML_SetStartDoctypeDeclHandler (XML_Parser @var{P}, XML_StartDoctypeDeclHandler @var{H})
+Set a handler called at the start of a @code{<!DOCTYPE} declaration,
+before any external or internal subset is parsed.
+@end deftypefun
+
+
+@deftp {Function Pointer Typedef} XML_EndDoctypeDeclHandler
+Handler called at the end of a @code{<!DOCTYPE} declaration, after
+parsing any external subset.  Defined as:
+
+@example
+typedef void (* XML_EndDoctypeDeclHandler) (void * user_data);
+@end example
+
+@var{user_data} references the custom value registered with
+@cfunc{XML_SetUserData} or @cfunc{XML_UseParserAsHandlerArg}.
+@end deftp
+
+
+@deftypefun void XML_SetEndDoctypeDeclHandler (XML_Parser @var{P}, XML_EndDoctypeDeclHandler @var{H})
+Set a handler that is called at the end of a @code{<!DOCTYPE}
+declaration, after parsing any external subset.
+@end deftypefun
+
+
+@deftypefun void XML_SetDoctypeDeclHandler (XML_Parser @var{P}, XML_StartDoctypeDeclHandler @var{S}, XML_EndDoctypeDeclHandler @var{E})
+Set both @code{<!DOCTYPE} handlers with one call.
+@end deftypefun
 
 @c page
 @node api handlers dtd element
@@ -2058,6 +2333,56 @@ Set a handler for attribute list declarations in the @dtd{}.
 @end deftypefun
 
 @c page
+@node api handlers dtd notation
+@subsection @dtd{} notation declaration
+
+
+Notation declarations look like this:
+
+@example
+<!NOTATION bouncing SYSTEM 'http://localhost/bouncer'>
+<!NOTATION bouncing PUBLIC 'The Bouncer'>
+<!NOTATION bouncing PUBLIC 'The Bouncer'
+   'http://localhost/bouncer'>
+@end example
+
+
+
+@deftp {Function Pointer Typedef} XML_NotationDeclHandler
+Handler called when parsing a @code{<!NOTATION} declaration.  Defined
+as:
+
+@example
+typedef void (* XML_NotationDeclHandler)
+   (void           *    user_data,
+    const XML_Char *    notation_name,
+    const XML_Char *    base,
+    const XML_Char *    system_id,
+    const XML_Char *    public_id);
+@end example
+
+@var{user_data} references the custom value registered with
+@cfunc{XML_SetUserData} or @cfunc{XML_UseParserAsHandlerArg}.
+
+@var{notation_name} references a zero--terminated string representing
+the notation name.
+
+@var{base} is either @cnull{} or references the zero--terminated string
+set with @cfunc{XML_SetBase}.
+
+@var{system_id} is either @cnull{} or references a zero--terminated
+string representing the system identifier.
+
+@var{public_id} is either @cnull{} or references a zero--terminated
+string representing the public identifier.
+@end deftp
+
+
+@deftypefun void XML_SetNotationDeclHandler (XML_Parser @var{p}, XML_NotationDeclHandler @var{h})
+Set a handler that receives notation declarations.
+@end deftypefun
+
+@c page
 @node api handlers dtd entity
 @subsection Entity @dtd{} declaration handlers
 
@@ -2138,124 +2463,203 @@ unparsed entity declarations.
 Set a handler that will be called for all entity declarations.
 @end deftypefun
 
-@c page
-@node api handlers misc
-@subsection Other handlers
 
-
-
-@deftp {Function Pointer Typedef} XML_StartElementHandler
-Defined as:
+@deftp {Function Pointer Typedef} XML_UnparsedEntityDeclHandler
+Handler for declarations of unparsed entities; these are entity
+declarations that have a notation (@code{NDATA}) field:
 
 @example
-typedef void (* XML_StartElementHandler) (void * user_data,
-                                          const XML_Char * name,
-                                          const XML_Char ** atts);
+<!ENTITY logo SYSTEM "images/logo.gif" NDATA gif>
+@end example
+
+@noindent
+this handler is obsolete and is provided for backwards compatibility.
+Use instead @cfunc{XML_EntityDeclHandler}.  Defined as:
+
+@example
+typedef void (* XML_UnparsedEntityDeclHandler)
+   (void           *    user_data,
+    const XML_Char *    entity_name,
+    const XML_Char *    base,
+    const XML_Char *    system_id,
+    const XML_Char *    public_id,
+    const XML_Char *    notation_name);
 @end example
 @end deftp
 
 
-@deftypefun void XML_SetStartElementHandler (XML_Parser @var{p}, XML_StartElementHandler @var{start})
-Set the handler for start (and empty) tags.  Attributes are passed to
-the the start handler as a pointer to a vector of char pointers.  Each
-attribute seen in a start (or empty) tag occupies 2 consecutive places
-in this vector: the attribute name followed by the attribute value.
-These pairs are terminated by a @cnull{} pointer.
+@deftypefun void XML_SetUnparsedEntityDeclHandler (XML_Parser @var{P}, XML_UnparsedEntityDeclHandler @var{H})
+Set a handler that receives declarations of unparsed entities.
+@end deftypefun
+
+@c page
+@node api handlers element
+@subsection Element handlers
+
+
+@deftp {Function Pointer Typedef} XML_StartElementHandler
+Handler for start and empty tags.  Defined as:
+
+@example
+typedef void (* XML_StartElementHandler)
+   (void           *    user_data,
+    const XML_Char *    name,
+    const XML_Char **   atts);
+@end example
+
+@var{user_data} references the custom value registered with
+@cfunc{XML_SetUserData} or @cfunc{XML_UseParserAsHandlerArg}.
+
+@var{name} references a zero--terminated string representing the element
+type name.
+
+Attributes are passed to the the start handler as a pointer @var{atts}
+to a vector of char pointers; each attribute seen in a start (or empty)
+tag occupies @math{2} consecutive places in this vector: the attribute
+name followed by the attribute value; these pairs are terminated by a
+@cnull{} pointer.
 
 Note that an empty tag generates a call to both start and end handlers
 (in that order).
+@end deftp
+
+
+@deftypefun void XML_SetStartElementHandler (XML_Parser @var{P}, XML_StartElementHandler @var{H})
+Set the handler for start and empty tags.
 @end deftypefun
 
 
 @deftp {Function Pointer Typedef} XML_EndElementHandler
-Defined as:
+Handler for end and empty tags.  Defined as:
 
 @example
-typedef void (* XML_EndElementHandler) (void * user_data,
-                                        const XML_Char * name);
+typedef void (* XML_EndElementHandler)
+   (void           *    user_data,
+    const XML_Char *    name);
 @end example
+
+@var{user_data} references the custom value registered with
+@cfunc{XML_SetUserData} or @cfunc{XML_UseParserAsHandlerArg}.
+
+@var{name} references a zero--terminated string representing the element
+type name.
+
+An empty tag generates a call to both start and end handlers.
 @end deftp
 
 
-@deftypefun void XML_SetEndElementHandler (XML_Parser @var{p}, XML_EndElementHandler @var{end})
-Set the handler for end (and empty) tags.  As noted above, an empty tag
-generates a call to both start and end handlers.
+@deftypefun void XML_SetEndElementHandler (XML_Parser @var{p}, XML_EndElementHandler @var{H})
+Set the handler for end (and empty) tags.
 @end deftypefun
 
 
-@deftypefun void XML_SetElementHandler (XML_Parser @var{p}, XML_StartElementHandler @var{start}, XML_EndElementHandler @var{end})
+@deftypefun void XML_SetElementHandler (XML_Parser @var{P}, XML_StartElementHandler @var{S}, XML_EndElementHandler @var{E})
 Set handlers for start and end tags with one call.
 @end deftypefun
 
+@c page
+@node api handlers char data
+@subsection Character data handlers
 
-@deftp {Function Pointer Typedef} XML_CharacterDataHandler
-Defined as:
+
+Given the element:
 
 @example
-typedef void (* XML_CharacterDataHandler) (void * user_data,
-                                           const XML_Char * s,
-                                           int len);
+<greetings>Hello</greetings>
 @end example
+
+@noindent
+the character data is the @code{Hello} string.
+
+
+@deftp {Function Pointer Typedef} XML_CharacterDataHandler
+Handler for character data.  Defined as:
+
+@example
+typedef void (* XML_CharacterDataHandler)
+   (void           *    user_data,
+    const XML_Char *    string,
+    int                 string_len);
+@end example
+
+@var{user_data} references the custom value registered with
+@cfunc{XML_SetUserData} or @cfunc{XML_UseParserAsHandlerArg}.
+
+The string the handler receives through @var{string} is @strong{not}
+zero--terminated; we have to use the @var{string_len} argument to deal
+with the end of the string.
+
+A single block of contiguous text free of markup may still result in a
+sequence of calls to this handler.  In other words, if we are searching
+for a pattern in the text, it may be split across calls to this handler.
 @end deftp
 
 
 @deftypefun void XML_SetCharacterDataHandler (XML_Parser @var{p}, XML_CharacterDataHandler @var{handler})
-Set a text handler.  The string the handler receives is @strong{not}
-zero--terminated.  We have to use the @var{len} argument to deal with
-the end of the string.
-
-A single block of contiguous text free of markup may still result in a
-sequence of calls to this handler.  In other words, if we are searching
-for a pattern in the text, it may be split across calls to this
-handler.
-
-Note: Setting this handler to @cnull{} may @strong{not} immediately
-terminate callbacks if the parser is currently processing such a single
-block of contiguous markup--free text, as the parser will continue
-calling back until the end of the block is reached.
+Set a text handler.  Setting this handler to @cnull{} may @strong{not}
+immediately terminate callbacks if the parser is currently processing
+such a single block of contiguous markup--free text, as the parser will
+continue calling back until the end of the block is reached.
 @end deftypefun
 
+@c page
+@node api handlers comment
+@subsection Comment handlers
 
 
-@deftp {Function Pointer Typedef} XML_ProcessingInstructionHandler
+Comments in @axml{} look like this:
+
 @example
-typedef void
-  (* XML_ProcessingInstructionHandler) (void * user_data,
-                                        const XML_Char * target,
-                                        const XML_Char * data);
+<!-- this text means nothing -->
 @end example
-@end deftp
-
-
-@deftypefun void XML_SetProcessingInstructionHandler (XML_Parser @var{p}, XML_ProcessingInstructionHandler @var{proc})
-Set a handler for processing instructions.  The target is the first word
-in the processing instruction.  The data is the rest of the characters
-in it after skipping all whitespace after the initial word.
-@end deftypefun
 
 
 @deftp {Function Pointer Typedef} XML_CommentHandler
-Defined as:
+Handler for comments.  Defined as:
 
 @example
-typedef void (* XML_CommentHandler) (void * user_data,
-                                     const XML_Char * data);
+typedef void (* XML_CommentHandler)
+   (void           *    user_data,
+    const XML_Char *    data);
 @end example
+
+@var{user_data} references the custom value registered with
+@cfunc{XML_SetUserData} or @cfunc{XML_UseParserAsHandlerArg}.
+
+@var{data} is either @cnull{} or references a zero--terminated string
+representing the text of the comment.
 @end deftp
 
 
 @deftypefun void XML_SetCommentHandler (XML_Parser @var{p}, XML_CommentHandler @var{handler})
-Set a handler for comments.  The data is all text inside the comment
-delimiters.
+Set a handler for comments.
 @end deftypefun
+
+@c page
+@node api handlers cdata
+@subsection Cdata handler
+
+
+A @code{CDATA} element looks like this:
+
+@example
+<![CDATA[<stuff>interpreted literally</stuff>]]>
+@end example
+
+@noindent
+in which the text @code{<stuff>interpreted literally</stuff>} is handed
+to the @code{XML_CharacterDataHandler} handler.
 
 
 @deftp {Function Pointer Typedef} XML_StartCdataSectionHandler
-Defined as:
+Handler called when the @code{<![CDATA[} token is parsed.  Defined as:
 
 @example
 typedef void (* XML_StartCdataSectionHandler) (void * user_data);
 @end example
+
+@var{user_data} references the custom value registered with
+@cfunc{XML_SetUserData} or @cfunc{XML_UseParserAsHandlerArg}.
 @end deftp
 
 
@@ -2266,62 +2670,143 @@ section.
 
 
 @deftp {Function Pointer Typedef} XML_EndCdataSectionHandler
-Defined as:
+Handler called when the @code{]]>} token ending a @code{CDATA} section
+is parsed.  Defined as:
 
 @example
 typedef void (* XML_EndCdataSectionHandler) (void * user_data);
 @end example
+
+@var{user_data} references the custom value registered with
+@cfunc{XML_SetUserData} or @cfunc{XML_UseParserAsHandlerArg}.
 @end deftp
 
-@deftypefun void XML_SetEndCdataSectionHandler (XML_Parser @var{p}, XML_EndCdataSectionHandler @var{end})
+
+@deftypefun void XML_SetEndCdataSectionHandler (XML_Parser @var{P}, XML_EndCdataSectionHandler @var{H})
 Set a handler that gets called at the end of a @code{CDATA} section.
 @end deftypefun
 
 
-@deftypefun void XML_SetCdataSectionHandler (XML_Parser @var{p}, XML_StartCdataSectionHandler @var{start}, XML_EndCdataSectionHandler @var{end})
+@deftypefun void XML_SetCdataSectionHandler (XML_Parser @var{P}, XML_StartCdataSectionHandler @var{S}, XML_EndCdataSectionHandler @var{E})
 Set both @code{CDATA} handlers: the one called at the start and the one
 called at the end.
 @end deftypefun
 
+@c page
+@node api handlers namespace
+@subsection Namespace handlers
 
-@deftp {Function Pointer Typedef} XML_DefaultHandler
-Defined as:
+
+@deftp {Function Pointer Typedef} XML_StartNamespaceDeclHandler
+Handler called when a namespace is declared.  Defined as:
 
 @example
-typedef void (* XML_DefaultHandler) (void * user_data,
-                                     const XML_Char * s,
-                                     int len);
+typedef void (* XML_StartNamespaceDeclHandler)
+   (void           *    user_data,
+    const XML_Char *    prefix,
+    const XML_Char *    uri);
 @end example
+
+Namespace declarations occur inside start tags; but the namespace
+declaration start handler is called before the start tag handler for
+each namespace declared in that start tag.
+
+@var{user_data} references the custom value registered with
+@cfunc{XML_SetUserData} or @cfunc{XML_UseParserAsHandlerArg}.
+
+@var{prefix} is either @cnull{} or references a zero--terminated string
+representing the namespace prefix.
+
+@var{uri} is either @cnull{} or references a zero--terminated string
+representing the namespace @uri{}.
 @end deftp
 
 
-@deftypefun void XML_SetDefaultHandler (XML_Parser @var{p}, XML_DefaultHandler @var{h})
-Set a handler for any characters in the document which wouldn't
-otherwise be handled.  This includes both data for which no handlers can
+@deftypefun void XML_SetStartNamespaceDeclHandler (XML_Parser @var{P}, XML_StartNamespaceDeclHandler @var{H})
+Set a handler to be called when a namespace is declared.
+@end deftypefun
+
+
+@deftp {Function Pointer Typedef} XML_EndNamespaceDeclHandler
+Handler called when leaving the scope of a namespace declaration.
+Defined as:
+
+@example
+typedef void (* XML_EndNamespaceDeclHandler)
+   (void           *    user_data,
+    const XML_Char *    prefix);
+@end example
+
+This handler will be called, for each namespace declaration, after the
+handler for the end tag of the element in which the namespace was
+declared.
+
+@var{user_data} references the custom value registered with
+@cfunc{XML_SetUserData} or @cfunc{XML_UseParserAsHandlerArg}.
+
+@var{prefix} is either @cnull{} or references a zero--terminated string
+representing the namespace prefix.
+@end deftp
+
+
+@deftypefun void XML_SetEndNamespaceDeclHandler (XML_Parser @var{P}, XML_EndNamespaceDeclHandler @var{E})
+Set a handler to be called when leaving the scope of a namespace
+declaration.
+@end deftypefun
+
+
+@deftypefun void XML_SetNamespaceDeclHandler (XML_Parser @var{P}, XML_StartNamespaceDeclHandler @var{S}, XML_EndNamespaceDeclHandler @var{E})
+Set both namespace declaration handlers with a single call.
+@end deftypefun
+
+@c page
+@node api handlers default
+@subsection Default handler
+
+
+@deftp {Function Pointer Typedef} XML_DefaultHandler
+Handler called for any characters in the document which would not
+otherwise be handled; this includes both data for which no handlers can
 be set (like some kinds of @dtd{} declarations) and data which could be
-reported but which currently has no handler set.
+reported but which currently has no handler set.  Defined as:
+
+@example
+typedef void (* XML_DefaultHandler)
+   (void           *    user_data,
+    const XML_Char *    string,
+    int                 string_len);
+@end example
 
 The characters are passed exactly as they were present in the @pxml{}
-document except that they will be encoded in @utf{}-8 or @utf{}-16.
+document except that they will be encoded in @utf{}-8 or @utf{}-16; note
+that a byte order mark character is not passed to the default handler.
 Line boundaries are not normalized.
-
-Note that a byte order mark character is not passed to the default
-handler.
 
 There are no guarantees about how characters are divided between calls
 to the default handler: for example, a comment might be split between
 multiple calls.
 
-Setting the handler with this call has the side effect of turning off
-expansion of references to internally defined general entities.  Instead
-these references are passed to the default handler.
+@var{user_data} references the custom value registered with
+@cfunc{XML_SetUserData} or @cfunc{XML_UseParserAsHandlerArg}.
+
+@var{string} references a @strong{not} zero--terminated string holding
+@var{string_len} characters representing the input data.
 
 See also @cfunc{XML_DefaultCurrent}.
+@end deftp
+
+
+@deftypefun void XML_SetDefaultHandler (XML_Parser @var{P}, XML_DefaultHandler @var{H})
+Set a handler for any characters in the document which wouldn't
+otherwise be handled.  Setting the handler with this call has the side
+effect of turning off expansion of references to internally defined
+general entities; instead these references are passed to the default
+handler.
 @end deftypefun
 
 
-@deftypefun void XML_SetDefaultHandlerExpand (XML_Parser @var{p}, XML_DefaultHandler @var{h})
-Set a default handler, but doesn't inhibit the expansion of internal
+@deftypefun void XML_SetDefaultHandlerExpand (XML_Parser @var{P}, XML_DefaultHandler @var{H})
+Set a default handler, but does not inhibit the expansion of internal
 entity references.  The entity reference will not be passed to the
 default handler.
 
@@ -2329,103 +2814,30 @@ See also @cfunc{XML_DefaultCurrent}.
 @end deftypefun
 
 
-@deftp {Function Pointer Typedef} XML_ExternalEntityRefHandler
-Defined as:
-
-@example
-typedef int
-  (* XML_ExternalEntityRefHandler) (XML_Parser p,
-                                    const XML_Char * context,
-                                    const XML_Char * base,
-                                    const XML_Char * system_id,
-                                    const XML_Char * public_id);
-@end example
-@end deftp
-
-
-@deftypefun void XML_SetExternalEntityRefHandler (XML_Parser @var{p}, XML_ExternalEntityRefHandler @var{h})
-Set an external entity reference handler.  This handler is also called
-for processing an external @dtd{} subset if parameter entity parsing is
-in effect.  See @cfunc{XML_SetParamEntityParsing}.
-
-The context parameter specifies the parsing context in the format
-expected by the context argument to
-@cfunc{XML_ExternalEntityParserCreate}.  @code{code} is valid only until
-the handler returns, so if the referenced entity is to be parsed later,
-it must be copied.
-
-@var{context} is @cnull{} only when the entity is a parameter entity,
-which is how one can differentiate between general and parameter
-entities.
-
-The @var{base} parameter is the base to use for relative system
-identifiers.  It is set by @cfunc{XML_SetBase} and may be @cnull{}.
-
-The @var{public_id} parameter is the public id given in the entity
-declaration and may be @cnull{}.
-
-@var{system_id} is the system identifier specified in the entity
-declaration and is never @cnull{}.
-
-There are a couple of ways in which this handler differs from others.
-
-@enumerate
-@item
-This handler returns a status indicator (an integer).
-@code{XML_STATUS_OK} should be returned for successful handling of the
-external entity reference.  Returning @code{XML_STATUS_ERROR} indicates
-failure, and causes the calling parser to return an
-@code{XML_ERROR_EXTERNAL_ENTITY_HANDLING} error.
-
-@item
-Instead of having the user data as its first argument, it receives the
-parser that encountered the entity reference.  This, along with the
-@var{context} parameter, may be used as arguments to a call to
-@cfunc{XML_ExternalEntityParserCreate}.  Using the returned parser, the
-body of the external entity can be recursively parsed.
-@end enumerate
-
-Since this handler may be called recursively, it should not be saving
-information into global or static variables.
+@deftypefun void XML_DefaultCurrent (XML_Parser @var{p})
+This function can be called within a handler for a start element, end
+element, processing instruction or character data.  It causes the
+corresponding markup to be passed to the default handler set by
+@cfunc{XML_SetDefaultHandler} or @cfunc{XML_SetDefaultHandlerExpand}.
+It does nothing if there is not a default handler.
 @end deftypefun
 
-
-@deftypefun void XML_SetExternalEntityRefHandlerArg (XML_Parser @var{p}, void * @var{arg})
-Set the argument passed to the @code{XML_ExternalEntityRefHandler}.  If
-@var{arg} is not @cnull{}, it is the new value passed to the handler set
-using @cfunc{XML_SetExternalEntityRefHandler}; if @var{arg} is @cnull{},
-the argument passed to the handler function will be the parser object
-itself.
-
-@quotation
-@strong{NOTE} The type of @var{arg} and the type of the first argument to
-the @code{XML_ExternalEntityRefHandler} do not match.  This function
-takes a @code{void *} to be passed to the handler, while the handler
-accepts an @code{XML_Parser}.
-
-This is a historical accident, but will not be corrected before Expat
-2.0 (at the earliest) to avoid causing compiler warnings for code that's
-known to work with this @api{}.  It is the responsibility of the
-application code to know the actual type of the argument passed to the
-handler and to manage it properly.
-@end quotation
-@end deftypefun
+@c page
+@node api handlers entity
+@subsection Special entity handlers
 
 
 @deftp {Function Pointer Typedef} XML_SkippedEntityHandler
-Defined as:
+Handler for skipped entities.  Defined as:
 
 @example
-typedef void
-  (* XML_SkippedEntityHandler) (void * user_data,
-                                const XML_Char *entityName,
-                                int is_parameter_entity);
+typedef void (* XML_SkippedEntityHandler)
+   (void           *    user_data,
+    const XML_Char *    entity_name,
+    int                 is_parameter_entity);
 @end example
-@end deftp
 
-
-@deftypefun void XML_SetSkippedEntityHandler (XML_Parser @var{p}, XML_SkippedEntityHandler @var{h})
-Set a skipped entity handler.  This is called in two situations:
+This is called in two situations:
 
 @enumerate
 @item
@@ -2437,8 +2849,14 @@ An internal entity reference is read, but not expanded, because
 @cfunc{XML_SetDefaultHandler} has been called.
 @end enumerate
 
-The @var{is_parameter_entity} argument will be non--zero for a parameter
-entity and zero for a general entity.
+@var{user_data} references the custom value registered with
+@cfunc{XML_SetUserData} or @cfunc{XML_UseParserAsHandlerArg}.
+
+@var{entity_name} references a zero--terminated string representing the
+entity name.
+
+@var{is_parameter_entity} is non--zero for a parameter entity and zero
+for a general entity.
 
 @quotation
 @strong{NOTE} Skipped parameter entities in declarations and skipped
@@ -2446,18 +2864,88 @@ general entities in attribute values cannot be reported, because the
 event would be out of sync with the reporting of the declarations or
 attribute values.
 @end quotation
+@end deftp
+
+
+@deftypefun void XML_SetSkippedEntityHandler (XML_Parser @var{P}, XML_SkippedEntityHandler @var{H})
+Set a skipped entity handler.
 @end deftypefun
+
+@c page
+@node api handlers procinst
+@subsection Processing instruction handlers
+
+
+Processing instructions look like this:
+
+@example
+<?scheme (display 123)?>
+@end example
+
+@noindent
+in which the target is @code{scheme} and the data is @code{(display
+123)}.
+
+
+@deftp {Function Pointer Typedef} XML_ProcessingInstructionHandler
+Handler for processing instructions.  Defined as:
+
+@example
+typedef void (* XML_ProcessingInstructionHandler)
+   (void           *    user_data,
+    const XML_Char *    target,
+    const XML_Char *    data);
+@end example
+
+The target is the first word in the processing instruction.  The data is
+the rest of the characters in it after skipping all whitespace after the
+initial word.
+
+@var{user_data} references the custom value registered with
+@cfunc{XML_SetUserData} or @cfunc{XML_UseParserAsHandlerArg}.
+
+@var{target} references a zero--terminated string representing the
+processing instruction target.
+
+@var{data} references a zero--terminated string representing the
+processing instruction data.
+@end deftp
+
+
+@deftypefun void XML_SetProcessingInstructionHandler (XML_Parser @var{P}, XML_ProcessingInstructionHandler @var{H})
+Set a handler for processing instructions.
+@end deftypefun
+
+@c page
+@node api handlers encoding
+@subsection Character encoding handlers
 
 
 @deftp {Function Pointer Typedef} XML_UnknownEncodingHandler
-Defined as:
+Handler to deal with encodings other than the built in set.  Defined as:
 
 @example
-typedef int
-  (* XML_UnknownEncodingHandler) (void * encodingHandlerData,
-                                  const XML_Char *name,
-                                  XML_Encoding *info);
+typedef int (* XML_UnknownEncodingHandler)
+   (void           *    handler_data,
+    const XML_Char *    name,
+    XML_Encoding   *    info);
 @end example
+
+If the handler knows how to deal with an encoding with the given name,
+it should fill in the @var{info} data structure and return
+@code{XML_STATUS_OK}; otherwise it should return
+@code{XML_STATUS_ERROR}.
+
+The handler will be called at most once per parsed (external) entity.
+
+@var{handler_data} is the custom pointer registered with
+@cfunc{XML_SetUnknownEncodingHandler}.
+
+@var{name} references a zero--terminated string representing the
+encoding name.
+
+@var{info} references a data structure to be filled with stuff needed to
+handle the encoding.
 @end deftp
 
 
@@ -2466,230 +2954,50 @@ Structure representing an encoding.
 
 @table @code
 @item int map[256]
+The @var{map} array contains information for every possible leading byte
+in a byte sequence.
+
+@itemize
+@item
+If the corresponding value is @math{N >= 0}, then it's a single byte
+sequence and the byte encodes the Unicode code point @math{N}.
+
+@item
+If the value is @math{-1}, then that byte is invalid as the initial byte
+in a sequence.
+
+@item
+If the value is @math{-N}, then @math{N} is the number of bytes in the
+sequence and the actual conversion is accomplished by a call to the
+function pointed at by the field @code{convert}.
+@end itemize
+
 @item void * data
-@item int (* convert) (void * data, const char * s)
+Custom pointer used as first argument to the functions referenced by the
+fields @code{convert} and @code{release}.
+
+@item int (* convert) (void * data, const char * str)
+Pointer to the function used to convert a sequence of input characters;
+the @code{convert} pointer may be @cnull{} if there are only single byte
+codes.  The string @var{str} is @strong{not} zero--terminated and points
+at the sequence of bytes to be converted.  This function may return
+@code{-1} if the sequence itself is invalid.
+
 @item void (* release) (void * data)
+The function pointed at by @code{release} is called by the parser when
+it is finished with the encoding; it may be @cnull{}.
 @end table
 @end deftp
 
 
-@deftypefun void XML_SetUnknownEncodingHandler (XML_Parser @var{p}, XML_UnknownEncodingHandler @var{enchandler}, void * @var{encoding_handler_data})
+@deftypefun void XML_SetUnknownEncodingHandler (XML_Parser @var{P}, XML_UnknownEncodingHandler @var{H}, void * @var{encoding_data})
 Set a handler to deal with encodings other than the built in set.  This
-should be done before @cfunc{XML_Parse} or @cfunc{XML_ParseBuffer} have
-been called on the given parser.
+function should be called before @cfunc{XML_Parse} or
+@cfunc{XML_ParseBuffer} have been called on the given parser.
 
-If the handler knows how to deal with an encoding with the given name,
-it should fill in the @var{info} data structure and return
-@code{XML_STATUS_OK}.  Otherwise it should return
-@code{XML_STATUS_ERROR}.  The handler will be called at most once per
-parsed (external) entity.  The optional application data pointer
-@var{encoding_handler_data} will be passed back to the handler.
-
-The @var{map} array contains information for every possible possible
-leading byte in a byte sequence.
-
-@itemize
-@item
-If the corresponding value is >= 0, then it's a single byte sequence and
-the byte encodes that Unicode value.
-
-@item
-If the value is -1, then that byte is invalid as the initial byte in a
-sequence.
-
-@item
-If the value is -n, where n is an integer > 1, then n is the number of
-bytes in the sequence and the actual conversion is accomplished by a
-call to the function pointed at by convert.
-@end itemize
-
-This function may return @code{-1} if the sequence itself is invalid.
-The @code{convert} pointer may be null if there are only single byte
-codes.  The @var{data} parameter passed to the @code{convert} function
-is the data pointer from @cfunc{XML_Encoding}.  The string @var{s} is
-@strong{not} zero--terminated and points at the sequence of bytes to be
-converted.
-
-The function pointed at by @code{release} is called by the parser when
-it is finished with the encoding.  It may be @cnull{}.
+The optional application data pointer @var{encoding_data} will be passed
+back to the handler.
 @end deftypefun
-
-
-@deftp {Function Pointer Typedef} XML_StartNamespaceDeclHandler
-Defined as:
-
-@example
-typedef void
-  (* XML_StartNamespaceDeclHandler) (void * user_data,
-                                     const XML_Char *prefix,
-                                     const XML_Char *uri);
-@end example
-@end deftp
-
-
-@deftypefun void XML_SetStartNamespaceDeclHandler (XML_Parser @var{p}, XML_StartNamespaceDeclHandler @var{start})
-Set a handler to be called when a namespace is declared.  Namespace
-declarations occur inside start tags.  But the namespace declaration
-start handler is called before the start tag handler for each namespace
-declared in that start tag.
-@end deftypefun
-
-
-@deftp {Function Pointer Typedef} XML_EndNamespaceDeclHandler
-Defined as:
-
-@example
-typedef void
-  (* XML_EndNamespaceDeclHandler) (void * user_data,
-                                   const XML_Char *prefix);
-@end example
-@end deftp
-
-
-@deftypefun void XML_SetEndNamespaceDeclHandler (XML_Parser @var{p}, XML_EndNamespaceDeclHandler @var{end})
-Set a handler to be called when leaving the scope of a namespace
-declaration.  This will be called, for each namespace declaration, after
-the handler for the end tag of the element in which the namespace was
-declared.
-@end deftypefun
-
-
-@deftypefun void XML_SetNamespaceDeclHandler (XML_Parser @var{p}, XML_StartNamespaceDeclHandler @var{start}, XML_EndNamespaceDeclHandler @var{end})
-Set both namespace declaration handlers with a single call.
-@end deftypefun
-
-
-@deftp {Function Pointer Typedef} XML_XmlDeclHandler
-Defined as:
-
-@example
-typedef void (* XML_XmlDeclHandler) (void            *userData,
-                                     const XML_Char  *version,
-                                     const XML_Char  *encoding,
-                                     int             standalone);
-@end example
-@end deftp
-
-
-@deftypefun void XML_SetXmlDeclHandler (XML_Parser @var{p}, XML_XmlDeclHandler @var{xmldecl})
-Sets a handler that is called for @pxml{} declarations and also for text
-declarations discovered in external entities.  The way to distinguish is
-that the version parameter will be @cnull{} for text declarations.  The
-encoding parameter may be @cnull{} for an @pxml{} declaration.  The
-standalone argument will contain -1, 0, or 1 indicating respectively
-that there was no standalone parameter in the declaration, that it was
-given as no, or that it was given as yes.
-@end deftypefun
-
-
-@deftp {Function Pointer Typedef} XML_StartDoctypeDeclHandler
-Defined as:
-
-@example
-typedef void
-  (* XML_StartDoctypeDeclHandler) (void * userData,
-                                   const XML_Char * doctypeName,
-                                   const XML_Char * sysid,
-                                   const XML_Char * pubid,
-                                   int has_internal_subset);
-@end example
-@end deftp
-
-
-@deftypefun void XML_SetStartDoctypeDeclHandler (XML_Parser @var{p}, XML_StartDoctypeDeclHandler @var{start})
-Set a handler that is called at the start of a @code{DOCTYPE}
-declaration, before any external or internal subset is parsed.  Both
-sysid and pubid may be @cnull{}.  The @var{has_internal_subset} will be
-non--zero if the @code{DOCTYPE} declaration has an internal subset.
-@end deftypefun
-
-
-@deftp {Function Pointer Typedef} XML_EndDoctypeDeclHandler
-Defined as:
-
-@example
-typedef void (* XML_EndDoctypeDeclHandler) (void * user_data);
-@end example
-@end deftp
-
-
-@deftypefun void XML_SetEndDoctypeDeclHandler (XML_Parser @var{p}, XML_EndDoctypeDeclHandler @var{end})
-Set a handler that is called at the end of a DOCTYPE declaration, after
-parsing any external subset.
-@end deftypefun
-
-
-@deftypefun void XML_SetDoctypeDeclHandler (XML_Parser @var{p}, XML_StartDoctypeDeclHandler @var{start}, XML_EndDoctypeDeclHandler @var{end})
-Set both doctype handlers with one call.
-@end deftypefun
-
-
-@deftp {Function Pointer Typedef} XML_UnparsedEntityDeclHandler
-Defined as:
-
-@example
-typedef void
-  (* XML_UnparsedEntityDeclHandler)
-    (void * user_data,
-     const XML_Char * entity_name,
-     const XML_Char * base,
-     const XML_Char * system_id,
-     const XML_Char * public_id,
-     const XML_Char * notation_name);
-@end example
-@end deftp
-
-
-@deftypefun void XML_SetUnparsedEntityDeclHandler (XML_Parser @var{p}, XML_UnparsedEntityDeclHandler @var{h})
-Set a handler that receives declarations of unparsed entities.  These are
-entity declarations that have a notation (@code{NDATA}) field:
-
-@example
-<!ENTITY logo SYSTEM "images/logo.gif" NDATA gif>
-@end example
-
-This handler is obsolete and is provided for backwards compatibility.
-Use instead @cfunc{XML_SetEntityDeclHandler}.
-@end deftypefun
-
-
-@deftp {Function Pointer Typedef} XML_NotationDeclHandler
-Defined as:
-
-@example
-typedef void
-(* XML_NotationDeclHandler) (void * user_data,
-                             const XML_Char * notation_name,
-                             const XML_Char * base,
-                             const XML_Char * system_id,
-                             const XML_Char * public_id);
-@end example
-@end deftp
-
-
-@deftypefun void XML_SetNotationDeclHandler (XML_Parser @var{p}, XML_NotationDeclHandler @var{h})
-Set a handler that receives notation declarations.
-@end deftypefun
-
-
-@deftp {Function Pointer Typedef} XML_NotStandaloneHandler
-Defined as:
-
-@example
-typedef int (* XML_NotStandaloneHandler) (void * user_data);
-@end example
-@end deftp
-
-
-@deftypefun void XML_SetNotStandaloneHandler (XML_Parser @var{p}, XML_NotStandaloneHandler @var{h})
-Set a handler that is called if the document is not ``standalone''.
-This happens when there is an external subset or a reference to a
-parameter entity, but does not have standalone set to @code{yes} in an
-@pxml{} declaration.  If this handler returns @code{XML_STATUS_ERROR},
-then the parser will throw an @code{XML_ERROR_NOT_STANDALONE} error.
-@end deftypefun
-
-
 
 @c page
 @node api report
@@ -3091,15 +3399,6 @@ returned parts is @uri{}, local name, and prefix.
 
 If @var{do_nst} is zero, then namespaces are reported in the default
 manner, @uri{} then local name separated by the namespace separator.
-@end deftypefun
-
-
-@deftypefun void XML_DefaultCurrent (XML_Parser @var{p})
-This function can be called within a handler for a start element, end
-element, processing instruction or character data.  It causes the
-corresponding markup to be passed to the default handler set by
-@cfunc{XML_SetDefaultHandler} or @cfunc{XML_SetDefaultHandlerExpand}.
-It does nothing if there is not a default handler.
 @end deftypefun
 
 @c page
