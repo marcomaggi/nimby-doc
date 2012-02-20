@@ -1744,13 +1744,13 @@ freeing any memory associated with user data.
 Clean up the memory structures maintained by the parser so that it may
 be used again.  After this has been called, the parser is ready to start
 parsing a new document.  All handlers are cleared from the parser,
-except for the @var{unknownEncodingHandler}.  The parser's external
+except for the @code{XML_UnknownEncodingHandler}.  The parser's external
 state is re--initialized except for the values of @var{ns} and
 @var{ns_triplets}.  This function may not be used on a parser created
 using @cfunc{XML_ExternalEntityParserCreate}; it will return
-@code{XML_FALSE} in that case.  Returns @code{XML_TRUE} on success.
-Our application is responsible for dealing with any memory associated
-with user data.
+@code{XML_FALSE} in that case.  Returns @code{XML_TRUE} on success.  Our
+application is responsible for dealing with any memory associated with
+user data.
 @end deftypefun
 
 @c page
