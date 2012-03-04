@@ -2019,13 +2019,11 @@ parameter entity parsing is in effect.  See
 
 The @var{context} parameter specifies the parsing context in the format
 expected by the context argument to
-@cfunc{XML_ExternalEntityParserCreate}.  @code{context} is valid only
+@cfunc{XML_ExternalEntityParserCreate}.  @var{context} is valid only
 until the handler returns, so if the referenced entity is to be parsed
-later, it must be copied.
-
-@var{context} is @cnull{} only when the entity is a parameter entity,
-which is how one can differentiate between general and parameter
-entities.
+later, it must be copied.  @var{context} is @cnull{} only when the
+entity is a parameter entity, which is how one can differentiate between
+general and parameter entities.
 
 @var{base} is the base to use for relative system identifiers; it is set
 by @cfunc{XML_SetBase} and may be @cnull{}.
