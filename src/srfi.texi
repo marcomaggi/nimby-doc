@@ -1,4 +1,4 @@
-\input srfi.tex
+\input texinfo.tex
 @c %**start of header
 @setfilename srfi.info
 @settitle Scheme Requests For Implementation
@@ -13,7 +13,7 @@
 2008-12-01-17-00-15
 @end macro
 
-@include texinfo-macros.texiinc
+@include texinfo-macros.texi
 
 @c ------------------------------------------------------------
 
@@ -139,7 +139,7 @@ Indexes
 * srfi environment-variables::  @ansrfi{98} environment variables.
 @end menu
 
-@include index.texiinc
+@include index.texi
 
 @c ------------------------------------------------------------
 

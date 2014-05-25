@@ -185,7 +185,7 @@ Copyright @copyright{}  2005--2008  by Nicolas Cannasse
 and it is distributed under the terms of the @gnu{} Lesser General
 Public License as published by the Free Software Foundation; either
 version 2.1 of the License, or (at your option) any later version.
-@ref{Software License} for details.
+@ref{Package License} for details.
 
 This document is:
 
@@ -216,7 +216,7 @@ Appendices
 * mod_neko::                    An introduction to @modneko{}.
 * nekoml::                      A quick guide to NekoML.
 * examples::                    Neko code examples.
-* Software License::            @gnu{} Lesser General Public License.
+* Package License::             @gnu{} Lesser General Public License.
 * Documentation License::       @gnu{} Free Documentation License.
 * References::                  Bibliography and references.
 
@@ -9238,9 +9238,8 @@ make = basic_new;
 
 
 @c page
-@node Software License
-@appendix @gnu{} Lesser General Public License
-
+@node Package License
+@appendix GNU LESSER GENERAL PUBLIC LICENSE
 
 @cindex LGPL, Lesser General Public License
 @center Version 2.1, February 1999
@@ -9804,8 +9803,6 @@ Ty Coon, President of Vice
 @end smallexample
 
 That's all there is to it!
-
-
 
 @c page
 @node Documentation License

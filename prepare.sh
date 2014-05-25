@@ -1,15 +1,10 @@
 # prepare.sh --
+#
+# Run this to rebuild the infrastructure and configure.
 
-set -x
+set -xe
 
-(cd .. && sh ./autogen.sh)
-
-prefix=/usr/local
-
-../configure \
-    --config-cache                              \
-    --cache-file=../config.cache                \
-    --prefix="${prefix}"                        \
-    "$@"
+(cd .. && sh autogen.sh)
+sh ../configure.sh
 
 ### end of file
