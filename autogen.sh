@@ -5,7 +5,7 @@
 export PATH=/bin:/usr/local/bin:/usr/bin:$PATH
 
 set -xe
-test -d autotools || mkdir autotools
+test -d meta/autotools || mkdir -p meta/autotools
 autoreconf --warnings=all --install --verbose "$@"
 
 ### end of file

@@ -2,9 +2,15 @@
 
 AUTOMAKE_OPTIONS	= foreign
 EXTRA_DIST		= README
-AM_MAKEINFOFLAGS	= --no-split -I $(srcdir)/appendices/srfi
 
 ## --------------------------------------------------------------------
+
+EXTRA_DIST		+= \
+	src/fdl-1.3.texi	\
+	src/lgpl-2.1.texi	\
+	src/gpl-2.0.texi
+
+AM_MAKEINFOFLAGS	= --no-split
 
 info_TEXINFOS	= \
 	src/boehm-gc.texi	\
@@ -15,43 +21,43 @@ info_TEXINFOS	= \
 	src/r6rs.texi		\
 	src/r6rs-lib.texi	\
 	src/ypsilon.texi	\
-	src/srfi.texi
+	src/srfi/srfi.texi
 
 ## --------------------------------------------------------------------
 
 EXTRA_DIST		+= \
-	appendices/uuid.texi				\
-	appendices/zlib.texi				\
-	appendices/bzlib.texi				\
-	appendices/ex.texi				\
+	appendices/uuid.texi			\
+	appendices/zlib.texi			\
+	appendices/bzlib.texi			\
+	appendices/ex.texi			\
 	appendices/sa.texi
 
-src_srfi_TEXINFOS	= \
-	appendices/srfi/index.texi			\
-	appendices/srfi/texinfo-macros.texi		\
+src_srfi_srfi_TEXINFOS	= \
+	src/srfi/index.texi			\
+	src/srfi/texinfo-macros.texi		\
 	\
-	appendices/srfi/and-let-star.texi		\
-	appendices/srfi/args-fold.texi			\
-	appendices/srfi/case-lambda.texi		\
-	appendices/srfi/cond-expand.texi		\
-	appendices/srfi/eager-comp.texi			\
-	appendices/srfi/environment-variables.texi	\
-	appendices/srfi/error-reporting.texi		\
-	appendices/srfi/general-cond.texi		\
-	appendices/srfi/let-values.texi			\
-	appendices/srfi/lightweight-testing.texi	\
-	appendices/srfi/list.texi			\
-	appendices/srfi/parameters.texi			\
-	appendices/srfi/random.texi			\
-	appendices/srfi/receive.texi			\
-	appendices/srfi/records.texi			\
-	appendices/srfi/rec.texi			\
-	appendices/srfi/shared-structures.texi		\
-	appendices/srfi/specialize-procedures.texi	\
-	appendices/srfi/streams.texi			\
-	appendices/srfi/string-ports.texi		\
-	appendices/srfi/strings.texi			\
-	appendices/srfi/time.texi			\
-	appendices/srfi/vector.texi
+	src/srfi/and-let-star.texi		\
+	src/srfi/args-fold.texi			\
+	src/srfi/case-lambda.texi		\
+	src/srfi/cond-expand.texi		\
+	src/srfi/eager-comp.texi		\
+	src/srfi/environment-variables.texi	\
+	src/srfi/error-reporting.texi		\
+	src/srfi/general-cond.texi		\
+	src/srfi/let-values.texi		\
+	src/srfi/lightweight-testing.texi	\
+	src/srfi/list.texi			\
+	src/srfi/parameters.texi		\
+	src/srfi/random.texi			\
+	src/srfi/receive.texi			\
+	src/srfi/records.texi			\
+	src/srfi/rec.texi			\
+	src/srfi/shared-structures.texi		\
+	src/srfi/specialize-procedures.texi	\
+	src/srfi/streams.texi			\
+	src/srfi/string-ports.texi		\
+	src/srfi/strings.texi			\
+	src/srfi/time.texi			\
+	src/srfi/vector.texi
 
 ### end of file
