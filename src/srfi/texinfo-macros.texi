@@ -184,7 +184,7 @@ Revised^6 Report on the algorithmic language Scheme
 @code{\NAME\()}
 @end macro
 
-@macro null{}
+@macro snull{}
 @code{()}
 @end macro
 
@@ -226,10 +226,6 @@ Revised^6 Report on the algorithmic language Scheme
 @c ------------------------------------------------------------
 @c RNRS document macros.
 @c ------------------------------------------------------------
-
-@macro cite{NAME}
-[@sc{\NAME\}]
-@end macro
 
 @macro rsixlibrary{THING}
 @code{(rnrs \THING\ (6))}

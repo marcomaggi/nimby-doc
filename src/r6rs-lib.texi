@@ -2147,16 +2147,16 @@ the same record type.
 
 The record mechanism spans three libraries:
 
-@table @rsixlibrary
-@item records syntactic
+@table @asis
+@item @rsixlibrary{records syntactic}
 library, a syntactic layer for defining a record type and associated
 constructor, predicate, accessor, and mutators,
 
-@item records procedural
+@item @rsixlibrary{records procedural}
 library, a procedural layer for creating and manipulating record types
 and creating constructors, predicates, accessors, and mutators;
 
-@item records inspection
+@item @rsixlibrary{records inspection}
 library, a set of inspection procedures.
 @end table
 
@@ -3921,12 +3921,12 @@ This type describes unbound identifiers in the program.
 This chapter describes Scheme's libraries for performing input and
 output:
 
-@table @rsixlibrary
-@item io ports
+@table @asis
+@item @rsixlibrary{io ports}
 it is an I/O layer for conventional, imperative buffered input and
 output with text and binary data;
 
-@item io simple
+@item @rsixlibrary{io simple}
 it is a convenience library atop the @rsixlibrary{io ports} library for
 textual I/O, compatible with the traditional Scheme I/O procedures.
 @end table
@@ -6240,32 +6240,32 @@ These predicates must be transitive.
 These numerical predicates test a flonum for a particular property,
 returning @true{} or @false{}:
 
-@table @func
-@item flinteger?
+@table @asis
+@item @func{flinteger?}
 procedure tests whether the number object is an integer,
 
-@item flzero?
+@item @func{flzero?}
 tests whether it is @func{fl=?} to zero,
 
-@item flpositive?
+@item @func{flpositive?}
 tests whether it is greater than zero,
 
-@item flnegative?
+@item @func{flnegative?}
 tests whether it is less than zero,
 
-@item flodd?
+@item @func{flodd?}
 tests whether it is odd,
 
-@item fleven?
+@item @func{fleven?}
 tests whether it is even,
 
-@item flfinite?
+@item @func{flfinite?}
 tests whether it is not an infinity and not a NaN,
 
-@item flinfinite?
+@item @func{flinfinite?}
 tests whether it is an infinity,
 
-@item flnan?
+@item @func{flnan?}
 tests whether it is a NaN.
 @end table
 
@@ -6407,18 +6407,18 @@ Implementations should implement following behavior:
 These procedures return integral flonums for flonum arguments that are
 not infinities or NaNs.
 
-@table @func
-@item flfloor
+@table @asis
+@item @func{flfloor}
 Returns the largest integral flonum not larger than @var{fl}.
 
-@item flceiling
+@item @func{flceiling}
 Returns the smallest integral flonum not smaller than @var{fl}.
 
-@item fltruncate
+@item @func{fltruncate}
 Returns the integral flonum closest to @var{fl} whose absolute value is
 not larger than the absolute value of @var{fl}.
 
-@item flround
+@item @func{flround}
 Returns the closest integral flonum to @var{fl}, rounding to even when
 @var{fl} represents a number halfway between two integers.
 @end table
@@ -6447,18 +6447,18 @@ given a NaN:
 @deffnx Procedure {flatan} @vari{fl} @varii{fl}
 These procedures compute the usual transcendental functions.
 
-@table @func
-@item flexp
+@table @asis
+@item @func{flexp}
 Computes the base-E exponential of @var{fl}.
 
-@item fllog
+@item @func{fllog}
 With a single argument computes the natural logarithm of @var{fl} (not
 the base ten logarithm); @code{(fllog @vari{fl} @varii{fl})} computes
 the base--@varii{fl} logarithm of @vari{fl}.
 
-@item flasin
-@itemx flacos
-@item flatan
+@item @func{flasin}
+@itemx @func{flacos}
+@itemx @func{flatan}
 Compute arcsine, arccosine, and arctangent, respectively.  @code{(flatan
 @vari{fl} @varii{fl})} computes the arc tangent of @vari{fl}/@varii{fl}.
 @end table
@@ -8529,11 +8529,11 @@ names of the @hyper{symbol}s are significant.
 The @rsixlibrary{} library is a composite of most of the libraries
 described in this report.  The only exceptions are:
 
-@table @rsixlibrary
-@item eval
-@item mutable-pairs
-@item mutable-strings
-@item r5rs
+@table @asis
+@item @rsixlibrary{eval}
+@item @rsixlibrary{mutable-pairs}
+@item @rsixlibrary{mutable-strings}
+@item @rsixlibrary{r5rs}
 @end table
 
 The library exports all procedures and syntactic forms provided by the

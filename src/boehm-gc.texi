@@ -1,6 +1,6 @@
 \input texinfo.tex
 @c %**start of header
-@setfilename gc.info
+@setfilename boehm-gc.info
 @settitle Boehm--Demers--Weiser Garbage Collection Library
 @c %**end of header
 

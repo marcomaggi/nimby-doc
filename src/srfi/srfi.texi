@@ -15,16 +15,12 @@
 
 @include texinfo-macros.texi
 
-@c ------------------------------------------------------------
-
 @c page
 @c ------------------------------------------------------------
 @c Values.
 @c ------------------------------------------------------------
 
 @set TITLE              Scheme Requests For Implementation
-
-@c ------------------------------------------------------------
 
 @c page
 @c ------------------------------------------------------------
@@ -41,8 +37,6 @@ The original documents can be downloaded from:
 @center @url{http://srfi.schemers.org/}
 
 @end copying
-
-@c ------------------------------------------------------------
 
 @c page
 @c ------------------------------------------------------------
@@ -74,8 +68,6 @@ The original documents can be downloaded from:
 @syncodeindex fn cp
 @end ignore
 
-@c ------------------------------------------------------------
-
 @c page
 @ifnottex
 @node Top
@@ -97,8 +89,6 @@ Indexes
 * type index::                  An entry for each type.
 @end menu
 @end ifnottex
-
-@c ------------------------------------------------------------
 
 @c page
 @node srfi
@@ -140,8 +130,6 @@ Indexes
 @end menu
 
 @include index.texi
-
-@c ------------------------------------------------------------
 
 @c page
 @node concept index

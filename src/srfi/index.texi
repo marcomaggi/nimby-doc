@@ -1,0 +1,29 @@
+@c index.texi --
+
+@c The order of the inclusion must match the order in which the heading appears in the menu.
+
+@include cond-expand.texi
+@include list.texi
+@include and-let-star.texi
+@include string-ports.texi
+@include receive.texi
+@include records.texi
+@include let-values.texi
+@include strings.texi
+@include case-lambda.texi
+@include time.texi
+@include error-reporting.texi
+@include shared-structures.texi
+@include specialize-procedures.texi
+@include random.texi
+@include rec.texi
+@include parameters.texi
+@include args-fold.texi
+@include streams.texi
+@include eager-comp.texi
+@include vector.texi
+@include general-cond.texi
+@include lightweight-testing.texi
+@include environment-variables.texi
+
+@c end of file

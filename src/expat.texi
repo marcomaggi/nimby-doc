@@ -579,17 +579,17 @@ Expat can be intimidating due to the many kinds of handlers and options
 we can set.  But we only need to learn four functions in order to do
 90% of what we'll want to do with it:
 
-@table @cfunc
-@item XML_ParserCreate
+@table @asis
+@item @cfunc{XML_ParserCreate}
 Create a new parser object.
 
-@item XML_SetElementHandler
+@item @cfunc{XML_SetElementHandler}
 Set handlers for start and end tags.
 
-@item XML_SetCharacterDataHandler
+@item @cfunc{XML_SetCharacterDataHandler}
 Set handler for text.
 
-@item XML_Parse
+@item @cfunc{XML_Parse}
 Feed a buffer holding the document to the parser.
 @end table
 

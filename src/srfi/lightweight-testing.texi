@@ -97,7 +97,7 @@ eager comprehension in the sense of @ansrfi{42}.  For example:
 
 @example
 (check-ec (:range e 100)
-          (:let x (expt 2.0 e)) 
+          (:let x (expt 2.0 e))
   (= (+ x 1) x) => #f (e x))
 @end example
 
@@ -146,12 +146,12 @@ development----of @srfi{}s.
 Although it is extremely straightforward, the origin of the particular
 mechanism described here is the @file{examples.scm} file accompanying
 the reference implementation of @ansrfi{42}.  The same mechanism has been
-reimplemented for the reference implementation of @srfi{67}, and a
+reimplemented for the reference implementation of @ansrfi{7}, and a
 simplified version is yet again found in the reference implementation of
 @ansrfi{77}.
 
 The mechanism in this @srfi{} does not replace more sophisticated
-approaches to unit testing, like @srfi{64} or SchemeUnit.  These
+approaches to unit testing, like @ansrfi{4} or SchemeUnit.  These
 systems provide more control of the testing, separate the definition of
 a test, its execution, and its reports, and provide several other
 features.
@@ -252,7 +252,7 @@ list the relevant free variables of @var{expr} (see examples) that you
 want to have printed.
 
 A @var{qualifier} is any qualifier of an eager comprehension as
-specified in @srfi{42}.
+specified in @ansrfi{2}.
 
 Examples:
 
@@ -274,7 +274,7 @@ Examples:
              (x y z)) ; passes with 10^3 cases checked
 @end example
 @end deffn
-       
+
 
 @defun check-report
 Print a summary and the first failed check, if there is any, depending

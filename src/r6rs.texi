@@ -467,7 +467,7 @@ Numerical operations
 
 @c page
 @node summary
-@chapheading Summary
+@chapter Summary
 
 
 @noindent
@@ -514,7 +514,7 @@ necessary.
 
 @c page
 @node introduction
-@chapheading Introduction
+@chapter Introduction
 
 
 @noindent
@@ -546,7 +546,7 @@ recently, Scheme became the first programming language to support
 hygienic macros, which permit the syntax of a block--structured language
 to be extended in a consistent and reliable manner.
 
-@section Guiding principles
+@subsubheading Guiding principles
 
 
 @noindent
@@ -635,7 +635,7 @@ future programs are those with which we should be most concerned.
 
 @c ------------------------------------------------------------
 
-@section Acknowledgements
+@subsubheading Acknowledgements
 
 
 @noindent
@@ -6311,29 +6311,29 @@ When in doubt, consult a numerical analyst.
 These numerical predicates test a number object for a particular
 property, returning @true{} or @false{}.
 
-@table @func
-@item zero?
+@table @asis
+@item @func{zero?}
 Tests if the number object is @code{=} to zero.
 
-@item positive?
+@item @func{positive?}
 Tests whether it is greater than zero.
 
-@item negative?
+@item @func{negative?}
 Tests whether it is less than zero.
 
-@item odd?
+@item @func{odd?}
 Tests whether it is odd.
 
-@item even?
+@item @func{even?}
 Tests whether it is even.
 
-@item finite?
+@item @func{finite?}
 Tests whether it is not an infinity and not a NaN.
 
-@item infinite?
+@item @func{infinite?}
 Tests whether it is an infinity.
 
-@item nan?
+@item @func{nan?}
 Tests whether it is a NaN.
 @end table
 
@@ -6607,18 +6607,18 @@ These procedures return inexact integer objects for inexact arguments
 that are not infinities or NaNs, and exact integer objects for exact
 rational arguments.
 
-@table @func
-@item floor
+@table @asis
+@item @func{floor}
 Returns the largest integer object not larger than @var{x}.
 
-@item ceiling
+@item @func{ceiling}
 Returns the smallest integer object not smaller than @var{x}.
 
-@item truncate
+@item @func{truncate}
 Returns the integer object closest to @var{x} whose absolute value is
 not larger than the absolute value of @var{x}.
 
-@item round
+@item @func{round}
 Returns the closest integer object to @var{x}, rounding to even when
 @var{x} represents a number halfway between two integers.
 @end table
