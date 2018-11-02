@@ -2,7 +2,7 @@ dnl @configure_input@
 dnl
 
 AC_PREREQ([2.68])
-MMUX_PKG_VERSIONS([1],[1],[0],[],[noarch])
+MMUX_PKG_VERSIONS([1],[2],[0],[],[noarch])
 AC_INIT([nimby-doc],MMUX_PACKAGE_VERSION,[marco.maggi-ipsu@poste.it])
 MMUX_INIT
 
