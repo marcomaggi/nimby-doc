@@ -1,0 +1,738 @@
+\input texinfo.tex
+@c %**start of header
+@setfilename chicken-egg-coops.info
+@settitle Chicken Scheme Egg: COOPS
+@c %**end of header
+
+@include macros.texi
+
+@c page
+@c ------------------------------------------------------------------------
+@c Macros.
+@c ------------------------------------------------------------------------
+
+@ifhtml
+@macro coops{}
+@acronym{coops}
+@end macro
+@end ifhtml
+@ifnothtml
+@macro coops{}
+@acronym{COOPS}
+@end macro
+@end ifnothtml
+
+@macro syntax{NAME}
+@code{\NAME\}
+@end macro
+
+
+@c page
+@c ------------------------------------------------------------
+@c Values.
+@c ------------------------------------------------------------
+
+@set TITLE                      @coops{} Chicken Egg
+
+@c To be used as @value{PACKAGE} whenever we need to include the full
+@c name of this package.
+@set PACKAGE                    @coops{}
+
+@c To be used as @value{PACKAGE} whenever we need to include the
+@c nickname of the project: the name that is used to compose the
+@c distribution tarball or the web address.
+@set PACKAGE_NICKNAME           coops
+
+@c To be used as @value{AUTHOR} whenever we need to include the list of
+@c authors of this document.
+@set AUTHOR                     Dorai Sitaram
+
+@c To be used as @value{COPYRIGHT_YEARS} whenever we need to include the
+@c list of copyright years.
+@set COPYRIGHT_YEARS            1996
+
+@c page
+@c ------------------------------------------------------------
+@c Copyright notice.
+@c ------------------------------------------------------------
+
+@copying
+This document describes @value{PACKAGE}, an object system for Scheme that provides:
+
+@itemize
+@item
+Classes with multiple inheritance.
+
+@item
+Generic procedures.
+
+@item
+Methods that can specialize on one or more arguments (multimethods).
+
+@item
+Before, after, and around auxiliary methods in addition to primary methods.
+
+@item
+@func{call-next-method} and @func{next-method?} in primary and around methods.
+
+@item
+Standard method combination (the default ``demon'' protocol used in CLOS).
+
+@item
+SRFI-17 setters as generic procedures.
+@end itemize
+
+@noindent
+Copyright @copyright{} 1996, Dorai Sitaram@*
+All rights reserved.
+@end copying
+
+@c page
+@c ------------------------------------------------------------
+@c Headers.
+@c ------------------------------------------------------------
+
+@titlepage
+@title @value{TITLE}
+@author @value{AUTHOR}
+@page
+@vskip 0pt plus 1filll
+@insertcopying
+@end titlepage
+
+@c ------------------------------------------------------------
+
+@ifinfo
+@dircategory Development
+@direntry
+* chicken-egg-coops: (chicken-egg-coops).  @coops{} Chicken Egg.
+@end direntry
+@end ifinfo
+
+@c ------------------------------------------------------------
+
+@ignore
+@syncodeindex tp cp
+@syncodeindex vr cp
+@syncodeindex fn cp
+@end ignore
+
+@c page
+@ifnottex
+@node Top
+@top @value{TITLE}
+
+@insertcopying
+
+@menu
+* overview::                    Overview of the package.
+* classes::                     Classes.
+* generics::                    Generic procedures.
+
+Appendices
+
+* Package License::             Package license.
+* history::                     Version history.
+* references::                  Bibliography and references.
+
+Indexes
+
+* concept index::               An entry for each concept.
+* function index::              An entry for each function.
+* variable index::              An entry for each variable.
+* type index::                  An entry for each type.
+@end menu
+@end ifnottex
+
+@c page
+@node overview
+@chapter Overview of the package
+
+This document describes @value{PACKAGE}, an object system for Scheme that provides:
+
+@itemize
+@item
+Classes with multiple inheritance.
+
+@item
+Generic procedures.
+
+@item
+Methods that can specialize on one or more arguments (multimethods).
+
+@item
+Before, after, and around auxiliary methods in addition to primary methods.
+
+@item
+@func{call-next-method} and @func{next-method?} in primary and around methods.
+
+@item
+Standard method combination (the default ``demon'' protocol used in CLOS).
+
+@item
+SRFI-17 setters as generic procedures.
+@end itemize
+
+@coops{} is based on ScmObj (@url{http://www.ccs.neu.edu/home/dorai/scmobj/scmobj.html}) by Dorai
+Sitaram and was ported to CHICKEN and heavily extended by Felix Winkelmann.
+
+Typically, to install the egg we should execute:
+
+@example
+$ (umask 0 ; chicken-install coops -sudo)
+@end example
+
+To compile code using the library we should use the form:
+
+@example
+(require-extension coops)
+@end example
+
+@noindent
+and optionally:
+
+@example
+(require-extension coops-primitive-objects)
+@end example
+
+@c page
+@node classes
+@chapter Classes
+
+
+@menu
+* classes definition::          Defining classes.
+* classes slot options::        Slot options.
+* classes operations::          Operations on classes.
+* classes instances::           Creating instances.
+@end menu
+
+@c page
+@node classes definition
+@section Defining classes
+
+
+@deffn Syntax define-class @var{CLASSNAME} [(@var{SUPERCLASS} @dots{}) [(@var{SLOTSPEC} ...) @var{CLASSOPTION} ...]]
+Define a @coops{} class and assign it to the variable @var{CLASSNAME}` (which should be a symbol).
+@code{(@var{SUPERCLASS} @dots{})} is a list of expressions evaluating to classes from which the
+newly defined class should inherit.  If no superclasses are given or the superclass list is empty,
+then @code{<standard-object>} is assumed to be the default superclass.
+
+@var{SLOTSPEC} specifies a slot (commonly called an instance variable) and should be either a symbol
+naming the slot or a list of the form:
+
+@example
+(@var{SLOTNAME} @vari{SLOTOPTION} @vari{OPTIONVALUE} @dots{})
+@end example
+
+The syntax @code{(@var{SLOTNAME} @var{INITFORM})} is also a valid @var{SLOTSPEC} and is equivalent
+to:
+
+@example
+(@var{SLOTNAME} initform: @var{INITFORM})
+@end example
+
+An instance always contains all the slots of all superclasses in addition to its own slots.
+
+Classes are first--class values and are actually instances themselves, of the class
+@code{<standard-class>} (see below for more details).
+@end deffn
+
+
+@deffn Syntax make-class [@var{CLASSNAME}] (@var{SUPERCLASS} @dots{}) [(@var{SLOTNAME} @dots{}) [@var{METACLASS}]]
+Define a class.  @syntax{define-class} is syntactic sugar around this form and is usually preferred.
+@syntax{make-class} allows the creation of @emph{anonymous} (that is: unnamed) classes.
+@end deffn
+
+
+@c ------------------------------------------------------------------------
+
+@subsubheading Class options
+
+
+@deffn {Class Option} {metaclass:} @var{CLASS}
+The class of which the newly defined class should be an instance (classes are instances, too).  The
+default meta--class is @code{<standard-class>}.  Use this option if you feel adventurous.
+@end deffn
+
+@c page
+@node classes slot options
+@section Slot options
+
+
+@deffn {Slot Option} {reader:} @var{NAME}
+Define a method on the generic procedure @var{NAME} that takes an instance of the defined class as
+its sole argument and return the value of the instance slot with the same name.  This is equivalent
+to:
+
+@example
+(define-method (@var{NAME} (obj @var{CLASSNAME}))
+  (slot-value obj '@var{NAME}))
+@end example
+@end deffn
+
+
+@deffn {Slot Option} {writer:} @var{NAME}
+Define a method on the generic procedure @var{NAME} that takes as arguments an instance of the
+defined class argument and a value and assigns the value to the instance slot with the same
+name.  This is equivalent to:
+
+@example
+(define-method (@var{NAME} (obj @var{CLASSNAME}) val)
+  (set! (slot-value obj '@var{NAME}) val))
+@end example
+@end deffn
+
+
+@deffn {Slot Option} {accessor:} @var{NAME}
+Similar to:
+
+@example
+(begin
+  (define-method (@var{NAME} (obj @var{CLASSNAME}))
+    (slot-value obj '@var{NAME}))
+  (define-method ((setter @var{NAME}) (obj @var{CLASSNAME}) val)
+    (set! (slot-value obj '@var{NAME}) val)))
+@end example
+
+So, we are defining a generic procedure method for accessing the slot, together with a @emph{setter}
+that allows assigning new values to the slot with the syntax:
+
+@example
+(set! (@var{NAME} obj) val)
+@end example
+@end deffn
+
+
+@deffn {Slot Option} {initform:} @var{EXPRESSION}
+If an instance of the defined class is created and this slot has not been given an initialisation
+argument, then @var{EXPRESSION} will be evaluated and the result assigned to the slot.
+@end deffn
+
+@c page
+@node classes operations
+@section Operations on classes
+
+
+@defun class-name @var{CLASS}
+Return the name of @var{CLASS}, if it has one, or @false{} it not.
+@end defun
+
+
+@defun subclass? @vari{CLASS} @varii{CLASS}
+Return @true{} if @vari{CLASS} is equal to @varii{CLASS}` or if it is a subclass of @varii{CLASS} or
+@false{} otherwise.
+@end defun
+
+
+@c page
+@node classes instances
+@section Creating instances
+
+
+@defun make @var{CLASS} @vari{SLOTNAME} @vari{INITFORM} @dots{}
+Create an instance of the @var{CLASS} and initialises the slots given in the remaining arguments.
+The new instance is returned.  Slots not given which have been declared to have an @code{initform:}
+will be initialized by evaluating that form.  All other slots will be uninitialised.
+@end defun
+
+
+@defun class-of @var{X}
+Return the class of @var{X} or @true{} if @var{X} is not a class instance.
+@end defun
+
+
+@defun initialize-instance @var{OBJECT}
+A generic procedure that is automatically invoked after a call to @func{make} and which initialises
+the remaining slots of @var{OBJECT} to initforms given in the class definition.  If you just want to
+use this as a constructor, @code{(call-next-method)} can be used to initialize the slots.
+@end defun
+
+@c page
+@node generics
+@chapter Generic procedures
+
+
+@menu
+* generics definition::         Defining multimethods.
+* generics slots::              Slots access.
+* generics predefined classes:: Predefined classes.
+* generics predefined procs::   Predefined generic procedures.
+* generics primitive classes::  Primitive classes.
+* generics limitations::        Bugs and limitations.
+* generics examples::           Examples.
+@end menu
+
+@c page
+@node generics definition
+@section Defining multimethods
+
+
+Generic procedures are like normal procedures but contain a hidden reference to a generic procedure
+object that holds additional information like method-tables.  We can define generic procedures
+explicitly with the @syntax{define-generic} and @func{make-generic-procedure} syntactic forms or
+implicitly by using @syntax{define-method}.
+
+
+@syntax{slot-value} and @syntax{class-of} can be used on generic procedures and will transparently
+access the generic procedure object.
+
+
+@defun generic-procedure? @var{X}
+Returns @true{} if @var{X} is a generic procedure or @false{} otherwise.
+@end defun
+
+
+@deffn Syntax define-generic (@var{NAME} @var{ARGUMENT} @dots{})
+Define a generic procedure, a procedure specialized for one or more argument types.  @var{ARGUMENT}
+defines the number of specialized arguments this generic procedure shoud use to dispatch to the
+correct method.  The generic procedure may receive additional arguments, but those will not be used
+to determine the method.  This form is roughly equivalent to:
+
+@example
+(define @var{NAME}
+  (make-generic-procedure @var{ARGUMENT} @dots{}))
+@end example
+
+We can use the syntax:
+
+@example
+(define-generic ((setter @var{NAME}) @var{ARGUMENT} @dots{}))
+@end example
+
+@noindent
+to define a SRFI-17 setter on @var{NAME} that is itself a generic procedure.
+@end deffn
+
+
+@deffn Syntax define-method (@var{NAME} [@var{QUALIFIER}] [(@vari{ARGUMENT} @vari{CLASS}) @dots{}] @dots{}) @var{BODY} @dots{}
+Define a method specialized for arguments of the classes @vari{CLASS} on the generic procedure
+@var{NAME}.  If @var{NAME} holds a method for the same argument classes, the previously defined
+method is replaced.
+
+If no generic procedure has previously been defined for @var{NAME}, then a generic procedure
+definition is done implicitly.  Whether it can be assumed a definition exists is assumed to be the
+case when one of the following holds true:
+
+@itemize
+@item
+@var{NAME} is an imported value binding.
+
+@item
+A generic procedure has been defined with @code{(define-generic @var{NAME} @dots{})} in the same
+compilation unit or the same interpreter session and is lexically visible:
+
+@example
+(define-method ((setter @var{NAME}) @dots{}) @var{BODY} @dots{})
+@end example
+
+@noindent
+is allowed and supported.
+@end itemize
+
+@var{QUALIFIER} may be one of the keywords @code{primary:}, @code{before:}, @code{after:} or
+@code{around:} and mark the method as being either a primary (default) method, a method that is
+called before or after the primary method or a method that is ``wrapped'' around more specific
+methods.  @code{before:} methods are invoked from most specific to least specific.  @code{after:}
+methods are invoked from least specific to most specific.  @code{around:} methods can chose to
+invoke the next most specific method with the same arguments by calling @code{(call-next-method)}
+with no arguments.
+
+All arguments of the form @code{(@var{ARGUMENT} @var{CLASS})} are specialized up to the first
+occurrence of a plain symbol or until a ``rest'' argument or extended lambda-list marker
+(@code{#!rest}, @code{#!optional} or @code{#!key}) is encountered.
+@end deffn
+
+
+@deffn Syntax make-generic-procedure @var{ARGUMENT} @dots{}
+Create a generic procedure, a procedure decorated with a hidden generic procedure object of class
+@code{<generic-procedure>}.  @var{ARGUMENT} is the list of specialized arguments this procedure
+should receive.  Methods for this generic procedure may accept more required or optional arguments,
+but the number of specialised arguments must be the same.
+@end deffn
+
+@c page
+@node generics slots
+@section Slots access
+
+
+@defun slot-value @var{OBJECT} @var{SLOTNAME}
+Return the slot named @var{SLOTNAME} of the class instance @var{OBJECT}, signalling an error if no
+such slot exists.  We can use the form:
+
+@example
+(set! (slot-value @var{OBJECT} @var{SLOTNAME}) @var{VAL})
+@end example
+
+@noindent
+to assign a value to a slot.
+@end defun
+
+
+@defun slot-initialized? @var{OBJECT} @var{SLOTNAME}
+Return @true{} if @var{OBJECT} has a slot named @var{SLOTNAME} or @false{} otherwise.
+@end defun
+
+@c page
+@node generics predefined classes
+@section Predefined classes
+
+
+@deftp Class <standard-object>
+The base class of classes defined with @syntax{define-class}.
+@end deftp
+
+
+@deftp Class <standard-class>
+The class of classes (classes are class instances themselves).  This implies that
+@code{<standard-class>} is an instance of itself.
+@end deftp
+
+
+@deftp Class <generic-procedure>
+A subclass of @code{<procedure>} that is the class of generic procedure objects.
+@end deftp
+
+
+@deftp Class {#t}
+The superclass of all other classes.
+@end deftp
+
+@c page
+@node generics predefined procs
+@section Predefined generic procedures
+
+
+@defun print-object @var{OBJECT} @var{PORT}
+A generic procedure that is invoked when @var{OBJECT} is printed.
+@end defun
+
+@c page
+@node generics primitive classes
+@section Primitive classes
+
+
+@dfn{Primitive classes} are classes representing primitive data objects like numbers, strings and
+record structures.  To be able to define generic procedures specialized on these types, primitive
+classes can be defined and associated with a predicate that returns a true value for objects that
+should be considered of the type represented by the class.
+
+
+@deffn Syntax define-primitive-class @var{NAME} [(@var{SUPERCLASS} @dots{})] @var{PREDICATE}
+Define a primitive class with the name @var{NAME} and the given list of superclasses.  If no
+superclasses are specified, then the superclass list defaults to @code{(<primitive-object>)}.
+@var{PREDICATE} should be a procedure of one argument determining whether the argument is a member
+of the newly defined primitive class.
+
+The predicate should be referentially transparent.
+@end deffn
+
+@c ------------------------------------------------------------------------
+
+@subsubheading primitive classes
+
+
+The extension @code{coops-primitive-objects} defines additional classes that allow defining generic
+procedures on objects used in the CHICKEN core libraries.
+
+
+@deftp Class <primitive-object>
+This is the base class of all primitive object classes.  Load the extension
+@code{coops-primitive-objects} to pull in @code{<primitive-object>} and its derivatives.
+@end deftp
+
+
+Other classes deriving from @code{<primitive-object>}
+
+@multitable {<condition-variable>} {Any immediate object} {<primitive-object>}
+@headitem CLASS @tab OBJECT TYPE @tab SUPERCLASSES
+@item @code{<immediate>} @tab Any immediate object @tab @code{<primitive-object>}
+@item @code{<boolean>} @tab @true{} or @false{} @tab @code{<immediate>}
+@item @code{<eof-object>} @tab end of file @tab @code{<immediate>}
+@item @code{<char>} @tab Characters @tab @code{<immediate>}
+@item @code{<record>} @tab Record instances  @tab @code{<primitive-object>}
+@item @code{<sequence>} @tab @tab @code{<primitive-object>}
+@item @code{<list>} @tab @tab @code{<sequence>}
+@item @code{<null>} @tab The empty list @tab @code{<immediate> <list>}
+@item @code{<pair>} @tab @tab @code{<list>}
+@item @code{<vector>} @tab Vectors  @tab @code{<sequence>}
+@item @code{<number-vector>}  @tab SRFI-4 vectors @tab @code{<sequence> <record>}
+@item @code{<u8vector>} @tab @tab @code{<number-vector>}
+@item @code{<s8vector>} @tab @tab @code{<number-vector>}
+@item @code{<u16vector>} @tab @tab @code{<number-vector>}
+@item @code{<s16vector>} @tab @tab @code{<number-vector>}
+@item @code{<u32vector>} @tab @tab @code{<number-vector>}
+@item @code{<s32vector>} @tab @tab @code{<number-vector>}
+@item @code{<f32vector>} @tab @tab @code{<number-vector>}
+@item @code{<f64vector>} @tab @tab @code{<number-vector>}
+@item @code{<string>} @tab @tab @code{<sequence>}
+@item @code{<char-set>} @tab SRFI-13 char sets  @tab @code{<sequence>} @code{<record>}
+@item @code{<symbol>} @tab @tab @code{<primitive-object>}
+@item @code{<keyword>} @tab Keyword symbols @tab @code{<symbol>}
+@item @code{<number>} @tab @tab @code{<primitive-object>}
+@item @code{<integer>} @tab @tab @code{<number>}
+@item @code{<exact-number>}  @tab @tab @code{<integer>}
+@item @code{<inexact-number>}  @tab @tab @code{<number>}
+@item @code{<fixnum>} @tab @tab @code{<exact-number> <immediate>}
+@item @code{<flonum>} @tab @tab @code{<inexact-number>}
+@item @code{<thread>} @tab SRFI-18 thread @tab @code{<record>}
+@item @code{<mutex>} @tab SRFI-18 mutex @tab @code{<record>}
+@item @code{<condition-variable>} @tab SRFI-18 condition variables @tab @code{<record>}
+@item @code{<condition>} @tab Condition objects  @tab @code{<record>}
+@item @code{<tcp-listener>}  @tab @tab @code{<record>}
+@item @code{<continuation>}  @tab @tab @code{<record>}
+@item @code{<regexp>} @tab Regular expression  @tab @code{<record>}
+@item @code{<pointer>} @tab Machine pointer @tab @code{<primitive-object>}
+@item @code{<locative>} @tab @tab @code{<record>}
+@item @code{<promise>} @tab created with @code{delay} @tab @code{<record>}
+@item @code{<queue>} @tab @tab @code{<sequence> <record>}
+@item @code{<hash-table>} @tab @tab @code{<sequence> <record>}
+@item @code{<blob>} @tab @tab @code{<primitive-object>}
+@item @code{<port>} @tab @tab @code{<record>}
+@item @code{<stream-port>} @tab file port @tab @code{<port>}
+@item @code{<custom-port>} @tab @tab @code{<port>}
+@item @code{<string-port>} @tab @tab @code{<port>}
+@item @code{<tcp-port>} @tab @tab @code{<port>}
+@item @code{<procedure>} @tab @tab @code{<primitive-object>}
+@end multitable
+@c page
+@node generics limitations
+@section Bugs and limitations
+
+
+@syntax{define-generic}, @syntax{define-method} and @func{make-generic-procedure} do currently not
+check for argument--list congruence, so it is important to make sure that the number of specialised
+arguments is always correct for the given generic procedure.
+
+@c page
+@node generics examples
+@section Examples
+
+
+A simple class:
+
+@example
+(define-class <stack> ()
+  ((content '())))              ; or "(content initform: '())"
+
+(define-method (push (val #t) (stack <stack>))
+  (set! (slot-value stack 'content) (cons val (slot-value stack 'content))))
+
+(define-method (pop (stack <stack>))
+  (let* ((c (slot-value stack 'content))
+         (x (car c)))
+    (set! (slot-value stack 'content) (cdr c))
+    x))
+
+(define-method (empty? (stack <stack>))
+  (null? (slot-value stack 'content)))
+@end example
+
+A subclass of @code{<stack>}, with logging:
+
+@example
+(define-class <stack-with-logging> (<stack>)
+  ((logfile initform: (current-output-port) accessor: stack-logfile)))
+
+(define-method (push before: (val #t) (stack <stack-with-logging>))
+  (with-output-to-port (stack-logfile stack)  ; uses accessor method
+    (lambda () (print "stack: pushing " val))))
+
+(define-method (pop before: (stack <stack-with-logging>))
+  (with-output-to-port (stack-logfile stack)
+    (lambda ()
+      (print "stack: popping " (car (slot-value stack 'content))))))
+
+(define-method ((setter stack-logfile) before: (stack <stack-with-logging>) file)
+  (print "stack: setting logfile to " file))
+@end example
+
+An example of a custom @func{initialize-instance} with @func{call-next-method}:
+
+@example
+(define-class <c> ()
+  ((type initform: 'int reader: type))
+  ((content)))
+
+(define-method (initialize-instance (c <c>))
+  (call-next-method)
+  (set! (slot-value c 'content) (if (eq? (type c) 'int) 0 "")))
+@end example
+
+@c page
+@node Package License
+@appendix Package License
+
+
+Copyright @copyright{} 1996, Dorai Sitaram@*
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification, are permitted
+provided that the following conditions are met:
+
+@itemize
+@item
+Redistributions of source code must retain the above copyright notice, this list of conditions and
+the following disclaimer.
+
+@item
+Redistributions in binary form must reproduce the above copyright notice, this list of conditions
+and the following disclaimer in the documentation and/or other materials provided with the
+distribution.
+
+@item
+Neither the name of the author nor the names of its contributors may be used to endorse or promote
+products derived from this software without specific prior written permission.
+@end itemize
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS'' AND ANY EXPRESS OR
+IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
+THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+@c page
+@node history
+@appendix Version History
+
+
+@code{1.0}: Initial release for CHICKEN 5, based on version 1.7 from CHICKEN 4.
+
+@c page
+@node references
+@appendix Bibliography and references
+
+
+
+@c page
+@node concept index
+@appendix An entry for each concept
+
+@printindex cp
+
+@node function index
+@appendix An entry for each function.
+
+@printindex fn
+
+@node variable index
+@appendix An entry for each variable.
+
+@printindex vr
+
+@node type index
+@appendix An entry for each type.
+
+@printindex tp
+
+@contents
+@bye
+
+@c end of file
+@c Local Variables:
+@c mode: texinfo
+@c TeX-master: t
+@c End:
