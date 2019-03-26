@@ -213,7 +213,7 @@ and optionally:
 
 
 @deffn Syntax define-class @var{CLASSNAME} [(@var{SUPERCLASS} @dots{}) [(@var{SLOTSPEC} ...) @var{CLASSOPTION} ...]]
-Define a @coops{} class and assign it to the variable @var{CLASSNAME}` (which should be a symbol).
+Define a @coops{} class and assign it to the variable @var{CLASSNAME} (which should be a symbol).
 @code{(@var{SUPERCLASS} @dots{})} is a list of expressions evaluating to classes from which the
 newly defined class should inherit.  If no superclasses are given or the superclass list is empty,
 then @code{<standard-object>} is assumed to be the default superclass.
