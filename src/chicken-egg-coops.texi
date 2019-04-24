@@ -385,7 +385,7 @@ Returns @true{} if @var{X} is a generic procedure or @false{} otherwise.
 
 @deffn Syntax define-generic (@var{NAME} @var{ARGUMENT} @dots{})
 Define a generic procedure, a procedure specialized for one or more argument types.  @var{ARGUMENT}
-defines the number of specialized arguments this generic procedure shoud use to dispatch to the
+defines the number of specialized arguments this generic procedure should use to dispatch to the
 correct method.  The generic procedure may receive additional arguments, but those will not be used
 to determine the method.  This form is roughly equivalent to:
 
