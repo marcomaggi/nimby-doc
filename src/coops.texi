@@ -1,6 +1,6 @@
 \input texinfo.tex
 @c %**start of header
-@setfilename chicken-egg-coops.info
+@setfilename coops.info
 @settitle Chicken Scheme Egg: COOPS
 @c %**end of header
 
