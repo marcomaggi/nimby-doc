@@ -6,25 +6,27 @@ EXTRA_DIST		= README
 ## --------------------------------------------------------------------
 
 EXTRA_DIST		+= \
-	src/fdl-1.3.texi	\
-	src/lgpl-2.1.texi	\
+	src/fdl-1.3.texi		\
+	src/lgpl-2.1.texi		\
 	src/gpl-2.0.texi
 
 AM_MAKEINFOFLAGS	= --no-split
 
 info_TEXINFOS	= \
-	src/boehm-gc.texi	\
-	src/expat.texi		\
-	src/igraph.texi		\
-	src/ikarus.texi		\
-	src/neko.texi		\
-	src/r6rs.texi		\
-	src/r6rs-lib.texi	\
-	src/ypsilon.texi	\
-	src/srfi/srfi.texi	\
+	src/boehm-gc.texi		\
+	src/expat.texi			\
+	src/igraph.texi			\
+	src/ikarus.texi			\
+	src/neko.texi			\
+	src/r6rs.texi			\
+	src/r6rs-lib.texi		\
+	src/ypsilon.texi		\
+	src/srfi/srfi.texi		\
+	src/chicken-internals.texi	\
 	src/coops.texi
 
-src_coops_TEXINFOS	= src/macros.texi
+src_coops_TEXINFOS		= src/macros.texi
+src_chicken_internals_TEXINFOS	= src/macros.texi
 
 ## --------------------------------------------------------------------
 
