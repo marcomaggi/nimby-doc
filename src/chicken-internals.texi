@@ -107,6 +107,7 @@ included in the section entitled ``@gnu{} Free Documentation License''.
 
 @menu
 * overview::                    Overview of the document.
+* slots::                       Slots operations.
 
 Appendices
 
@@ -130,6 +131,52 @@ Indexes
 This document describes the implementation internals of version @value{VERSION} of @value{PACKAGE}:
 a Scheme--to--C compiler supporting the language features as defined in the ``Revised^5 Report on
 Scheme''.  This is an unofficial document, @strong{not} authored by the @chicken{} development team.
+
+@c page
+@node slots
+@chapter Slots operations
+
+
+@deffn {System Operation} {##sys#slot} @qvar{vector} @qvar{slot-index}
+Unsafe implementation of @func{vector-ref}.  We can use it when we know that: @qvar{vector} is a
+vector object; @qvar{slot-index} is a valid slot index for @qvar{vector}.  Return the undefined
+value.
+@end deffn
+
+
+@deffn {System Operation} {##sys#setslot} @qvar{vector} @qvar{slot-index} @qvar{new-value}
+Unsafe implementation of @func{vector-ref}.  We can use it when we know that: @qvar{vector} is a
+vector object; @qvar{slot-index} is a valid slot index for @qvar{vector}.  Return the undefined
+value.
+@end deffn
+
+
+@deffn {System Operation} {##sys#setislot} @qvar{vector} @qvar{slot-index} @qvar{new-immediate-value}
+Like @syntax{##sys#setslot}, it is an unsafe implementation of @func{vector-ref} with an additional
+constraint on the new value.  We can use it when we know that: @qvar{vector} is a vector object;
+@qvar{slot-index} is a valid slot index for @qvar{vector}; @qvar{new-immediate-value} is any
+immediate Scheme value (examples: a fixnum, a boolean).  Return the undefined value.
+@end deffn
+
+
+@deffn {System Operation} {##sys#size} @qvar{vector}
+Unsafe implementation of @func{vector-length}.  We can use it when we know that: @qvar{vector} is a
+vector object.
+@end deffn
+
+
+We could make the use of the above operations a bit more descriptive by using the following macros:
+
+@lisp
+(define-syntax-rule ($vector-ref ?vector ?slot-index)
+  (##sys#slot ?vector ?slot-index))
+
+(define-syntax-rule ($vector-set! ?vector ?slot-index ?new-value)
+  (##sys#setslot ?vector ?slot-index ?new-value))
+
+(define-syntax-rule ($vector-length ?vector)
+  (##sys#size ?vector))
+@end lisp
 
 @c page
 @c ------------------------------------------------------------
