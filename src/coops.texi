@@ -22,11 +22,6 @@
 @end macro
 @end ifnothtml
 
-@macro syntax{NAME}
-@code{\NAME\}
-@end macro
-
-
 @c page
 @c ------------------------------------------------------------
 @c Values.
