@@ -22,7 +22,6 @@ info_TEXINFOS	= \
 	src/r6rs-lib.texi		\
 	src/ypsilon.texi		\
 	src/srfi/srfi.texi		\
-	src/chicken-internals.texi	\
 	src/coops.texi
 
 src_coops_TEXINFOS		= src/macros.texi
