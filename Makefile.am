@@ -16,11 +16,9 @@ info_TEXINFOS	= \
 	src/boehm-gc.texi		\
 	src/expat.texi			\
 	src/igraph.texi			\
-	src/ikarus.texi			\
 	src/neko.texi			\
 	src/r6rs.texi			\
 	src/r6rs-lib.texi		\
-	src/ypsilon.texi		\
 	src/srfi/srfi.texi		\
 	src/coops.texi
 
