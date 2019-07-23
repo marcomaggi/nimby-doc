@@ -2,7 +2,7 @@
 @appendixsec @ansrfi{45} lazy evaluation
 
 
-@cindex @srfi{} rec
+@cindex @srfi{} lazy-evaluation
 
 
 The @ansrfi{45} ``Primitives for Expressing Iterative Lazy Algorithms'' is by Andr@'e van
@@ -15,7 +15,7 @@ for more details.  The following documentation is an unofficial Texinfo reformat
 modification of the original document by Marco Maggi @email{mrc.mgg@@gmail.com} (Jul 23, 2019).
 
 @menu
-* srfi lazy-evaluation license::            Rec document license.
+* srfi lazy-evaluation license::            Document license.
 * srfi lazy-evaluation abstract::           Abstract.
 * srfi lazy-evaluation rationale::          Rationale.
 * srfi lazy-evaluation spec::               Specification.
@@ -24,7 +24,7 @@ modification of the original document by Marco Maggi @email{mrc.mgg@@gmail.com} 
 
 @c page
 @node srfi lazy-evaluation license
-@appendixsubsec Rec document license
+@appendixsubsec Document license
 
 
 Copyright @copyright{} Andr@'e van Tonder (2003).  All Rights Reserved.
