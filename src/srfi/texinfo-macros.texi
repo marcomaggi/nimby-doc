@@ -180,6 +180,10 @@ Revised^6 Report on the algorithmic language Scheme
 @code{@sc{\NAME\}}
 @end macro
 
+@macro syntax{NAME}
+@code{@sc{\NAME\}}
+@end macro
+
 @macro cfunc{NAME}
 @code{\NAME\()}
 @end macro
