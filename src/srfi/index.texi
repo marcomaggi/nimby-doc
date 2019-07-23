@@ -22,6 +22,7 @@
 @include streams.texi
 @include eager-comp.texi
 @include vector.texi
+@include lazy-evaluation.texi
 @include general-cond.texi
 @include lightweight-testing.texi
 @include environment-variables.texi

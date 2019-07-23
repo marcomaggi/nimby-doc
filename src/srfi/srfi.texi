@@ -124,6 +124,7 @@ Indexes
 * srfi streams::                @ansrfi{41} streams.
 * srfi eager-comp::             @ansrfi{42} eager comprehensions.
 * srfi vector::                 @ansrfi{43} vector library.
+* srfi lazy-evaluation::        @ansrfi{45} lazy evaluation.
 * srfi general-cond::           @ansrfi{61} a more general @func{cond} clause.
 * srfi lightweight-testing::    @ansrfi{78} lightweight testing.
 * srfi environment-variables::  @ansrfi{98} environment variables.

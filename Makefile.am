@@ -46,6 +46,7 @@ src_srfi_srfi_TEXINFOS	= \
 	src/srfi/environment-variables.texi	\
 	src/srfi/error-reporting.texi		\
 	src/srfi/general-cond.texi		\
+	src/srfi/lazy-evaluation.texi		\
 	src/srfi/let-values.texi		\
 	src/srfi/lightweight-testing.texi	\
 	src/srfi/list.texi			\
